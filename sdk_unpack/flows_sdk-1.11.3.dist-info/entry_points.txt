@@ -1,0 +1,2 @@
+[console_scripts]
+hs-flows = flows_sdk.bin.hs_flows:main

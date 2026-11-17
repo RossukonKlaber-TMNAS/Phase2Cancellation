@@ -1,0 +1,54 @@
+{
+  "metadata": {
+    "schema_version": 2,
+    "exported_from_hostname": "hs-dev.corp.tmnas.com",
+    "hs_tag": "41.0.35",
+    "hs_revision": "0abbb6e0345ea06bd2b34bf37f96375307f407c4",
+    "exported_version": 54,
+    "file_type": "flow_json"
+  },
+  "uuid": "f1d645cc-2383-45c3-8a55-82eb658b94fd",
+  "owner_email": "flows.sdk@hyperscience.com",
+  "title": "Submission State Notifications",
+  "manifest": {
+    "input": [
+      {
+        "name": "submission",
+        "type": "Submission",
+        "title": "Submission Object",
+        "ui": {
+          "hidden": true
+        }
+      }
+    ],
+    "ui": {
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAOGSURBVHgB7ZxBaupQFIZvH2/cFZR23tJ5V1DovKXzQhdQdKzoXHQDOhfdgG5A54JzwRW4gff4AxdsSYLRnPz3lP8DURIN8XxJ7s255+bq9vb2XxA0/gRBRQLISAAZCSAjAWQkgIwEkJEAMhJARgLISAAZCSAjAWQkgIwEkJEAMhJAxqWA6+vr0O12w2azCbvdLvuMZR658jYkiUBPp9Nwf3//bfl2uw3v7+/hcDgET7g6A4qCD7AM67ydCW4ElAU/4lGCCwGnBD/iTULyAqoEP+JJQtICzgl+xIuEZAVcEvyIBwlJCqgj+JHUJSQnoM7gR1KWkJyAr6+v0uDPZrOz1mGb2HZqJCfg9fW1cB0C3G63C9djXZmEsm2zcHMjtlwuS4MfKZOgS9AJ5AUPeZ5WqxVOpd/vZ7/5yXg8DqmRnIDRaJQFCkk1vPC5apIN38VvYsDjdrDt1HCXDQVIQedxd3cXvKEBGTISQEYCyEgAGQkg8zc0xNPTU3h7e8veb25uCr+HLuN8Pg+9Xi/UCdIQHx8fpTdjuHfAa7FYZDd+TWDeDUWwB4NBFvgqDIfDwn571W4oqiYQ/Crs9/vsXgLvlpgKuCQLiTPh8fExd11VAShfOXcfICHvrrouzNoAHPkeqxSOianxskvmpZgJuDT4ZVnNqlySA8J/wCXUChMBz8/PZx81OO1x/UdCrS6O80vngParaht2Kia9IAgoAsGdTCaNV7BBaJlUHOkYL0CDnQd6cOv1OtSNiYCHh4fc5ehaIvgpggMC+wYReSNnVmeAySWoaEgR/fvUKTpArBriRu+EPRTONr2PSkWQkQAyEkBGAshIABkJICMBZCSAjASQkQAyEkBGAshIABkJIONSQF7K2NszIiIuBeQNstc5iN8kjVXG1QkG2TF0iHFakOrki1MwKczyPoGiyf1XI0xGAsg0KsBDmWLT+2gioKiiuGqFMoPYsP/EqkDXRMBqtcpdfkqNPotYkNXpdHLXWwkw6QWhigzFub+Jz89Pk0kbJmcAaigt6ihZ4JJqNWPGrBHGowW8pgeOiZM0rDATEKf4eJYQg285Tcm0G4qG6+XlxXyelQW4hGLfLacngcaeFYE5A3ihdL3Op2HVCQ4UBB6JvabaMJcP6/hNKBVBRgLISAAZCSAjAWQkgIwEkJEAMhJARgLISAAZCSAjAWQkgIwEkJEAMhJA5j+5uWfcipqVAgAAAABJRU5ErkJggg=="
+    },
+    "identifier": "IDP_SUBMISSION_NOTIFY",
+    "roles": [
+      "notifications",
+      "supporting"
+    ]
+  },
+  "blocks": [
+    {
+      "identifier": "OUTPUTS",
+      "reference_name": "outputs",
+      "title": "Outputs",
+      "description": "Send submission data to external systems when a submission has been created or is waiting for supervision",
+      "role_filter": [
+        "idp_output"
+      ],
+      "input_template": {
+        "submission": {
+          "id": "${workflow.input.submission.id}"
+        },
+        "enabled": true
+      },
+      "blocks": []
+    }
+  ],
+  "input": {},
+  "description": "Send notifications to external systems when a submission has been created or is waiting for supervision. \nIf the \"Document Processing\" flow is live, this flow must also be live, but it can be empty.",
+  "output": {}
+}

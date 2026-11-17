@@ -1,0 +1,191 @@
+Metadata-Version: 2.4
+Name: flows_sdk
+Version: 1.11.3
+Summary: Hyperscience Flow SDK for Python
+Home-page: https://flows-sdk.hyperscience.com
+Author: Hyperscience
+Requires-Dist: pydantic<3.0,>=1.10.11
+Requires-Dist: asttokens==2.4.1
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Provides-Extra: build
+Requires-Dist: build==0.7.0; extra == "build"
+Requires-Dist: sphinx==7.2.6; extra == "build"
+Requires-Dist: sphinx_autodoc_typehints>=1.22.0; extra == "build"
+Requires-Dist: autodoc_pydantic; extra == "build"
+Requires-Dist: myst-parser>=2.0.0; extra == "build"
+Requires-Dist: sphinx_rtd_theme>=1.0.0; extra == "build"
+Requires-Dist: sphinx-toolbox>=3.2.0; extra == "build"
+Requires-Dist: pydantic_core==2.23.4; extra == "build"
+Dynamic: author
+Dynamic: description
+Dynamic: home-page
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: summary
+
+# Flows SDK
+
+Developer library for programatically creating Hyperscience Flows.
+
+
+## Local development
+
+Create a venv, source it and install requirements-dev.txt
+(note that requirements-dev uses the `-e` flag that allows for alive-reload of changes during dev/testing)
+
+```
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements-dev.txt
+```
+
+#### Folder structure
+
+- `/flows_sdk`- the package we deliver as "flows-sdk". Everything inside will be part of the distributed .whl
+  - `/flows_sdk/implementations`- bundles of block definitions specific to a particular Hyperscience release
+- `/docs`- root for the documentation, check out [Docs structure](#docs-structure) below for details
+- `/samples`- example e2e flows that are distributed as part of the documentation. Check out [Docs structure](#docs-structure) below for details
+- `/media` - misc files used in this readme(e.g. images, drawio source, slack workflow source)
+- `/tests` - unit tests root
+
+
+#### Running code formatters
+
+At this time, only pylint and mypy are enforced and code formatters are recommended, but not CI checked.
+
+From the root git folder, run isort and black in that particular order:
+
+`isort -rc . && black .` (or execute `run_code_format.sh`)
+
+- isort config can be found as `.isort.cfg`
+- black config can be found as `pyproject.toml`
+
+#### Pylint
+
+`run_pylint.sh`
+
+- pylint config is under `.pylintrc`
+
+#### Mypy
+
+`run_mypy.sh`
+
+- mypy config is under `mypy.ini`
+
+## Release
+
+We use both Github Actions (under `.github`) and CircleCI (under `.circle`) for CI automation.
+
+Example valid release, reachable from HS infrastructure only:
+`https://build-storage.int.hyperscience.com/flows_sdk/v0.4.1/flows_sdk-0.4.1-py3-none-any.whl`
+
+To release a new version of the library, create a PR that also updates the version in `VERSION.txt`.
+We use [semantic versioning](https://semver.org/).
+A new version includes all commits between the previous version and the updated one.
+
+Once you merge a PR into master, a Github Action will try to create a TAG for the commit. 
+This will be skipped if there is already an existing tag for the same version (e.g., version `1.2.3` and tag `v1.2.3`).
+Once the tag is applied, CircleCI will build and release the library under `https://{s3-url}/flows_sdk/{tag}/` as both a `.whl` wheel and `.tar.gz` sources.
+
+Manual tagging is also allowed in case a custom version needs to be created (e.g. `1.2.3-experimental`).
+
+![](media/git.png)
+
+Note: you can also build a wheel file locally using `python -m build`. 
+This will build a `.whl` and `.tar.gz` of the current version under `{repo-dir}/dist`
+
+#### Slack notifications
+
+On a new version in `master`, a slack notification will be sent. 
+This happens in  [in the main github workflow](.github/workflows/main.yml) by checking if a new tag has been applied and 
+triggering a slack workflow via webhook when that happens.
+
+The definition of the slack workflow can be found in [media/flows_sdk_new_release_notification.slackworkflow](media/flows_sdk_new_release_notification.slackworkflow)
+
+
+## Docs
+
+For documenting this library we use [Sphinx](https://www.sphinx-doc.org/en/master/index.html).
+
+We use [`autodoc`](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html)
+for generating sources documentation from docstrings. As a rule of thumb, all non-private
+classes/functions should have docstrings in reStructured format
+
+### Releasing the docs to https://flows-sdk.hyperscience.com/
+[AWS Amplify](https://us-east-1.console.aws.amazon.com/amplify/home?region=us-east-1#/d1nw87xs6xnvpy) 
+(under the `hs-prod` account)
+continuously delivers the documentation generated from the **branch** `flows-sdk.hyperscience.com`.
+In order to release a new version of the documentation, open a PR from `master` to `flows-sdk.hyperscience.com`. 
+Once merged, the docs will be built and deployed, reachable within a couple of minutes on the public website.
+
+NOTE: Please use the "rebase" merging option in order to preserve history parity between `master` and `flows-sdk.hypersciece.com`.
+For all other commits targeting `master`, we prefer the "Squash & Merge" option. 
+
+### Building the docs
+In an environment with installed `requirements-dev.txt`, run `./run_build_docs.sh` to build
+and bundle the mix of static pages and autogenerated from docstrings docs.
+
+### Serving locally
+To locally preview the generated documentation, you can use any HTTP server. For example,
+from the base dir invoke pythons' built-in server and point it to `docs/build`:
+`python -m http.server --directory docs/build`
+
+If you are actively editing, you can use the `./run_local_editing.sh` script that rebuilds the documentation
+and starts a local server on http://localhost:8989.
+
+### Docs structure
+Documentation sources live under `docs/source` and the build results in static files under `docs/build`.
+
+Notable files and folders:
+- `docs/source/conf.py` - sphinx configuration
+- `docs/source/index.rst` - used to generate the `index.html` initial page and define the "toctree"
+(table of content) from the pages under `/pages`
+- `docs/source/pages` - a mix of `.md` and `.rst` static files that make up the documentation.
+Note that "heading1" produces top-level links in the toctree, so as a convention, every file should have
+a single "heading1" (but can have as many h2, h3, etc. that result in nested links/anchors)
+- `docs/source/pages/examples.rst` - we showcase some of the examples under `/samples` as a preview-able
+python code and downloadable starters. Because `sphinx` cannot make "folders" downloadable,
+when there are multiple files, we first archive the folder and then add that archive to the static
+docs (check out `./run_build_docs.sh`)
+
+### Doc writing tips & tricks
+
+Links in markdown, depending on the context:
+- external link (regular .md syntax) [some text](https://hyperscience.com)
+- deeplink within page [some text](page.md#the-anchor)[1]
+- link to code documentation that has been included in "autodoc" [some text](flows_sdk.blocks.Block)
+
+[1] anchors are automatically generated for all h1 and h2 headings, 
+controlled by `myst_heading_anchors = 2 ` that is set in`conf.py`
+
+### Examples
+Examples are self-contained flows that can be built and deployed on a Hyperscience instance.
+They target a particular platform version (e.g. v33).
+
+Some of the IDP examples include a pre-made layout release alongside an accompanying document,
+allowing users to easily test them end-to-end as a starting point.
+
+Examples live under the `/samples` folder. Every example is a self-contained folder, suffixed by
+the Hyperscience platform version that the example is targeting (e.g. `idp_flow_v33`).
+
+During execution of `./run_build_docs.sh`, all folders are zipped into archives with the same name (e.g. `idp_flow_v33.zip`).
+Those zips can be referenced in the documentation - that's how we construct the download links in the examples page (`/docs/source/pages/examples.rst`)
+
+
+## CHANGELOG
+
+For every version, regardless if major, minor or patch, there should be a description of all changes in the [CHANGELOG.md](docs/source/pages/CHANGELOG.md).
+There should be a separate "heading 2" section in the CHANGELOG with the version number (`##` in markdown, e.g. `## 1.0.1`).
+The versions should be in descending order (the latest version on top of the CHANGELOG).
+
+Every (meaningful) change should be tagged with a prefix, depending on the type of change:
+- `[feature]` for new features, some new functionality that previously did not exist
+    * examples of features include: adding a new block, introducing new functionality to the SDK
+- `[bugfix]` for undesired behavior that was fixed as part of that version
+    * examples of bugfixes include: fixing a blocks' inputs, fixing a broken example
+- `[improvement]` for general improvements in usability, UX, not related to undesired behavior, but improved nonetheless.
+    * example of improvement include: adding new examples, making internal methods easier to use
+- `[deprecated]` for features that we plan to remove. Note that unless of platform incompatibilities,
+we should keep deprecated features around until the next major version!
+- `[removed]` for deprecated features that were removed
