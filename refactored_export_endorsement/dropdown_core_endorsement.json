@@ -1,7 +1,8 @@
 {
   "metadata": {
     "file_type": "workflow_dsl",
-    "schema_version": 2
+    "schema_version": 2,
+    "sdk_version": "2.11.3"
   },
   "uuid": "6113ffb0-31c5-431c-93ec-a5bb233a3672",
   "owner_email": "flows.sdk@hyperscience.com",
@@ -3853,13 +3854,14 @@
         "mobile_processing_enabled": "${workflow.input.machine_classification_mobile_processing_enabled}",
         "file_transcription_enabled": "${workflow.input.machine_classification_file_transcription_enabled}",
         "layout_id_dealbreaker": "${workflow.input.layout_id_dealbreaker}",
-        "layout_id_dealbreaker_bypass": "${workflow.input.layout_id_dealbreaker_bypass}"
+        "layout_id_dealbreaker_bypass": "${workflow.input.layout_id_dealbreaker_bypass}",
+        "manual_nlc_enabled": "${workflow.input.manual_nlc_enabled}"
       },
       "title": "Machine Classification",
       "description": "Automatically classify documents"
     },
     {
-      "identifier": "MANUAL_CLASSIFICATION_5",
+      "identifier": "MANUAL_CLASSIFICATION_7",
       "reference_name": "manual_classification",
       "input": {
         "layout_release_uuid": "${workflow.input.layout_release_uuid}",
@@ -3868,7 +3870,8 @@
         "api_params": "${submission_bootstrap.output.result.api_params}",
         "submission": "${machine_classification.output.submission}",
         "notification_workflow": "${workflow.input.notification_workflow_classification}",
-        "vpc_registration_threshold": "${workflow.input.structured_layout_match_threshold}"
+        "vpc_registration_threshold": "${workflow.input.structured_layout_match_threshold}",
+        "nlc_metadata": null
       },
       "title": "Manual Classification",
       "description": "Manually classify documents that could not be automatically classified"
@@ -3934,7 +3937,9 @@
         "semi_structured_checkbox_confidence_threshold": "${workflow.input.semi_structured_checkbox_threshold}",
         "semi_structured_checkbox_acceptable_confidence": "${workflow.input.semi_structured_checkbox_min_leg_threshold}",
         "field_target_accuracies": "${workflow.input.field_transcription_target_accuracies}",
-        "column_target_accuracies": "${workflow.input.column_transcription_target_accuracies}"
+        "column_target_accuracies": "${workflow.input.column_transcription_target_accuracies}",
+        "always_supervise_blank_cells": "${workflow.input.manual_transcription_always_supervise_blank_cells}",
+        "manual_transcription_enabled": "${workflow.input.manual_transcription_enabled}"
       },
       "title": "Machine Transcription",
       "description": "Automatically transcribe fields"
@@ -3956,7 +3961,7 @@
       "description": "Manually transcribe fields that could not be automatically transcribed"
     },
     {
-      "identifier": "PYTHON_3_12_CODE",
+      "identifier": "PYTHON_3_14_CODE",
       "reference_name": "build_supervision_template",
       "input": {
         "data": {
@@ -3983,16 +3988,16 @@
               "title": "Add Additional Property Coverage Forms"
             },
             {
-              "const": "Add_Amend_Delete_Additional_Insured_GL",
-              "title": "Add/Amend/Delete  Additional Insured- GL"
-            },
-            {
               "const": "Add_Amend_Delete_Additional_Insured_DO",
               "title": "Add/Amend/Delete  Additional Insured- D&O"
             },
             {
               "const": "Add_Amend_Delete_Additional_Insured_EPLI",
               "title": "Add/Amend/Delete  Additional Insured- EPLI"
+            },
+            {
+              "const": "Add_Amend_Delete_Additional_Insured_GL",
+              "title": "Add/Amend/Delete  Additional Insured- GL"
             },
             {
               "const": "Add_Amend_Delete_Additional_Insured_Ot",
@@ -4199,10 +4204,6 @@
               "title": "Delete D&O/EPLI Coverage/Limits"
             },
             {
-              "const": "Delete_PL_Coverage_Limits",
-              "title": "Delete PL Coverage/Limits"
-            },
-            {
               "const": "Delete_Location",
               "title": "Delete Location"
             },
@@ -4213,6 +4214,10 @@
             {
               "const": "Delete_Named_Insured",
               "title": "Delete Named Insured"
+            },
+            {
+              "const": "Delete_PL_Coverage_Limits",
+              "title": "Delete PL Coverage/Limits"
             },
             {
               "const": "Delete_Terrorism_Coverage",
@@ -4332,7 +4337,7 @@
             },
             {
               "const": "RapidSure_Request",
-              "title": "RapidSure Request"
+              "title": "RapidSure F&W Request"
             },
             {
               "const": "Remove_Additional_Insured",
@@ -4382,7 +4387,7 @@
             }
           ]
         },
-        "code": "\nfrom typing import Any, Dict, List, Tuple\nfrom blocks.base_python_block import WFEngineTaskResult\nfrom blocks.types import BlockInputs\nfrom blocks.base_python_block import Block, WFEngineTask\n\n\n# Used to deserialize json inputs by the CCB\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    date_field_names: Any\n    hs_base_url: Any\n    intent_oneof: Any\n    intent_slots: Any\n    policy_field_names: Any\n    submission: Any\n    transaction_type_oneof: Any\n\ndef _build_dynamic_template(\n    submission,\n    intent_oneof,\n    intent_slots,\n    policy_field_names,\n    date_field_names,\n    hs_base_url=None,\n    transaction_type_oneof=None,\n):\n    \"\"\"Build a minimal custom-supervision template: only the per-slot Intent\n    decision dropdowns. A banner row at the top renders a link back to the\n    Hyperscience submission detail page so reviewers can open the source\n    submission (and all attached documents) in a new tab.\n\n    The submission and field-name inputs are accepted for backward-\n    compatibility with the PythonBlock input contract but are unused.\n    \"\"\"\n\n    # Resolve submission id and full link URL (defensive against missing keys).\n    sub_id = None\n    if isinstance(submission, dict):\n        sub_id = submission.get(\"id\") or submission.get(\"submission_id\")\n    base_url = (hs_base_url or \"\").rstrip(\"/\")\n    link_url = (\n        f\"{base_url}/submissions/{sub_id}\"\n        if base_url and sub_id is not None\n        else None\n    )\n\n    inputs = []\n    groups = []\n\n    # Top banner: a transcription component whose visible TITLE carries the\n    # full submission URL as selectable plain text. HS populates the input\n    # box from ``data_identifier`` (not from ``value``), so the box itself\n    # will render empty -- but the URL printed in the title is selectable\n    # for copy/paste. HS still requires a well-formed UUID in\n    # ``data_identifier`` even for display-only components, so we pass the\n    # nil UUID.\n    # Top banner: a decision component with a single \"Acknowledge\" option.\n    # The decision component's title renders as a full-width label that\n    # wraps, so we put the full submission URL in the title. The dropdown\n    # below is functionally a no-op (single option, pre-selected) but is\n    # the only HS component type whose label reliably wraps long text.\n    for i in range(1, intent_slots + 1):\n        s = str(i)\n        inputs.append({\n            \"name\": f\"intent_{s}\",\n            \"type\": \"decision\",\n            \"title\": f\"Intent {s}\",\n            \"relation\": {\"type\": \"document\"},\n            \"schema\": {\"oneOf\": intent_oneof},\n        })\n        groups.append({\"title\": \"\", \"fields\": [f\"intent_{s}\"]})\n\n    # Transaction Type dropdown: required reviewer selection that drives the\n    # 'Transaction Type' field on the downstream Salesforce payload.\n    tx_oneof = transaction_type_oneof or [\n        {\"const\": \"MidTermChange\", \"title\": \"MidTermChange\"},\n        {\"const\": \"MidTermQuote\", \"title\": \"MidTermQuote\"},\n        {\"const\": \"Exception\", \"title\": \"Exception\"},\n    ]\n    inputs.append({\n        \"name\": \"transaction_type\",\n        \"type\": \"decision\",\n        \"title\": \"Transaction Type\",\n        \"relation\": {\"type\": \"document\"},\n        \"required\": True,\n        \"schema\": {\"oneOf\": tx_oneof},\n    })\n\n    inputs.append({\n        \"name\": \"multiple_transaction_type\",\n        \"type\": \"decision\",\n        \"title\": \"Multiple Transaction Type\",\n        \"relation\": {\"type\": \"document\"},\n        \"schema\": {\n            \"oneOf\": [\n                {\"const\": \"True\", \"title\": \"True\"},\n                {\"const\": \"False\", \"title\": \"False\"},\n            ]\n        },\n    })\n    groups.append({\"title\": \"\", \"fields\": [\"transaction_type\", \"multiple_transaction_type\"]})\n\n    action = {\n        \"name\": \"endorsement_intents\",\n        \"display\": \"Endorsement Intents\",\n        \"input\": inputs,\n        \"ui\": {\"groups\": groups},\n    }\n    if link_url:\n        # Some HS UI versions render the action description prominently near\n        # the task header; this is a belt-and-braces second placement for the\n        # link in case the banner component is collapsed.\n        action[\"description\"] = f\"Submission link: {link_url}\"\n\n    return [\n        {\n            \"name\": \"three_column_template\",\n            \"version\": \"1.0\",\n            \"thumbnail\": {\"group_by_document\": True, \"group_by_case\": True},\n            \"action\": [action],\n        }\n    ]\n\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _build_dynamic_template(**task.inputData.dict())\n\n"
+        "code": "from typing import Any, Dict, List, Tuple\nfrom blocks.base_python_block import WFEngineTaskResult\nfrom blocks.types import BlockInputs\nfrom blocks.base_python_block import Block, WFEngineTask\n\n\n# Used to deserialize json inputs by the CCB\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    date_field_names: Any\n    hs_base_url: Any\n    intent_oneof: Any\n    intent_slots: Any\n    policy_field_names: Any\n    submission: Any\n    transaction_type_oneof: Any\n\ndef _build_dynamic_template(\n    submission,\n    intent_oneof,\n    intent_slots,\n    policy_field_names,\n    date_field_names,\n    hs_base_url=None,\n    transaction_type_oneof=None,\n):\n    \"\"\"Build a minimal custom-supervision template: only the per-slot Intent\n    decision dropdowns. A banner row at the top renders a link back to the\n    Hyperscience submission detail page so reviewers can open the source\n    submission (and all attached documents) in a new tab.\n\n    The submission and field-name inputs are accepted for backward-\n    compatibility with the PythonBlock input contract but are unused.\n    \"\"\"\n\n    # Resolve submission id and full link URL (defensive against missing keys).\n    sub_id = None\n    if isinstance(submission, dict):\n        sub_id = submission.get(\"id\") or submission.get(\"submission_id\")\n    base_url = (hs_base_url or \"\").rstrip(\"/\")\n    link_url = (\n        f\"{base_url}/submissions/{sub_id}\"\n        if base_url and sub_id is not None\n        else None\n    )\n\n    inputs = []\n    groups = []\n\n    # Top banner: a transcription component whose visible TITLE carries the\n    # full submission URL as selectable plain text. HS populates the input\n    # box from ``data_identifier`` (not from ``value``), so the box itself\n    # will render empty -- but the URL printed in the title is selectable\n    # for copy/paste. HS still requires a well-formed UUID in\n    # ``data_identifier`` even for display-only components, so we pass the\n    # nil UUID.\n    # Top banner: a decision component with a single \"Acknowledge\" option.\n    # The decision component's title renders as a full-width label that\n    # wraps, so we put the full submission URL in the title. The dropdown\n    # below is functionally a no-op (single option, pre-selected) but is\n    # the only HS component type whose label reliably wraps long text.\n    for i in range(1, intent_slots + 1):\n        s = str(i)\n        inputs.append({\n            \"name\": f\"intent_{s}\",\n            \"type\": \"decision\",\n            \"title\": f\"Intent {s}\",\n            \"relation\": {\"type\": \"document\"},\n            \"schema\": {\"oneOf\": intent_oneof},\n        })\n        groups.append({\"title\": \"\", \"fields\": [f\"intent_{s}\"]})\n\n    # Transaction Type dropdown: required reviewer selection that drives the\n    # 'Transaction Type' field on the downstream Salesforce payload.\n    tx_oneof = transaction_type_oneof or [\n        {\"const\": \"MidTermChange\", \"title\": \"MidTermChange\"},\n        {\"const\": \"MidTermQuote\", \"title\": \"MidTermQuote\"},\n        {\"const\": \"Exception\", \"title\": \"Exception\"},\n    ]\n    inputs.append({\n        \"name\": \"transaction_type\",\n        \"type\": \"decision\",\n        \"title\": \"Transaction Type\",\n        \"relation\": {\"type\": \"document\"},\n        \"required\": True,\n        \"schema\": {\"oneOf\": tx_oneof},\n    })\n\n    inputs.append({\n        \"name\": \"multiple_transaction_type\",\n        \"type\": \"decision\",\n        \"title\": \"Multiple Transaction Type\",\n        \"relation\": {\"type\": \"document\"},\n        \"schema\": {\n            \"oneOf\": [\n                {\"const\": \"True\", \"title\": \"True\"},\n                {\"const\": \"False\", \"title\": \"False\"},\n            ]\n        },\n    })\n    groups.append({\"title\": \"\", \"fields\": [\"transaction_type\", \"multiple_transaction_type\"]})\n\n    action = {\n        \"name\": \"endorsement_intents\",\n        \"display\": \"Endorsement Intents\",\n        \"input\": inputs,\n        \"ui\": {\"groups\": groups},\n    }\n    if link_url:\n        # Some HS UI versions render the action description prominently near\n        # the task header; this is a belt-and-braces second placement for the\n        # link in case the banner component is collapsed.\n        action[\"description\"] = f\"Submission link: {link_url}\"\n\n    return [\n        {\n            \"name\": \"three_column_template\",\n            \"version\": \"1.0\",\n            \"thumbnail\": {\"group_by_document\": True, \"group_by_case\": True},\n            \"action\": [action],\n        }\n    ]\n\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _build_dynamic_template(**task.inputData.dict())\n\n"
       }
     },
     {
@@ -4396,7 +4401,8 @@
         "task_restrictions": [],
         "supervision_transcription_masking": true,
         "page_ids": [],
-        "notification_workflow": "IDP_SUBMISSION_NOTIFY"
+        "notification_workflow": "IDP_SUBMISSION_NOTIFY",
+        "chat_flow_identifier": null
       },
       "title": "IDP Custom Supervision",
       "description": "IDP Custom Supervision"

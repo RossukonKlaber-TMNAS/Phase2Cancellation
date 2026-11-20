@@ -1,7 +1,8 @@
 {
   "metadata": {
     "file_type": "workflow_dsl",
-    "schema_version": 2
+    "schema_version": 2,
+    "sdk_version": "2.11.3"
   },
   "uuid": "2271e1ef-82d9-4bb6-8b60-8e7f9cf3bb4b",
   "owner_email": "flows.sdk@hyperscience.com",

@@ -1,8 +1,8 @@
-"""Refactor the imported "Endorsement Automation Dev Sample - Custom Flow"
+"""Refactor the imported "Cancellation Automation Dev Sample - Custom Flow"
 export so its core subflow uses our dropdown supervision blocks instead of the
 shipped custom Python blocks (validate_effective_date / get_submission_details
 / identify_productcode / mark_as_complete / sync_transformed) and the
-Flexible Extraction block. Also renames "NB" → "Endorsement" in titles and
+Flexible Extraction block. Also renames "NB" → "Cancellation" in titles and
 filenames.
 
 Reads from   : C:\\Users\\<user>\\Downloads\\Flow-Endorsement_Automation_Dev_Sample_-_Custom_Flow-45c5dd9e-...
@@ -24,12 +24,12 @@ DST = ROOT / "refactored_export"
 
 # New identity for the duplicated flows. Hard-coded so re-running the script
 # is idempotent (same UUIDs each run, no accidental new flow records in HS).
-NEW_CORE_UUID = "a1b2c3d4-e5f6-47a8-9b10-1d2e3f4a5b6c"
-NEW_CORE_IDENTIFIER = "ENDORSEMENT_CUSTOM_CORE_V41"
+NEW_CORE_UUID = "b87e2988-f94c-4642-b298-16fed14109d5"
+NEW_CORE_IDENTIFIER = "CANCELLATION_CUSTOM_CORE_V44"
 ORIGINAL_CORE_IDENTIFIER = "CUSTOM_PRODUCT_CODE_IDENTIFIER_CORE_V41"
 
-NEW_WRAPPER_UUID = "b2c3d4e5-f6a7-48b9-ac10-2e3f4a5b6c7d"
-NEW_WRAPPER_IDENTIFIER_SUFFIX = "__hs_b2c3d4e5-f6a7-48b9-ac10-2e3f4a5b6c7d__"
+NEW_WRAPPER_UUID = "b2c3d4e5-f6a7-48b9-ac10-2e3f4a5b6c7e"
+NEW_WRAPPER_IDENTIFIER_SUFFIX = "__hs_b2c3d4e5-f6a7-48b9-ac10-2e3f4a5b6c7e__"
 ORIGINAL_WRAPPER_UUID = "45c5dd9e-9b74-4a02-b3da-d5ed2a87be7d"
 ORIGINAL_WRAPPER_IDENTIFIER_SUFFIX = "__hs_45c5dd9e-9b74-4a02-b3da-d5ed2a87be7d__"
 
@@ -120,15 +120,15 @@ def build_salesforce_payload_block() -> dict:
 
 def refactor_core_flow(flow: dict) -> dict:
     flow = copy.deepcopy(flow)
-    flow["title"] = "Endorsement Custom Core Flow_V41"
+    flow["title"] = "Cancellation Custom Core Flow_V44"
     # Give the duplicated core flow its own UUID + manifest identifier so it
     # becomes a separate flow record in HS instead of overwriting the shared
-    # "NB SF Custom Product Code Core Flow V41".
+    # "NB SF Custom Product Code Core Flow V44".
     flow["uuid"] = NEW_CORE_UUID
     if isinstance(flow.get("manifest"), dict):
         flow["manifest"]["identifier"] = NEW_CORE_IDENTIFIER
     if isinstance(flow.get("description"), str):
-        flow["description"] = flow["description"].replace("NB SF", "Endorsement")
+        flow["description"] = flow["description"].replace("NB SF", "Cancellation")
 
     # Drop unwanted blocks.
     flow["blocks"] = [b for b in flow["blocks"] if b.get("reference_name") not in REMOVE_BLOCKS]
@@ -171,7 +171,7 @@ def refactor_core_flow(flow: dict) -> dict:
 def refactor_wrapper(flow: dict, new_core_title: str) -> dict:
     flow = copy.deepcopy(flow)
     # Give the wrapper its own UUID + identifier so importing it does not
-    # overwrite the original "Endorsement Automation Dev Sample - Custom Flow".
+    # overwrite the original "Cancellation Automation Dev Sample - Custom Flow".
     flow["uuid"] = NEW_WRAPPER_UUID
     if isinstance(flow.get("manifest"), dict):
         old_id = flow["manifest"].get("identifier", "")
@@ -187,7 +187,7 @@ def refactor_wrapper(flow: dict, new_core_title: str) -> dict:
     blob = json.dumps(flow)
     blob = blob.replace(f"system.secrets.{old_prefix}__", f"system.secrets.{new_prefix}__")
     flow = json.loads(blob)
-    # Title is already "Endorsement Automation Dev Sample - Custom Flow"; leave alone.
+    # Title is already "Cancellation Automation Dev Sample - Custom Flow"; leave alone.
     for b in flow.get("blocks", []):
         if b.get("reference_name") == "__idp_core__":
             # Re-point the subflow reference at our duplicated core flow.
@@ -197,18 +197,18 @@ def refactor_wrapper(flow: dict, new_core_title: str) -> dict:
                 if k in WRAPPER_INPUT_KEYS_TO_REMOVE:
                     b["input"].pop(k, None)
             # Strip ingestion secret references — not configured yet for the
-            # endorsement flow. Submissions will be created manually via UI
+            # Cancellation flow. Submissions will be created manually via UI
             # until S3/OCS bootstrap is wired up.
             for k in ("submission_bootstrap_s3_config", "submission_bootstrap_ocs_config"):
                 if k in b.get("input", {}):
                     b["input"][k] = None
             # Update the human-readable title of the subflow node.
             if "title" in b:
-                b["title"] = b["title"].replace("NB", "Endorsement")
+                b["title"] = b["title"].replace("NB", "Cancellation")
         if b.get("reference_name") == "outputs":
             # Historically we stripped `cob_http_export_*` sub-blocks because
             # the source snapshot carried NB-side Salesforce push connectors
-            # that would have failed on import for the endorsement wrapper.
+            # that would have failed on import for the Cancellation wrapper.
             # Salesforce push and the preceding log block are now configured
             # in HS Studio and must survive re-runs, so we preserve every
             # sub-block from the source as-is. To restore old behavior,
@@ -230,14 +230,14 @@ def refactor_wrapper(flow: dict, new_core_title: str) -> dict:
 def refactor_on_error(flow: dict) -> dict:
     flow = copy.deepcopy(flow)
     if isinstance(flow.get("title"), str):
-        flow["title"] = flow["title"].replace(" - NB", " - Endorsement").replace(" NB ", " Endorsement ")
+        flow["title"] = flow["title"].replace(" - NB", " - Cancellation").replace(" NB ", " Cancellation ")
     return flow
 
 
 def rename_file(name: str) -> str:
     return (
-        name.replace("NB_SF_Custom_Product_Code_Core_Flow_V41", "Endorsement_Custom_Core_Flow_V41")
-        .replace("On-Error_with_included_Submission_data_-_NB", "On-Error_with_included_Submission_data_-_Endorsement")
+        name.replace("NB_SF_Custom_Product_Code_Core_Flow_V41", "Cancellation_Custom_Core_Flow_V44")
+        .replace("On-Error_with_included_Submission_data_-_NB", "On-Error_with_included_Submission_data_-_Cancellation")
         .replace("bc01b5ef-f9e4-49dd-aa0f-a8e3bd89fa00", NEW_CORE_UUID)
         .replace(ORIGINAL_WRAPPER_UUID, NEW_WRAPPER_UUID)
     )
@@ -258,7 +258,7 @@ def main() -> None:
     dst_flows = DST / "flows"
     dst_flows.mkdir(parents=True, exist_ok=True)
 
-    new_core_title = "Endorsement Custom Core Flow_V41"
+    new_core_title = "Cancellation Custom Core Flow_V44"
 
     for fn in os.listdir(src_flows):
         src_path = src_flows / fn
@@ -267,7 +267,7 @@ def main() -> None:
 
         if "Custom Product Code Core Flow" in title or "NB SF" in title:
             new_flow = refactor_core_flow(flow)
-        elif "Endorsement Automation Dev Sample" in title:
+        elif "Cancellation Automation Dev Sample" in title:
             new_flow = refactor_wrapper(flow, new_core_title)
         elif "On-Error" in title:
             new_flow = refactor_on_error(flow)

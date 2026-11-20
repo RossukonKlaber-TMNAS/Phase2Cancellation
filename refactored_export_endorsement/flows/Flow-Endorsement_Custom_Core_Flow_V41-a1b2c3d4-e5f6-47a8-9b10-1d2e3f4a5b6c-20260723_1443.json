@@ -1,0 +1,4573 @@
+{
+  "metadata": {
+    "schema_version": 2,
+    "exported_from_hostname": "hs-dev.corp.tmnas.com",
+    "hs_tag": "41.0.35",
+    "hs_revision": "0abbb6e0345ea06bd2b34bf37f96375307f407c4",
+    "exported_version": 79,
+    "file_type": "flow_json"
+  },
+  "uuid": "a1b2c3d4-e5f6-47a8-9b10-1d2e3f4a5b6c",
+  "owner_email": "flows.sdk@hyperscience.com",
+  "title": "Endorsement Custom Core Flow_V41",
+  "manifest": {
+    "input": [
+      {
+        "name": "layout_release_uuid",
+        "type": "ReleaseUUID",
+        "title": "Layout Release"
+      },
+      {
+        "name": "workflow_uuid",
+        "type": "string",
+        "title": "Root workflow UUID",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "workflow_name",
+        "type": "string",
+        "title": "Root workflow name",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "workflow_version",
+        "type": "string",
+        "title": "Root workflow version",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "$trigger",
+        "type": "object",
+        "title": "Trigger",
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "file_filter_filter_type",
+        "type": "string",
+        "title": "All files or images only",
+        "description": "Determines whether filters will be applied to all files or only to image files",
+        "value": "ALL_FILES",
+        "schema": {
+          "type": "string",
+          "oneOf": [
+            {
+              "title": "Apply to all files",
+              "const": "ALL_FILES"
+            },
+            {
+              "title": "Apply to images only",
+              "const": "IMAGES_ONLY"
+            }
+          ]
+        }
+      },
+      {
+        "name": "file_filter_minimum_image_width",
+        "type": "number",
+        "title": "Minimum image width (px)",
+        "description": "Minimum width (in pixels) for an image to be processed. This filter is only applied to images and has no impact on other files.",
+        "optional": true
+      },
+      {
+        "name": "file_filter_minimum_image_height",
+        "type": "number",
+        "title": "Minimum image height (px)",
+        "description": "Minimum height (in pixels) for an image to be processed. This filter is only applied to images and has no impact on other files.",
+        "optional": true
+      },
+      {
+        "name": "file_filter_minimum_file_size_kb",
+        "type": "number",
+        "title": "Minimum file size (KB)",
+        "description": "Minimum file size (in KB) for a file to be processed",
+        "optional": true
+      },
+      {
+        "name": "file_filter_file_extensions_action",
+        "type": "string",
+        "title": "File extension action",
+        "description": "Allow or deny files based on extensions",
+        "value": "NONE",
+        "schema": {
+          "type": "string",
+          "oneOf": [
+            {
+              "title": "Do not filter files by extension",
+              "const": "NONE"
+            },
+            {
+              "title": "Allow only these file extensions",
+              "const": "ALLOW"
+            },
+            {
+              "title": "Deny files with these extensions",
+              "const": "DENY"
+            }
+          ]
+        }
+      },
+      {
+        "name": "file_filter_file_extensions",
+        "type": "array",
+        "title": "File extensions",
+        "description": "List of file extensions to use for filtering. Select the \u201cother\u201d option to specify any file extensions you want to filter by that do not appear in this list.",
+        "optional": true,
+        "schema": {
+          "type": "array",
+          "minItems": 1,
+          "values": {
+            "oneOf": [
+              {
+                "const": "png",
+                "title": "png"
+              },
+              {
+                "const": "pdf",
+                "title": "pdf"
+              },
+              {
+                "const": "jpg",
+                "title": "jpg"
+              },
+              {
+                "const": "jpeg",
+                "title": "jpeg"
+              },
+              {
+                "const": "heic",
+                "title": "heic"
+              },
+              {
+                "const": "heif",
+                "title": "heif"
+              },
+              {
+                "const": "xps",
+                "title": "xps"
+              },
+              {
+                "const": "tif",
+                "title": "tif"
+              },
+              {
+                "const": "tiff",
+                "title": "tiff"
+              },
+              {
+                "const": "zip",
+                "title": "zip"
+              },
+              {
+                "const": "gif",
+                "title": "gif"
+              },
+              {
+                "const": "",
+                "title": "<no extension>"
+              },
+              {
+                "const": "other",
+                "title": "other"
+              }
+            ]
+          }
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "file_filter_file_extensions_action"
+              ],
+              "properties": {
+                "file_filter_file_extensions_action": {
+                  "not": {
+                    "const": "NONE"
+                  }
+                }
+              }
+            },
+            "override": {
+              "optional": false,
+              "ui": {
+                "hidden": false
+              }
+            }
+          },
+          {
+            "condition": {
+              "required": [
+                "file_filter_filter_type"
+              ],
+              "properties": {
+                "file_filter_filter_type": {
+                  "const": "IMAGES_ONLY"
+                }
+              }
+            },
+            "override": {
+              "schema": {
+                "type": "array",
+                "minItems": 1,
+                "values": {
+                  "oneOf": [
+                    {
+                      "const": "png",
+                      "title": "png"
+                    },
+                    {
+                      "const": "jpg",
+                      "title": "jpg"
+                    },
+                    {
+                      "const": "jpeg",
+                      "title": "jpeg"
+                    },
+                    {
+                      "const": "heic",
+                      "title": "heic"
+                    },
+                    {
+                      "const": "heif",
+                      "title": "heif"
+                    },
+                    {
+                      "const": "tif",
+                      "title": "tif"
+                    },
+                    {
+                      "const": "tiff",
+                      "title": "tiff"
+                    },
+                    {
+                      "const": "gif",
+                      "title": "gif"
+                    },
+                    {
+                      "const": "",
+                      "title": "<no extension>"
+                    },
+                    {
+                      "const": "other",
+                      "title": "other"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "file_filter_file_extensions_other",
+        "type": "string",
+        "title": "Other file extensions",
+        "description": "Comma-separated list of additional file extensions to use for filtering",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "file_filter_file_extensions"
+              ],
+              "properties": {
+                "file_filter_file_extensions": {
+                  "contains": {
+                    "enum": [
+                      "other"
+                    ]
+                  },
+                  "not": {
+                    "const": null
+                  }
+                }
+              }
+            },
+            "override": {
+              "optional": false,
+              "schema": {
+                "type": "string",
+                "minLength": 1
+              },
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "notification_workflow_initialization",
+        "type": "FlowIdentifier",
+        "type_spec": {
+          "filter_roles": [
+            "notifications"
+          ],
+          "label": "If task needed"
+        },
+        "title": "Submission Initialization Notification Flow",
+        "value": null,
+        "optional": true
+      },
+      {
+        "name": "submission_bootstrap_s3_config",
+        "type": "object",
+        "title": "S3 Submission Retrieval Store Configuration",
+        "description": "Specify Amazon S3 credentials for submission retrieval store. Expects a json expression: {\"aws_access_key_id\": \"X\", \"aws_secret_access_key\": \"Y\"}",
+        "optional": true,
+        "secret": true
+      },
+      {
+        "name": "submission_bootstrap_s3_endpoint_url",
+        "type": "string",
+        "title": "S3 Submission Retrieval Endpoint URL",
+        "description": "Endpoint URL for S3 Submission Retrieval Store. Do not use when your submission retrieval store is in a public cloud.",
+        "optional": true
+      },
+      {
+        "name": "submission_bootstrap_ocs_config",
+        "type": "object",
+        "title": "OCS Configuration",
+        "description": "OCS configuration for submission retrieval store. Expects a json expression: {\"host_url\": \"X\", \"username\": \"Y\", \"password\": \"Z\", \"ssl_cert\": \"CA bundle filename\"}. ssl_cert is the CA bundle filename inside $HS_PATH/certs directory. Set it to \"SKIP\" to disable certificate validation.",
+        "optional": true,
+        "secret": true
+      },
+      {
+        "name": "submission_bootstrap_http_config",
+        "type": "object",
+        "title": "Generic Web Storage (HTTP/HTTPS) Configuration",
+        "description": "Specify relevant Generic Web Storage configuration variables for submission retrieval store. Expects a JSON expression: {\"username\": \"X\", \"password\": \"Y\", \"ssl_cert\": \"CA bundle filename\"}. ssl_cert is the CA bundle filename inside $HS_PATH/certs directory. Set it to \"SKIP\" to disable certificate validation.",
+        "optional": true,
+        "secret": true
+      },
+      {
+        "name": "submission_bootstrap_abs_auth_type",
+        "type": "string",
+        "title": "Azure Blob Storage Authentication Type",
+        "description": "The type of authentication to use.",
+        "optional": true,
+        "schema": {
+          "type": "string",
+          "oneOf": [
+            {
+              "title": "SAS Token Only",
+              "const": "sas_token_only"
+            },
+            {
+              "title": "Service Principal",
+              "const": "service_principal"
+            },
+            {
+              "title": "Managed Identity",
+              "const": "managed_identity"
+            },
+            {
+              "title": "Account Key",
+              "const": "account_key"
+            }
+          ]
+        }
+      },
+      {
+        "name": "submission_bootstrap_abs_account_url",
+        "type": "string",
+        "title": "Azure Blob Storage Account URL",
+        "description": "The URL of the storage account.",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ]
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              },
+              "optional": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "submission_bootstrap_abs_tenant_id",
+        "type": "string",
+        "title": "Azure Blob Storage Tenant ID",
+        "description": "The tenant ID of the service principal.",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ],
+              "properties": {
+                "submission_bootstrap_abs_auth_type": {
+                  "const": "service_principal"
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "submission_bootstrap_abs_client_id",
+        "type": "string",
+        "title": "Azure Blob Storage Client ID",
+        "description": "The client ID of the service principal or managed identity.",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ],
+              "properties": {
+                "submission_bootstrap_abs_auth_type": {
+                  "enum": [
+                    "service_principal",
+                    "managed_identity"
+                  ]
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "submission_bootstrap_abs_client_secret",
+        "type": "string",
+        "title": "Azure Blob Storage Client Secret",
+        "description": "The client secret of the service principal.",
+        "optional": true,
+        "secret": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ],
+              "properties": {
+                "submission_bootstrap_abs_auth_type": {
+                  "const": "service_principal"
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "submission_bootstrap_abs_authority_host",
+        "type": "string",
+        "title": "Azure Blob Storage Authority Host",
+        "description": "The authority host of the service principal.",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ],
+              "properties": {
+                "submission_bootstrap_abs_auth_type": {
+                  "const": "service_principal"
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "submission_bootstrap_abs_account_name",
+        "type": "string",
+        "title": "Azure Blob Storage Account Name",
+        "description": "The account name of the storage account.",
+        "optional": true,
+        "secret": false,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ],
+              "properties": {
+                "submission_bootstrap_abs_auth_type": {
+                  "const": "account_key"
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "submission_bootstrap_abs_account_key",
+        "type": "string",
+        "title": "Azure Blob Storage Account Key",
+        "description": "The account key of the storage account.",
+        "optional": true,
+        "secret": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ],
+              "properties": {
+                "submission_bootstrap_abs_auth_type": {
+                  "const": "account_key"
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "machine_collation_dedupe_files",
+        "type": "boolean",
+        "title": "Replace case data from duplicate file names",
+        "description": "Enabling this setting will replace case data from repeated file names within the same case. Cases will retain data from the most recently submitted version of a particular file. Note that this setting does not delete the old data, it just removes it from the case. Keep in mind this option is only relevant when adding to cases",
+        "value": false
+      },
+      {
+        "name": "machine_collation_remove_from_cases",
+        "type": "array",
+        "title": "Remove from Cases Information",
+        "description": "This parameter accepts an array of JSON objects that contains information on how documents or pages should be removed from a pre-existing case. Currently, the only way to de-collate from a case is by the ids of the Documents or Pages within a given case",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "machine_collation_retention_period",
+        "type": "integer",
+        "title": "Retention Period",
+        "description": "The number of days to retain cases after they are updated by this block. If None, no changes to the deletion date will be made.",
+        "value": null,
+        "optional": true
+      },
+      {
+        "name": "machine_collation_refresh_retention_period",
+        "type": "boolean",
+        "title": "Refresh Retention Period",
+        "description": "If True, applies Retention Period to all cases in the block. If False, only updates those without a pre-existing deletion date.",
+        "value": true,
+        "optional": true
+      },
+      {
+        "name": "machine_classification_rotation_correction_enabled",
+        "type": "boolean",
+        "title": "Image correction",
+        "description": "Identifies and corrects the orientation of semi-structured images.",
+        "value": true
+      },
+      {
+        "name": "machine_classification_mobile_processing_enabled",
+        "type": "boolean",
+        "title": "Mobile processing",
+        "description": "Improves the machine readability of photo captured documents",
+        "value": false
+      },
+      {
+        "name": "machine_classification_file_transcription_enabled",
+        "type": "boolean",
+        "title": "Faster PDF transcription",
+        "description": "Improves the transcription speed of pdf files. Make sure that the \"Image Correction\" option is disabled and the pdfs you submit do not contain any rotated images",
+        "value": false
+      },
+      {
+        "name": "layout_id_dealbreaker",
+        "type": "boolean",
+        "title": "Validate classification using LayoutID",
+        "description": "Validates structured document matching by ensuring that the Form ID on the document matches the Layout ID on the corresponding layout.",
+        "value": false
+      },
+      {
+        "name": "layout_id_dealbreaker_bypass",
+        "type": "boolean",
+        "title": "Bypass validation if LayoutID missing",
+        "description": "Bypasses Form ID and Layout ID validation if there is no Layout ID present on the Layout Page.",
+        "value": false,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "layout_id_dealbreaker": {
+                  "const": true
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "structured_layout_match_threshold",
+        "type": "number",
+        "title": "Structured Layout Match Threshold",
+        "description": "Matches structured layouts above this threshold to a layout variation automatically. Pages below this threshold will be sent to Document Classification, if enabled. If disabled, such pages will be marked as \"No Layout Variation Found.\"",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      {
+        "name": "semi_structured_classification",
+        "type": "boolean",
+        "title": "Semi-Structured Classification",
+        "description": "Enables workflow to manage a model for automated classification of semi-structured and additional layout variations.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "manual_nlc_enabled",
+        "type": "boolean",
+        "title": "Manual Classification Supervision",
+        "description": "Enables manual classification when applicable"
+      },
+      {
+        "name": "semi_target_accuracy",
+        "type": "Percentage",
+        "title": "Semi-Structured Classification Target Accuracy",
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_doc_grouping_logic",
+        "type": "string",
+        "title": "Semi-Structured Classification Grouping Logic",
+        "description": "Flow level grouping logic setting will default to the defined layout level grouping logic when configured.",
+        "schema": {
+          "type": "string",
+          "oneOf": [
+            {
+              "title": "Consecutive pages as a document",
+              "const": "group_pages"
+            },
+            {
+              "title": "Consecutive pages as separate documents",
+              "const": "split_pages"
+            },
+            {
+              "title": "Manual review of consecutive pages",
+              "const": "manual"
+            }
+          ]
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Semi-Structured Classification QA Sample Rate",
+        "description": "Defines the percentage of documents sampled for QA.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "notification_workflow_classification",
+        "type": "FlowIdentifier",
+        "type_spec": {
+          "filter_roles": [
+            "notifications"
+          ],
+          "label": "If task needed"
+        },
+        "title": "Manual Classification Notification Flow",
+        "value": null,
+        "optional": true
+      },
+      {
+        "name": "manual_classification_task_restrictions",
+        "type": "TaskRestrictions",
+        "title": "Default Task Restrictions",
+        "description": "Defines what users can access Supervision tasks created by this block.",
+        "optional": true
+      },
+      {
+        "name": "field_id_target_accuracy",
+        "type": "Percentage",
+        "title": "Field Identification Target Accuracy",
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "anyOf": [
+                            {
+                              "not": {
+                                "allOf": [
+                                  {
+                                    "contains": {
+                                      "const": 1003
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "not": {
+                                "allOf": [
+                                  {
+                                    "contains": {
+                                      "const": 1007
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "table_id_target_accuracy",
+        "type": "Percentage",
+        "title": "Table Identification Target Accuracy",
+        "value": 0.96,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "anyOf": [
+                            {
+                              "not": {
+                                "allOf": [
+                                  {
+                                    "contains": {
+                                      "const": 1003
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "not": {
+                                "anyOf": [
+                                  {
+                                    "contains": {
+                                      "const": 1008
+                                    }
+                                  },
+                                  {
+                                    "contains": {
+                                      "const": 1018
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "identification_target_accuracies",
+        "type": "IdentificationTargetAccuracies",
+        "title": "Identification Target Accuracies",
+        "description": "Identification Target Accuracies",
+        "value": [],
+        "optional": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_uuid": {
+                "type": "string"
+              },
+              "target_accuracy": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "ui": {
+          "hidden": false
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "anyOf": [
+                            {
+                              "not": {
+                                "allOf": [
+                                  {
+                                    "contains": {
+                                      "const": 1003
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "allOf": [
+                                {
+                                  "not": {
+                                    "allOf": [
+                                      {
+                                        "contains": {
+                                          "const": 1007
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "not": {
+                                    "anyOf": [
+                                      {
+                                        "contains": {
+                                          "const": 1008
+                                        }
+                                      },
+                                      {
+                                        "contains": {
+                                          "const": 1018
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "manual_field_id_enabled",
+        "type": "boolean",
+        "title": "Manual Identification Supervision",
+        "description": "Enables manual identification when applicable",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "field_id_qa_enabled",
+        "type": "boolean",
+        "title": "Field Identification Quality Assurance",
+        "description": "Allows users to verify the location or presence of fields on semi-structured documents.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "field_id_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Field Identification QA Sample Rate",
+        "description": "Defines the percentage of documents the system samples for QA.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "field_id_qa_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Field Identification Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "table_id_qa_enabled",
+        "type": "boolean",
+        "title": "TABLE IDENTIFICATION QUALITY ASSURANCE",
+        "description": "Allows users to verify the location of table cells.",
+        "value": true,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "table_id_qa_sample_rate",
+        "type": "Percentage",
+        "title": "TABLE IDENTIFICATION QA SAMPLE RATE",
+        "description": "Defines the percentage of tables the system samples for QA.",
+        "value": 0.05,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "table_id_qa_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Table Identification Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "notification_workflow_identification",
+        "type": "FlowIdentifier",
+        "type_spec": {
+          "filter_roles": [
+            "notifications"
+          ],
+          "label": "If task needed"
+        },
+        "title": "Manual Identification Notification Flow",
+        "value": null,
+        "optional": true,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "manual_identification_task_restrictions",
+        "type": "TaskRestrictions",
+        "title": "Default Task Restrictions",
+        "description": "Defines what users can access Supervision tasks created by this block.",
+        "optional": true,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "field_transcription_target_accuracies",
+        "type": "FieldTranscriptionTargetAccuracies",
+        "title": "Field Transcription Accuracy Targets",
+        "description": "Field Transcription Accuracy Targets",
+        "value": [],
+        "optional": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_uuid": {
+                "type": "string"
+              },
+              "target_accuracy": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "ui": {
+          "hidden": false
+        }
+      },
+      {
+        "name": "manual_transcription_enabled",
+        "type": "boolean",
+        "title": "Manual Transcription Supervision",
+        "description": "Enables manual transcription when applicable"
+      },
+      {
+        "name": "qa",
+        "type": "boolean",
+        "title": "Transcription Quality Assurance"
+      },
+      {
+        "name": "auto_qa_sampling_rate_enabled",
+        "type": "boolean",
+        "title": "Automatic QA Sample Rate",
+        "description": "Updates QA rate daily based on submission volume.",
+        "value": false,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "qa": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "structured_entry_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Structured Text Transcription QA Sample Rate",
+        "description": "Defines the percentage of structured text fields the system samples for QA.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "qa": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "auto_qa_sampling_rate_enabled": {
+                  "const": true
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "disabled": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "structured_checkbox_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Structured Checkbox Transcription QA Sample Rate",
+        "description": "Defines the percentage of structured checkbox fields the system samples for QA.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "qa": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "auto_qa_sampling_rate_enabled": {
+                  "const": true
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "disabled": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "structured_signature_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Structured Signature Transcription QA Sample Rate",
+        "description": "Defines the percentage of structured signature fields the system samples for QA.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "qa": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "auto_qa_sampling_rate_enabled": {
+                  "const": true
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "disabled": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Semi-Structured Transcription QA Sample Rate",
+        "description": "Defines the percentage of semi-structured fields the system samples for QA.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "qa": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "auto_qa_sampling_rate_enabled": {
+                  "const": true
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "disabled": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "table_cell_transcription_qa_enabled",
+        "type": "boolean",
+        "title": "Table Transcription Quality Assurance",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "table_cell_transcription_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Table Transcription QA Sample Rate",
+        "description": "Defines the percentage of cells the system samples for QA. This value is likely to be lower than \"Transcription QA Sample Rate\" sincethere are more table cells than fields on any given page.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "table_cell_transcription_qa_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Table Transcription Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "transcription_overrides",
+        "type": "object",
+        "title": "Transcription Overrides",
+        "value": {},
+        "optional": true,
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "finetuning_only_trained_layouts",
+        "type": "boolean",
+        "title": "Finetuning only for trained layouts",
+        "description": "Run finetuning only for trained layouts."
+      },
+      {
+        "name": "force_normalization_errors_to_sv",
+        "type": "boolean",
+        "title": "Force normalization errors to Supervision",
+        "description": "Enable this option to ensure that fields or table cells with normalization errors are sent to Supervision for additional human review, preventing uncorrected errors from proceeding to downstream processing.",
+        "value": false
+      },
+      {
+        "name": "force_required_entries_to_sv",
+        "type": "boolean",
+        "title": "Force missing/blank Fields to Supervision",
+        "description": "Enable this option to route fields marked as \"Required\" to Supervision for review if they are missing or left blank, ensuring important data is present in downstream processes.",
+        "value": false
+      },
+      {
+        "name": "exclude_auto_transcribe_fields_from_qa",
+        "type": "boolean",
+        "title": "Exclude Auto-Transcribe Fields From QA",
+        "value": false
+      },
+      {
+        "name": "notification_workflow_transcription",
+        "type": "FlowIdentifier",
+        "type_spec": {
+          "filter_roles": [
+            "notifications"
+          ],
+          "label": "If task needed"
+        },
+        "title": "Manual Transcription Notification Flow",
+        "value": null,
+        "optional": true
+      },
+      {
+        "name": "manual_transcription_supervision_transcription_masking",
+        "type": "boolean",
+        "title": "Supervision Transcription Masking",
+        "description": "Prevents users from inputting invalid characters during Supervision Transcription tasks.",
+        "value": true
+      },
+      {
+        "name": "manual_transcription_table_output_manual_review",
+        "type": "boolean",
+        "title": "Table Output Manual Review",
+        "description": "Always generates a table transcription task if the layout contains a table. If disabled, a table transcription task will only be generated if one or more cells have transcribed values below the defined thresholds.",
+        "value": false,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "manual_transcription_always_supervise_blank_cells",
+        "type": "boolean",
+        "title": "Create Manual Transcription Task For Tables With Blank Cells",
+        "description": "If enabled, always send blank cells in transcribed tables to be supervised manually, regardless of confidence.",
+        "value": true,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "manual_transcription_task_restrictions",
+        "type": "TaskRestrictions",
+        "title": "Default Task Restrictions",
+        "description": "Defines what users can access Supervision tasks created by this block.",
+        "optional": true
+      },
+      {
+        "name": "transcription_model",
+        "type": "string",
+        "title": "Transcription Model",
+        "description": "The transcription model that will be used for this flow",
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_transcription_training",
+        "type": "TranscriptionAutomationTraining",
+        "title": "Transcription Automation Training",
+        "description": "Uses QA data for on-premise machine learning to improve transcription automation.",
+        "value": true,
+        "schema": {
+          "type": "boolean",
+          "training_type": "structured"
+        }
+      },
+      {
+        "name": "structured_transcription_training_period",
+        "type": "integer",
+        "title": "Period of records to use",
+        "value": 30,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "prefix": "Past",
+          "suffix": "days"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "structured_transcription_training": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Automation Training is disabled."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "structured_improved_transcr_threshold_accuracy",
+        "type": "boolean",
+        "title": "Improved threshold accuracy",
+        "value": true,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "structured_transcription_training": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Automation Training is disabled."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "structured_text_min_training_records",
+        "type": "integer",
+        "title": "Structured Text Min Training Records",
+        "value": 2000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_text_max_training_records",
+        "type": "integer",
+        "title": "Structured Text Max Training Records",
+        "value": 50000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_text_target_accuracy",
+        "type": "TranscriptionTargetAccuracy",
+        "title": "Structured Text Target Accuracy",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "entry",
+          "min_training_records_prop": "structured_text_min_training_records",
+          "training_period_prop": "structured_transcription_training_period"
+        }
+      },
+      {
+        "name": "structured_text_automation",
+        "type": "TranscriptionAutomation",
+        "title": "Structured Text Automation",
+        "description": "This number shows the amount of automation you will get based on the target accuracy.",
+        "value": 0,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "entry",
+          "target_accuracy_prop": "structured_text_target_accuracy",
+          "min_training_records_prop": "structured_text_min_training_records",
+          "training_period_prop": "structured_transcription_training_period"
+        },
+        "ui": {
+          "disabled": true
+        }
+      },
+      {
+        "name": "structured_text_threshold",
+        "type": "TranscriptionThreshold",
+        "title": "Structured Text Threshold",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "entry",
+          "target_accuracy_prop": "structured_text_target_accuracy",
+          "training_period_prop": "structured_transcription_training_period"
+        }
+      },
+      {
+        "name": "structured_min_leg_threshold",
+        "type": "number",
+        "title": "Structured Text Minimum Legibility Threshold",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      {
+        "name": "structured_checkbox_min_training_records",
+        "type": "integer",
+        "title": "Structured Checkbox Min Training Records",
+        "value": 2000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_checkbox_max_training_records",
+        "type": "integer",
+        "title": "Structured Checkbox Max Training Records",
+        "value": 50000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_checkbox_target_accuracy",
+        "type": "TranscriptionTargetAccuracy",
+        "title": "Structured Checkbox Target Accuracy",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "checkbox",
+          "min_training_records_prop": "structured_checkbox_min_training_records",
+          "training_period_prop": "structured_transcription_training_period"
+        }
+      },
+      {
+        "name": "structured_checkbox_automation",
+        "type": "TranscriptionAutomation",
+        "title": "Structured Checkbox Automation",
+        "description": "This number shows the amount of automation you will get based on the target accuracy.",
+        "value": 0,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "checkbox",
+          "target_accuracy_prop": "structured_checkbox_target_accuracy",
+          "min_training_records_prop": "structured_checkbox_min_training_records",
+          "training_period_prop": "structured_transcription_training_period"
+        },
+        "ui": {
+          "disabled": true
+        }
+      },
+      {
+        "name": "structured_checkbox_threshold",
+        "type": "TranscriptionThreshold",
+        "title": "Structured Checkbox Threshold",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "checkbox",
+          "target_accuracy_prop": "structured_checkbox_target_accuracy",
+          "training_period_prop": "structured_transcription_training_period"
+        }
+      },
+      {
+        "name": "checkbox_min_leg_threshold",
+        "type": "number",
+        "title": "Structured Checkbox Minimum Legibility Threshold",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      {
+        "name": "structured_signature_min_training_records",
+        "type": "integer",
+        "title": "Structured Signature Min Training Records",
+        "value": 2000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_signature_max_training_records",
+        "type": "integer",
+        "title": "Structured Signature Max Training Records",
+        "value": 50000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_signature_target_accuracy",
+        "type": "TranscriptionTargetAccuracy",
+        "title": "Structured Signature Target Accuracy",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "signature",
+          "min_training_records_prop": "structured_signature_min_training_records",
+          "training_period_prop": "structured_transcription_training_period"
+        }
+      },
+      {
+        "name": "structured_signature_automation",
+        "type": "TranscriptionAutomation",
+        "title": "Structured Signature Automation",
+        "description": "This number shows the amount of automation you will get based on the target accuracy.",
+        "value": 0,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "signature",
+          "target_accuracy_prop": "structured_signature_target_accuracy",
+          "min_training_records_prop": "structured_signature_min_training_records",
+          "training_period_prop": "structured_transcription_training_period"
+        },
+        "ui": {
+          "disabled": true
+        }
+      },
+      {
+        "name": "structured_signature_threshold",
+        "type": "TranscriptionThreshold",
+        "title": "Structured Signature Threshold",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "signature",
+          "target_accuracy_prop": "structured_signature_target_accuracy",
+          "training_period_prop": "structured_transcription_training_period"
+        }
+      },
+      {
+        "name": "signature_min_leg_threshold",
+        "type": "number",
+        "title": "Structured Signature Minimum Legibility Threshold",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      {
+        "name": "semi_structured_transcription_training",
+        "type": "TranscriptionAutomationTraining",
+        "title": "Transcription Automation Training",
+        "description": "Uses QA data for on-premise machine learning to improve transcription automation.",
+        "value": true,
+        "schema": {
+          "type": "boolean",
+          "training_type": "semi_structured"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_transcription_training_period",
+        "type": "integer",
+        "title": "Period of records to use",
+        "value": 30,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "prefix": "Past",
+          "suffix": "days"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "semi_structured_transcription_training": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Automation Training is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_improved_transcr_threshold_accuracy",
+        "type": "boolean",
+        "title": "Improved threshold accuracy",
+        "value": true,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "semi_structured_transcription_training": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Automation Training is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_text_min_training_records",
+        "type": "integer",
+        "title": "Semi-Structured Text Min Training Records",
+        "value": 2000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_text_max_training_records",
+        "type": "integer",
+        "title": "Semi-Structured Text Max Training Records",
+        "value": 50000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_text_target_accuracy",
+        "type": "TranscriptionTargetAccuracy",
+        "title": "Semi-Structured Text Target Accuracy",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_entry",
+          "min_training_records_prop": "semi_structured_text_min_training_records",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_text_automation",
+        "type": "TranscriptionAutomation",
+        "title": "Semi-Structured Text Automation",
+        "description": "This number shows the amount of automation you will get based on the target accuracy.",
+        "value": 0,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_entry",
+          "target_accuracy_prop": "semi_structured_text_target_accuracy",
+          "min_training_records_prop": "semi_structured_text_min_training_records",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "ui": {
+          "disabled": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_text_threshold",
+        "type": "TranscriptionThreshold",
+        "title": "Semi-Structured Text Threshold",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_entry",
+          "target_accuracy_prop": "semi_structured_text_target_accuracy",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_min_leg_threshold",
+        "type": "number",
+        "title": "Semi-Structured Text Minimum Legibility Threshold",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_table_min_training_records",
+        "type": "integer",
+        "title": "Table Min Training Records",
+        "value": 2000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_table_max_training_records",
+        "type": "integer",
+        "title": "Table Max Training Records",
+        "value": 50000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_table_target_accuracy",
+        "type": "TranscriptionTargetAccuracy",
+        "title": "Table Target Accuracy",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_table_entry",
+          "min_training_records_prop": "semi_structured_table_min_training_records",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_table_automation",
+        "type": "TranscriptionAutomation",
+        "title": "Table Automation",
+        "description": "This number shows the amount of automation you will get based on the target accuracy.",
+        "value": 0,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_table_entry",
+          "target_accuracy_prop": "semi_structured_table_target_accuracy",
+          "min_training_records_prop": "semi_structured_table_min_training_records",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "ui": {
+          "disabled": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_table_threshold",
+        "type": "TranscriptionThreshold",
+        "title": "Table Threshold",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_table_entry",
+          "target_accuracy_prop": "semi_structured_table_target_accuracy",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_table_min_leg_threshold",
+        "type": "number",
+        "title": "Table Minimum Legibility Threshold",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_checkbox_min_training_records",
+        "type": "integer",
+        "title": "Semi-Structured Checkbox Min Training Records",
+        "value": 2000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_checkbox_max_training_records",
+        "type": "integer",
+        "title": "Semi-Structured Checkbox Max Training Records",
+        "value": 50000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_checkbox_target_accuracy",
+        "type": "TranscriptionTargetAccuracy",
+        "title": "Semi-Structured Checkbox Target Accuracy",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_checkbox",
+          "min_training_records_prop": "semi_structured_checkbox_min_training_records",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_checkbox_automation",
+        "type": "TranscriptionAutomation",
+        "title": "Semi-Structured Checkbox Automation",
+        "description": "This number shows the amount of automation you will get based on the target accuracy.",
+        "value": 0,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_checkbox",
+          "target_accuracy_prop": "semi_structured_checkbox_target_accuracy",
+          "min_training_records_prop": "semi_structured_checkbox_min_training_records",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "ui": {
+          "disabled": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_checkbox_threshold",
+        "type": "TranscriptionThreshold",
+        "title": "Semi-Structured Checkbox Threshold",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_checkbox",
+          "target_accuracy_prop": "semi_structured_checkbox_target_accuracy",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_checkbox_min_leg_threshold",
+        "type": "number",
+        "title": "Semi-Structured Checkbox Minimum Legibility Threshold",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "notification_workflow_flexible_extraction",
+        "type": "FlowIdentifier",
+        "type_spec": {
+          "filter_roles": [
+            "notifications"
+          ],
+          "label": "If task needed"
+        },
+        "title": "Flexible Extraction Notification Flow",
+        "value": null,
+        "optional": true
+      },
+      {
+        "name": "flexible_extraction_supervision_transcription_masking",
+        "type": "boolean",
+        "title": "Flexible Extraction Transcription Masking",
+        "description": "Prevents users from inputting invalid characters during the Flexible Extraction task.",
+        "value": true
+      },
+      {
+        "name": "flexible_extraction_task_restrictions",
+        "type": "TaskRestrictions",
+        "title": "Default Task Restrictions",
+        "description": "Defines what users can access Supervision tasks created by this block.",
+        "optional": true
+      },
+      {
+        "name": "document_rendering_enabled",
+        "type": "boolean",
+        "title": "Document Rendering Enabled",
+        "description": "Enable document rendering",
+        "value": false,
+        "ui": {
+          "warning": "Enabling document rendering will result in a higher compute utilization and require more storage for storing all documents."
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1021
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "value": false,
+              "ui": {
+                "hide_and_retain": true,
+                "warning": "Document rendering feature is not available in your current license."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "document_rendering_mime_type",
+        "type": "string",
+        "title": "Rendered Document Format",
+        "description": "Format in which the document will be rendered. Currently only PDF is supported.",
+        "value": "application/pdf",
+        "schema": {
+          "type": "string",
+          "oneOf": [
+            {
+              "title": "PDF",
+              "const": "application/pdf"
+            }
+          ]
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1021
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "document_rendering_unit",
+        "type": "number",
+        "title": "Document Measurement Unit",
+        "description": "Unit of measurement for the document rendering.",
+        "value": "in",
+        "schema": {
+          "type": "string",
+          "oneOf": [
+            {
+              "title": "Inches",
+              "const": "in"
+            },
+            {
+              "title": "Millimeters",
+              "const": "mm"
+            }
+          ]
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1021
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "document_rendering_width",
+        "type": "number",
+        "title": "Document Width",
+        "description": "Width of the rendered document.",
+        "value": 8.5,
+        "optional": true,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 600
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1021
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_unit": {
+                  "const": "in"
+                }
+              }
+            },
+            "override": {
+              "value": 8.5
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_unit": {
+                  "const": "mm"
+                }
+              }
+            },
+            "override": {
+              "value": 215.9
+            }
+          }
+        ]
+      },
+      {
+        "name": "document_rendering_height",
+        "type": "number",
+        "title": "Document Height",
+        "description": "Height of the rendered document.",
+        "value": 11,
+        "optional": true,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 600
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1021
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_unit": {
+                  "const": "in"
+                }
+              }
+            },
+            "override": {
+              "value": 11
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_unit": {
+                  "const": "mm"
+                }
+              }
+            },
+            "override": {
+              "value": 279.4
+            }
+          }
+        ]
+      },
+      {
+        "name": "document_rendering_quality",
+        "type": "integer",
+        "title": "Quality",
+        "description": "Quality of pages (images) appended to the resulting document as a percentage (recommended 50%). Higher quality results in a larger file size for the generated PDF.",
+        "value": 50,
+        "optional": true,
+        "schema": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 100
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1021
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Layout-Product code Mapping",
+        "type": "string",
+        "title": "Layout-Product code Mapping",
+        "description": "Layout Name and the Product code mapping",
+        "value": "",
+        "optional": false,
+        "ui": {
+          "hidden": false
+        }
+      },
+      {
+        "name": "hs_base_url",
+        "type": "string",
+        "title": "Hyperscience UI base URL",
+        "description": "Used to render the 'Open submission in HS' link inside the Custom Supervision task. Override per environment.",
+        "value": "https://hs-dev.corp.tmnas.com",
+        "optional": true
+      },
+      {
+        "name": "perf_test_mode",
+        "type": "boolean",
+        "title": "Perf Test Mode (auto-fill supervision)",
+        "description": "TEMPORARY: When true, the custom supervision step is auto-filled with intent_1='Add_Named_Insured' + transaction_type='MidTermChange', and Policy Number / Effective Date / Instructions are populated with hardcoded values. Also set manual_field_id_enabled=false and manual_transcription_enabled=false for a fully hands-off run. Leave FALSE for regular UAT / prod runs.",
+        "value": false,
+        "optional": true
+      }
+    ],
+    "ui": {
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAMbGlDQ1BJQ0MgUHJvZmlsZQAASImVVwdYU8kWnluSkJDQAhGQEnoTRHqREkKLVKmCjZAEEkqMCUHFhsqigmsXUbChqyCKrq6ALCpiL4ti74sFFWVd1EVRVN6EBHTdV753vm/u/Dlz5j8lM/fOAKDZx5VIclAtAHLFedK4sCDmhJRUJukZIAAq0AT2wJzLk0lYsbGRAMpQ/3d5dwMgiv6qo4Lrn+P/VXT4AhkPAGQSxOl8GS8X4hYA8EqeRJoHAFGht5iRJ1HgQoh1pTBAiNcqcKYSVytwuhI3D9okxLEhvgyAGpXLlWYCoHEP6pn5vEzIo/EJYmcxXyQGQHMUxP48IZcPsSL2Ubm50xS4HGJbaC+BGMYDvNK/4cz8G3/6MD+XmzmMlXkNilqwSCbJ4c76P0vzvyU3Rz7kwxo2qlAaHqfIH9bwVva0CAWmQtwtTo+OUdQa4j4RX1l3AFCKUB6eqLRHjXgyNqwfYEDszOcGR0BsBHGoOCc6UqVPzxCFciCGqwWdKcrjJECsD/ESgSwkXmWzVTotTuULrc+Qslkq/VmudNCvwtcDeXYiS8X/RijgqPgxjQJhQjLEFIgt80VJ0RBrQOwky46PUNmMLRCyo4dspPI4RfyWEMcJxGFBSn4sP0MaGqeyL8mVDeWLbRWKONEqfCBPmBCurA92kscdjB/mgl0WiFmJQzwC2YTIoVz4guAQZe7Yc4E4MV7F0yfJC4pTzsUpkpxYlT1uLsgJU+jNIXaT5cer5uJJeXBxKvnxDElebIIyTrwgizsuVhkPvhJEAjYIBkwghy0dTANZQNTW3dANfylHQgEXSEEmEABHlWZoRvLgiBg+40EB+AMiAZANzwsaHBWAfKj/PKxVPh1BxuBo/uCMbPAU4lwQAXLgb/ngLPGwtyTwBGpE//DOhY0H482BTTH+7/VD2q8aFtREqjTyIY9MzSFLYggxmBhODCXa4Ya4P+6LR8JnIGwuuBfuPZTHV3vCU0I74RHhOqGDcHuqaKH0uyijQAfkD1XVIv3bWuDWkNMdD8L9IDtkxhm4IXDE3aAfFh4APbtDLVsVt6IqzO+4/5bBN/+Gyo7sTEbJI8iBZNvvZ2rYa7gPsyhq/W19lLGmD9ebPTzyvX/2N9Xnwz7ie0tsCXYQO4Mdx85hzVgDYGLHsEbsInZEgYdX15PB1TXkLW4wnmzII/qHP67Kp6KSMuda5y7nT8qxPMHMPMXGY0+TzJKKMoV5TBb8OgiYHDHPaRTTxdnFFQDFt0b5+nrLGPyGIIzzX3WLzADwmzUwMND8VRcB37kHj8Dtf+erzqYTvibOA3B2PU8uzVfqcMWDAN8SmnCnGQATYAFsYT4uwAP4gkAQAsaBGJAAUsAUWGUhXOdSMAPMAQtAMSgFK8E6sBFsAdtBNdgLDoAG0AyOg9PgArgMroO7cPV0gpegB7wD/QiCkBAaQkcMEFPECnFAXBAvxB8JQSKROCQFSUMyETEiR+Ygi5BSZDWyEdmG1CA/I4eR48g5pB25jTxEupA3yEcUQ6moLmqMWqOjUS+UhUagCehkNBOdjhagRehytBytQveg9ehx9AJ6He1AX6K9GMDUMQZmhjliXhgbi8FSsQxMis3DSrAyrAqrw5rg/3wV68C6sQ84EafjTNwRruBwPBHn4dPxefgyfCNejdfjJ/Gr+EO8B/9CoBGMCA4EHwKHMIGQSZhBKCaUEXYSDhFOwb3USXhHJBIZRBuiJ9yLKcQs4mziMuIm4j5iC7Gd+JjYSyKRDEgOJD9SDIlLyiMVkzaQ9pCOka6QOkl9aupqpmouaqFqqWpitYVqZWq71Y6qXVF7ptZP1iJbkX3IMWQ+eRZ5BXkHuYl8idxJ7qdoU2wofpQEShZlAaWcUkc5RblHeauurm6u7q0+Xl2kXqherr5f/az6Q/UPVB2qPZVNnUSVU5dTd1FbqLepb2k0mjUtkJZKy6Mtp9XQTtAe0Po06BpOGhwNvsZ8jQqNeo0rGq80yZpWmizNKZoFmmWaBzUvaXZrkbWstdhaXK15WhVah7VuavVq07XHaMdo52ov096tfU77uQ5Jx1onRIevU6SzXeeEzmM6Rregs+k8+iL6DvopeqcuUddGl6ObpVuqu1e3TbdHT0fPTS9Jb6Zehd4RvQ4GxrBmcBg5jBWMA4wbjI8jjEewRghGLB1RN+LKiPf6I/UD9QX6Jfr79K/rfzRgGoQYZBusMmgwuG+IG9objjecYbjZ8JRh90jdkb4jeSNLRh4YeccINbI3ijOabbTd6KJRr7GJcZixxHiD8QnjbhOGSaBJlslak6MmXaZ0U39Tkela02OmL5h6TBYzh1nOPMnsMTMyCzeTm20zazPrN7cxTzRfaL7P/L4FxcLLIsNirUWrRY+lqWWU5RzLWss7VmQrLyuh1XqrM1bvrW2sk60XWzdYP7fRt+HYFNjU2tyzpdkG2E63rbK9Zke087LLtttkd9ketXe3F9pX2F9yQB08HEQOmxzaRxFGeY8Sj6oaddOR6shyzHesdXzoxHCKdFro1OD0arTl6NTRq0afGf3F2d05x3mH890xOmPGjVk4pmnMGxd7F55Lhcs1V5prqOt810bX124ObgK3zW633OnuUe6L3VvdP3t4ekg96jy6PC090zwrPW966XrFei3zOutN8A7ynu/d7P3Bx8Mnz+eAz5++jr7Zvrt9n4+1GSsYu2PsYz9zP67fNr8Of6Z/mv9W/44AswBuQFXAo0CLQH7gzsBnLDtWFmsP61WQc5A06FDQe7YPey67JRgLDgsuCW4L0QlJDNkY8iDUPDQztDa0J8w9bHZYSzghPCJ8VfhNjjGHx6nh9IzzHDd33MkIakR8xMaIR5H2kdLIpig0alzUmqh70VbR4uiGGBDDiVkTcz/WJnZ67K/jieNjx1eMfxo3Jm5O3Jl4evzU+N3x7xKCElYk3E20TZQntiZpJk1Kqkl6nxycvDq5Y8LoCXMnXEgxTBGlNKaSUpNSd6b2TgyZuG5i5yT3ScWTbky2mTxz8rkphlNyphyZqjmVO/VgGiEtOW132iduDLeK25vOSa9M7+Gxeet5L/mB/LX8LoGfYLXgWYZfxuqM55l+mWsyu4QBwjJht4gt2ih6nRWetSXrfXZM9q7sgZzknH25arlpuYfFOuJs8clpJtNmTmuXOEiKJR3Tfaavm94jjZDulCGyybLGPF14qL8ot5X/IH+Y759fkd83I2nGwZnaM8UzL86yn7V01rOC0IKfZuOzebNb55jNWTDn4VzW3G3zkHnp81rnW8wvmt9ZGFZYvYCyIHvBbwudF65e+Nei5EVNRcZFhUWPfwj7obZYo1hafHOx7+ItS/AloiVtS12Xblj6pYRfcr7UubSs9NMy3rLzP475sfzHgeUZy9tWeKzYvJK4UrzyxqqAVdWrtVcXrH68JmpN/Vrm2pK1f62buu5cmVvZlvWU9fL1HeWR5Y0bLDes3PBpo3Dj9Yqgin2VRpVLK99v4m+6sjlwc90W4y2lWz5uFW29tS1sW32VdVXZduL2/O1PdyTtOPOT1081Ow13lu78vEu8q6M6rvpkjWdNzW6j3Stq0Vp5bdeeSXsu7w3e21jnWLdtH2Nf6X6wX77/xc9pP984EHGg9aDXwbpfrH6pPEQ/VFKP1M+q72kQNnQ0pjS2Hx53uLXJt+nQr06/7mo2a644ondkxVHK0aKjA8cKjvW2SFq6j2cef9w6tfXuiQknrp0cf7LtVMSps6dDT584wzpz7Kzf2eZzPucOn/c633DB40L9RfeLh35z/+1Qm0db/SXPS42XvS83tY9tP3ol4Mrxq8FXT1/jXLtwPfp6+43EG7duTrrZcYt/6/ntnNuv7+Tf6b9beI9wr+S+1v2yB0YPqn63+31fh0fHkYfBDy8+in909zHv8csnsiefOoue0p6WPTN9VvPc5XlzV2jX5RcTX3S+lLzs7y7+Q/uPyle2r375M/DPiz0TejpfS18PvFn21uDtrr/c/mrtje198C73Xf/7kj6DvuoPXh/OfEz++Kx/xifSp/LPdp+bvkR8uTeQOzAg4Uq5g0cBDDY0IwOAN7sAoKUAQIdnCMpE5V1wUBDl/XUQgf+ElffFQfEAoA52imM8uwWA/bBZF0Ju2CuO8AmBAHV1HW4qkWW4uii5qPAmROgbGHhrDACpCYDP0oGB/k0DA593wGBvA9AyXXkHVQgR3hm2BivQ7TWTC8F3oryffpPj9z1QROAGvu//BRpQkXCiEKuZAAADSUlEQVRoBe1bvW4iMRA26Fqi66GgJDwAob0XQAc1KJcHgBYKWhA8ANT8tcADAEJXEkW6knSHRNKfoIf4s86RsQhnBvuWrHakZe3dsWc+z9hjzyYhxukrp5ubmx8oou4H2u/3q/V63fkCMBzcL36Lo+wXCoVCLBaLxUNxTrvd7rdfgGk4VmHtge+qAcDPbtLAgoEFr3wEfO+iItBfaoRUKsXu7u5YNBo17mq5XLLpdMpeX1+N21AYLwr0ANRqtVgymaTIZi8vL6xQKLgESQ/0ANfv98ngMCJ8KyX6OMfy544keQ4Wi0Wh4LkCdX4JMpFI6K+s1Ekuyjfn7Onp6V0BzKN8Pm/kao1Gg+Vyufe2srDZbEQfz8/P8pGNO81FI5HIgfDRaGQE7qCRVsGgDQYDZtuSZBfV9CNX1VXUBUjPAequLUFms1nyoKkNPQd4bP4CZLPZZDZAeg4Q81mCRPBXyQZIKzsZVSmUEdfu7++RChGvFosFG4/HoqzOOTwAX7fbFSAR9BFbb29vBS9+ABIk24vKGT9OALbb7QMlZViAklhxEUMllUolhusUASQs3ev1TrEdfefERaXlVIlIAoFgwXq9rr4yKj88PBjx6UxOLFgul1m1WhWjDoEANZlM3mV3Oh1Rhnu63KZBiBOAj4+PLJPJCBAf/QDkcDhk6XT6w+COVRRbuUvICUBThbbbrbCsal21LY5hlwJ0MgdVJb0uO7GgHiZMQKqhxITflMcJQD1MmCiDUILVFzHRJjlx0WNhwkRpFyuqEwvWajURvPVj1SmQCCW2rQd5TgAimYTrGsiJi14DMKmD7wE6cdEgTEj/Ue7qiUN5fHHRiYtSw4R6DrwY2d8OnLhoECZsmcegHycuaiD3v7F8GoDIfFOIBBDnOJVwMLW9j0Sf+CQnCV+iKERaZDCaON5IBXAonc/nFPnGbWazmTGvykiyIDqoVCoi16J25qqMfS2ycRQiA8TuX0+7UxT4VxvkbpDEohLp85kuDK5qI3+i9ossN6aBnu1WeQzKKysADQR5xUL7PuiVthS55DlIEeZFmwCgF6NuU2ZgQZuj6UVffrfgn/CKEx9ZXL4j/rfoP8VmOxwOf+OV7xyhr/6tgJ9AOm+LQDKbDr467wAAAABJRU5ErkJggg==",
+      "groups": [
+        {
+          "title": "File Filter",
+          "fields": [
+            "file_filter_filter_type",
+            "file_filter_minimum_image_width",
+            "file_filter_minimum_image_height",
+            "file_filter_minimum_file_size_kb",
+            "file_filter_file_extensions_action",
+            "file_filter_file_extensions",
+            "file_filter_file_extensions_other"
+          ]
+        },
+        {
+          "title": "Submission Bootstrap",
+          "fields": [
+            "notification_workflow_initialization",
+            "submission_bootstrap_s3_config",
+            "submission_bootstrap_s3_endpoint_url",
+            "submission_bootstrap_ocs_config",
+            "submission_bootstrap_http_config",
+            "submission_bootstrap_abs_auth_type",
+            "submission_bootstrap_abs_account_url",
+            "submission_bootstrap_abs_tenant_id",
+            "submission_bootstrap_abs_client_id",
+            "submission_bootstrap_abs_client_secret",
+            "submission_bootstrap_abs_authority_host",
+            "submission_bootstrap_abs_account_key",
+            "submission_bootstrap_abs_account_name"
+          ]
+        },
+        {
+          "title": "Collation",
+          "fields": [
+            "machine_collation_dedupe_files",
+            "machine_collation_retention_period",
+            "machine_collation_refresh_retention_period"
+          ]
+        },
+        {
+          "title": "Classification",
+          "fields": [
+            "structured_layout_match_threshold",
+            "semi_structured_classification",
+            "manual_nlc_enabled",
+            "semi_target_accuracy",
+            "semi_doc_grouping_logic",
+            "semi_qa_sample_rate",
+            "machine_classification_rotation_correction_enabled",
+            "machine_classification_mobile_processing_enabled",
+            "machine_classification_file_transcription_enabled",
+            "notification_workflow_classification",
+            "manual_classification_task_restrictions",
+            "layout_id_dealbreaker",
+            "layout_id_dealbreaker_bypass"
+          ]
+        },
+        {
+          "title": "Identification",
+          "fields": [
+            "identification_target_accuracies",
+            "field_id_target_accuracy",
+            "table_id_target_accuracy",
+            "manual_field_id_enabled",
+            "field_id_qa_enabled",
+            "field_id_qa_sample_rate",
+            "table_id_qa_enabled",
+            "table_id_qa_sample_rate",
+            "notification_workflow_identification",
+            "manual_identification_task_restrictions"
+          ]
+        },
+        {
+          "title": "General Transcription",
+          "fields": [
+            "field_transcription_target_accuracies",
+            "manual_transcription_enabled",
+            "qa",
+            "auto_qa_sampling_rate_enabled",
+            "structured_entry_qa_sample_rate",
+            "structured_checkbox_qa_sample_rate",
+            "structured_signature_qa_sample_rate",
+            "semi_structured_qa_sample_rate",
+            "table_cell_transcription_qa_enabled",
+            "table_cell_transcription_qa_sample_rate",
+            "transcription_overrides",
+            "finetuning_only_trained_layouts",
+            "exclude_auto_transcribe_fields_from_qa",
+            "notification_workflow_transcription",
+            "manual_transcription_task_restrictions",
+            "manual_transcription_supervision_transcription_masking",
+            "manual_transcription_table_output_manual_review",
+            "manual_transcription_always_supervise_blank_cells",
+            "force_normalization_errors_to_sv",
+            "force_required_entries_to_sv"
+          ]
+        },
+        {
+          "title": "Structured Document Transcription",
+          "fields": [
+            "structured_transcription_training",
+            "structured_transcription_training_period",
+            "structured_improved_transcr_threshold_accuracy",
+            "structured_text_min_training_records",
+            "structured_text_max_training_records",
+            "structured_text_target_accuracy",
+            "structured_text_automation",
+            "structured_text_threshold",
+            "structured_min_leg_threshold",
+            "structured_checkbox_min_training_records",
+            "structured_checkbox_max_training_records",
+            "structured_checkbox_target_accuracy",
+            "structured_checkbox_automation",
+            "structured_checkbox_threshold",
+            "checkbox_min_leg_threshold",
+            "structured_signature_min_training_records",
+            "structured_signature_max_training_records",
+            "structured_signature_target_accuracy",
+            "structured_signature_automation",
+            "structured_signature_threshold",
+            "signature_min_leg_threshold"
+          ]
+        },
+        {
+          "title": "Semi-Structured Document Transcription",
+          "fields": [
+            "semi_structured_transcription_training",
+            "semi_structured_transcription_training_period",
+            "semi_structured_improved_transcr_threshold_accuracy",
+            "semi_structured_text_min_training_records",
+            "semi_structured_text_max_training_records",
+            "semi_structured_text_target_accuracy",
+            "semi_structured_text_automation",
+            "semi_structured_text_threshold",
+            "semi_structured_min_leg_threshold",
+            "semi_structured_table_min_training_records",
+            "semi_structured_table_max_training_records",
+            "semi_structured_table_target_accuracy",
+            "semi_structured_table_automation",
+            "semi_structured_table_threshold",
+            "semi_structured_table_min_leg_threshold",
+            "semi_structured_checkbox_min_training_records",
+            "semi_structured_checkbox_max_training_records",
+            "semi_structured_checkbox_target_accuracy",
+            "semi_structured_checkbox_automation",
+            "semi_structured_checkbox_threshold",
+            "semi_structured_checkbox_min_leg_threshold"
+          ]
+        },
+        {
+          "title": "Flexible Extraction",
+          "fields": [
+            "notification_workflow_flexible_extraction",
+            "flexible_extraction_supervision_transcription_masking",
+            "flexible_extraction_task_restrictions"
+          ]
+        },
+        {
+          "title": "Document Rendering",
+          "fields": [
+            "document_rendering_enabled",
+            "document_rendering_mime_type",
+            "document_rendering_unit",
+            "document_rendering_width",
+            "document_rendering_height",
+            "document_rendering_quality"
+          ]
+        }
+      ]
+    },
+    "identifier": "ENDORSEMENT_CUSTOM_CORE_V41",
+    "roles": [
+      "idp_core",
+      "supporting"
+    ],
+    "output": [
+      {
+        "name": "submission",
+        "type": "Submission",
+        "title": "Submission",
+        "description": "The processed submission"
+      },
+      {
+        "name": "salesforce_payload",
+        "type": "object",
+        "title": "Salesforce Payload",
+        "description": "Salesforce-shaped JSON payload built by build_salesforce_payload; use as the POST body for SyncHSPolicyTxnToSF"
+      }
+    ],
+    "enable_overrides": true
+  },
+  "blocks": [
+    {
+      "identifier": "SUBMISSION_BOOTSTRAP_2",
+      "reference_name": "submission_bootstrap",
+      "input": {
+        "$trigger": "${workflow.input.$trigger}",
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "s3_config": "${workflow.input.submission_bootstrap_s3_config}",
+        "s3_endpoint_url": "${workflow.input.submission_bootstrap_s3_endpoint_url}",
+        "ocs_config": "${workflow.input.submission_bootstrap_ocs_config}",
+        "http_config": "${workflow.input.submission_bootstrap_http_config}",
+        "abs_auth_type": "${workflow.input.submission_bootstrap_abs_auth_type}",
+        "abs_account_url": "${workflow.input.submission_bootstrap_abs_account_url}",
+        "abs_tenant_id": "${workflow.input.submission_bootstrap_abs_tenant_id}",
+        "abs_client_id": "${workflow.input.submission_bootstrap_abs_client_id}",
+        "abs_client_secret": "${workflow.input.submission_bootstrap_abs_client_secret}",
+        "abs_authority_host": "${workflow.input.submission_bootstrap_abs_authority_host}",
+        "abs_account_name": "${workflow.input.submission_bootstrap_abs_account_name}",
+        "abs_account_key": "${workflow.input.submission_bootstrap_abs_account_key}",
+        "notification_workflow": "${workflow.input.notification_workflow_initialization}",
+        "workflow_uuid": "${workflow.input.workflow_uuid}",
+        "workflow_name": "${workflow.input.workflow_name}",
+        "workflow_version": "${workflow.input.workflow_version}",
+        "submission": "${workflow.input.submission}"
+      },
+      "title": "Submission Initialization",
+      "description": "Initialize submission and, if necessary, fetch and prepare external images or other submission data"
+    },
+    {
+      "identifier": "MACHINE_COLLATION_2",
+      "reference_name": "auto_machine_collation_2__1",
+      "input": {
+        "submission": "${submission_bootstrap.output.result.submission}",
+        "cases": "${submission_bootstrap.output.result.api_params.cases}",
+        "dedupe_files": "${workflow.input.machine_collation_dedupe_files}",
+        "remove_from_cases": "${workflow.input.machine_collation_remove_from_cases}",
+        "retention_period": "${workflow.input.machine_collation_retention_period}",
+        "refresh_retention_period": "${workflow.input.machine_collation_refresh_retention_period}"
+      },
+      "title": "Machine Collation",
+      "description": "Group files, documents, and pages into cases"
+    },
+    {
+      "identifier": "MACHINE_CLASSIFICATION_7",
+      "reference_name": "machine_classification",
+      "input": {
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "submission": "${auto_machine_collation_2__1.output.submission}",
+        "api_params": "${submission_bootstrap.output.result.api_params}",
+        "vpc_registration_threshold": "${workflow.input.structured_layout_match_threshold}",
+        "nlc_enabled": "${workflow.input.semi_structured_classification}",
+        "nlc_target_accuracy": "${workflow.input.semi_target_accuracy}",
+        "nlc_doc_grouping_logic": "${workflow.input.semi_doc_grouping_logic}",
+        "rotation_correction_enabled": "${workflow.input.machine_classification_rotation_correction_enabled}",
+        "mobile_processing_enabled": "${workflow.input.machine_classification_mobile_processing_enabled}",
+        "file_transcription_enabled": "${workflow.input.machine_classification_file_transcription_enabled}",
+        "layout_id_dealbreaker": "${workflow.input.layout_id_dealbreaker}",
+        "layout_id_dealbreaker_bypass": "${workflow.input.layout_id_dealbreaker_bypass}"
+      },
+      "title": "Machine Classification",
+      "description": "Automatically classify documents"
+    },
+    {
+      "identifier": "MANUAL_CLASSIFICATION_7",
+      "reference_name": "manual_classification",
+      "input": {
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "manual_nlc_enabled": "${workflow.input.manual_nlc_enabled}",
+        "task_restrictions": "${workflow.input.manual_classification_task_restrictions}",
+        "api_params": "${submission_bootstrap.output.result.api_params}",
+        "submission": "${machine_classification.output.submission}",
+        "notification_workflow": "${workflow.input.notification_workflow_classification}",
+        "vpc_registration_threshold": "${workflow.input.structured_layout_match_threshold}",
+        "nlc_metadata": null
+      },
+      "title": "Manual Classification",
+      "description": "Manually classify documents that could not be automatically classified"
+    },
+    {
+      "identifier": "MACHINE_IDENTIFICATION_8",
+      "reference_name": "machine_identification",
+      "input": {
+        "submission": "${manual_classification.output.submission}",
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "api_params": "${submission_bootstrap.output.result.api_params}",
+        "manual_field_id_enabled": "${workflow.input.manual_field_id_enabled}",
+        "force_required_missing_entries_to_sv": "${workflow.input.force_required_entries_to_sv}",
+        "field_id_target_accuracy": "${workflow.input.field_id_target_accuracy}",
+        "table_id_target_accuracy": "${workflow.input.table_id_target_accuracy}",
+        "id_target_accuracies": "${workflow.input.identification_target_accuracies}"
+      },
+      "title": "Machine Identification",
+      "description": "Automatically locate fields on semi-structured documents"
+    },
+    {
+      "identifier": "MANUAL_IDENTIFICATION_6",
+      "reference_name": "manual_identification",
+      "input": {
+        "submission": "${machine_identification.output.submission}",
+        "api_params": "${submission_bootstrap.output.result.api_params}",
+        "manual_field_id_enabled": "${workflow.input.manual_field_id_enabled}",
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "notification_workflow": "${workflow.input.notification_workflow_identification}",
+        "task_restrictions": "${workflow.input.manual_identification_task_restrictions}"
+      },
+      "title": "Manual Identification",
+      "description": "Manually locate fields on semi-structured documents that could not be automatically located"
+    },
+    {
+      "identifier": "MACHINE_TRANSCRIPTION_9",
+      "reference_name": "machine_transcription",
+      "input": {
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "submission": "${manual_identification.output.submission}",
+        "api_params": "${submission_bootstrap.output.result.api_params}",
+        "transcription_model": "${workflow.input.transcription_model}",
+        "finetuning_only_trained_layouts": "${workflow.input.finetuning_only_trained_layouts}",
+        "force_normalization_errors_to_sv": "${workflow.input.force_normalization_errors_to_sv}",
+        "force_required_blank_entries_to_sv": "${workflow.input.force_required_entries_to_sv}",
+        "transcription_overrides": "${workflow.input.transcription_overrides}",
+        "structured_text_target_accuracy": "${workflow.input.structured_text_target_accuracy}",
+        "structured_text_confidence_threshold": "${workflow.input.structured_text_threshold}",
+        "structured_text_acceptable_confidence": "${workflow.input.structured_min_leg_threshold}",
+        "semi_structured_text_target_accuracy": "${workflow.input.semi_structured_text_target_accuracy}",
+        "semi_structured_text_confidence_threshold": "${workflow.input.semi_structured_text_threshold}",
+        "semi_structured_text_acceptable_confidence": "${workflow.input.semi_structured_min_leg_threshold}",
+        "semi_structured_table_target_accuracy": "${workflow.input.semi_structured_table_target_accuracy}",
+        "semi_structured_table_confidence_threshold": "${workflow.input.semi_structured_table_threshold}",
+        "semi_structured_table_acceptable_confidence": "${workflow.input.semi_structured_table_min_leg_threshold}",
+        "structured_checkbox_target_accuracy": "${workflow.input.structured_checkbox_target_accuracy}",
+        "structured_checkbox_confidence_threshold": "${workflow.input.structured_checkbox_threshold}",
+        "structured_checkbox_acceptable_confidence": "${workflow.input.checkbox_min_leg_threshold}",
+        "structured_signature_target_accuracy": "${workflow.input.structured_signature_target_accuracy}",
+        "structured_signature_confidence_threshold": "${workflow.input.structured_signature_threshold}",
+        "structured_signature_acceptable_confidence": "${workflow.input.signature_min_leg_threshold}",
+        "semi_structured_checkbox_target_accuracy": "${workflow.input.semi_structured_checkbox_target_accuracy}",
+        "semi_structured_checkbox_confidence_threshold": "${workflow.input.semi_structured_checkbox_threshold}",
+        "semi_structured_checkbox_acceptable_confidence": "${workflow.input.semi_structured_checkbox_min_leg_threshold}",
+        "field_target_accuracies": "${workflow.input.field_transcription_target_accuracies}",
+        "column_target_accuracies": "${workflow.input.column_transcription_target_accuracies}"
+      },
+      "title": "Machine Transcription",
+      "description": "Automatically transcribe fields"
+    },
+    {
+      "identifier": "MANUAL_TRANSCRIPTION_6",
+      "reference_name": "manual_transcription",
+      "input": {
+        "submission": "${machine_transcription.output.submission}",
+        "api_params": "${submission_bootstrap.output.result.api_params}",
+        "task_restrictions": "${workflow.input.manual_transcription_task_restrictions}",
+        "manual_transcription_enabled": "${workflow.input.manual_transcription_enabled}",
+        "supervision_transcription_masking": "${workflow.input.manual_transcription_supervision_transcription_masking}",
+        "table_output_manual_review": "${workflow.input.manual_transcription_table_output_manual_review}",
+        "always_supervise_blank_cells": "${workflow.input.manual_transcription_always_supervise_blank_cells}",
+        "notification_workflow": "${workflow.input.notification_workflow_transcription}",
+        "address_parsing_enabled": false,
+        "address_parser_api_provider": "none",
+        "address_parser_api_key": null,
+        "address_parser_api_options": null
+      },
+      "title": "Manual Transcription",
+      "description": "Manually transcribe fields that could not be automatically transcribed"
+    },
+    {
+      "identifier": "PYTHON_3_14_CODE",
+      "reference_name": "perf_test_preprocessor",
+      "input": {
+        "data": {
+          "submission": "${manual_transcription.output.submission}",
+          "perf_test_mode": "${workflow.input.perf_test_mode}"
+        },
+        "code": "\nfrom typing import Any\nfrom blocks.base_python_block import WFEngineTaskResult, Block, WFEngineTask\nfrom blocks.types import BlockInputs\n\n\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    submission: Any\n    perf_test_mode: Any = False\n\n\nPERF_EFFECTIVE_DATE = \"08/26/2026\"\nPERF_INSTRUCTIONS = \"add john doe to the policy\"\nPERF_INTENT_1 = \"Add_Named_Insured\"\nPERF_TRANSACTION_TYPE = \"MidTermChange\"\n\nFIELD_DEFAULTS = {\n    \"Effective Date of Change\": PERF_EFFECTIVE_DATE,\n    \"Instructions\": PERF_INSTRUCTIONS,\n}\n\n# Mirrors build_salesforce_payload._clean_name so we match fields the way the\n# downstream connector does (ZWSP-strip + alias-resolve).\nZWSP = \"\\u200b\"\nFIELD_NAME_ALIASES = {\n    \"Policy Producer Contact\": \"Policy Endorsement Contact\",\n    \"Path ID\": \"Path Id\",\n}\n\n\ndef _clean(name):\n    if not isinstance(name, str):\n        return \"\"\n    cleaned = name.replace(ZWSP, \"\").strip()\n    return FIELD_NAME_ALIASES.get(cleaned, cleaned)\n\n\ndef _target_document(submission):\n    documents = [d for d in submission.get(\"documents\") or [] if isinstance(d, dict)]\n    if not documents:\n        return None\n    for doc in documents:\n        metadata = doc.get(\"metadata\") or {}\n        filename = \" \".join(\n            str(doc.get(key) or metadata.get(key) or \"\")\n            for key in (\"filename\", \"file_name\", \"name\", \"original_filename\", \"source_filename\")\n        )\n        if \"email\" in filename.lower():\n            return doc\n    return documents[0]\n\n\ndef _inject_field_defaults(submission):\n    if not isinstance(submission, dict):\n        return submission\n    doc = _target_document(submission)\n    if doc is None:\n        return submission\n    fields = doc.setdefault(\"document_fields\", [])\n    by_name = {}\n    for f in fields:\n        if not isinstance(f, dict):\n            continue\n        if f.get(\"occurrence_index\", 0) != 0:\n            continue\n        key = _clean(f.get(\"output_name\") or f.get(\"field_name\") or f.get(\"name\"))\n        if key and key not in by_name:\n            by_name[key] = f\n    for name, value in FIELD_DEFAULTS.items():\n        existing = by_name.get(name)\n        if existing is not None:\n            existing[\"transcription\"] = value\n            existing[\"transcription_normalized\"] = value\n            existing[\"transcription_source\"] = \"human_transcription\"\n            existing[\"transcription_confidence\"] = \"sure\"\n            existing[\"state\"] = \"complete\"\n        else:\n            fields.append({\n                \"id\": None,\n                \"output_name\": name,\n                \"field_name\": name,\n                \"occurrence_index\": 0,\n                \"page_number\": 1,\n                \"identification_source\": \"human_identification\",\n                \"identification_confidence\": \"sure\",\n                \"transcription\": value,\n                \"transcription_normalized\": value,\n                \"transcription_source\": \"human_transcription\",\n                \"transcription_confidence\": \"sure\",\n                \"required\": False,\n                \"multiline\": False,\n                \"state\": \"complete\",\n            })\n    return submission\n\n\ndef _perf_prefill(submission):\n    doc = _target_document(submission) if isinstance(submission, dict) else None\n    doc_ids = [doc.get(\"id\") if doc is not None else None]\n    selected = []\n    for did in doc_ids:\n        selected.append({\n            \"document_id\": did,\n            \"decision\": \"intent_1\",\n            \"choice\": PERF_INTENT_1,\n            \"task_purpose_id\": 2005,\n        })\n    selected.append({\n        \"document_id\": doc_ids[0],\n        \"decision\": \"transaction_type\",\n        \"choice\": PERF_TRANSACTION_TYPE,\n        \"task_purpose_id\": 2005,\n    })\n    return {\"selected_choices\": selected}\n\n\ndef _preprocess(submission, perf_test_mode=False):\n    if not perf_test_mode:\n        return {\"submission\": submission, \"supervision_data\": {}}\n    modified = _inject_field_defaults(submission)\n    return {\"submission\": modified, \"supervision_data\": _perf_prefill(modified)}\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _preprocess(**task.inputData.dict())\n"
+      },
+      "title": "Perf Test Preprocessor",
+      "description": "TEMPORARY: When perf_test_mode=true, injects default field values into the submission and pre-fills supervision decisions so the custom supervision step auto-completes without a UI task."
+    },
+    {
+      "identifier": "PYTHON_3_14_CODE",
+      "reference_name": "build_supervision_template",
+      "input": {
+        "data": {
+          "submission": "${perf_test_preprocessor.output.result.submission}",
+          "intent_oneof": [
+            {
+              "const": "None",
+              "title": "-- None --"
+            },
+            {
+              "const": "Account_Contact_Update",
+              "title": "Account Contact Update"
+            },
+            {
+              "const": "Add_Additional_Insured_Auto",
+              "title": "Add Additional Insured - Auto"
+            },
+            {
+              "const": "Add_Additional_Insured_Property",
+              "title": "Add Additional Insured - Property"
+            },
+            {
+              "const": "Add_Additional_Property_Coverage_Forms",
+              "title": "Add Additional Property Coverage Forms"
+            },
+            {
+              "const": "Add_Amend_Delete_Additional_Insured_GL",
+              "title": "Add/Amend/Delete  Additional Insured- GL"
+            },
+            {
+              "const": "Add_Amend_Delete_Additional_Insured_DO",
+              "title": "Add/Amend/Delete  Additional Insured- D&O"
+            },
+            {
+              "const": "Add_Amend_Delete_Additional_Insured_EPLI",
+              "title": "Add/Amend/Delete  Additional Insured- EPLI"
+            },
+            {
+              "const": "Add_Amend_Delete_Additional_Insured_Ot",
+              "title": "Add/Amend/Delete Additional Insured - Other"
+            },
+            {
+              "const": "Add_Amend_Delete_Additional_Insured_PL",
+              "title": "Add/Amend/Delete  Additional Insured- PL"
+            },
+            {
+              "const": "Add_Amend_Delete_Driver",
+              "title": "Add/Amend/Delete Driver Request"
+            },
+            {
+              "const": "Add_Amend_Delete_Med",
+              "title": "Add/Amend/Delete Med Mal Coverage"
+            },
+            {
+              "const": "Add_Amend_Delete_PL_Coverage",
+              "title": "Add/Amend/Delete PL Coverage/Limits"
+            },
+            {
+              "const": "Add_Amend_Delete_Special_Events",
+              "title": "Add/Amend/Delete Special Events"
+            },
+            {
+              "const": "Add_Amend_Delete_Underlying_Coverages",
+              "title": "Add/Amend/Delete Underlying Coverages"
+            },
+            {
+              "const": "Add_Auto",
+              "title": "Add Auto"
+            },
+            {
+              "const": "Add_Auto_First_Time",
+              "title": "Add Auto - First Time"
+            },
+            {
+              "const": "Add_Crime_First_Time",
+              "title": "Add Crime - First Time"
+            },
+            {
+              "const": "Add_Cyber_Coverage_Limits",
+              "title": "Add Cyber Coverage/Limits"
+            },
+            {
+              "const": "Add_Delete_Less_Than_10_Autos",
+              "title": "Add/Delete Less Than 10 Autos"
+            },
+            {
+              "const": "Add_Delete_Location_s",
+              "title": "Add/Delete Location(s)"
+            },
+            {
+              "const": "Add_Delete_More_Than_10_Autos",
+              "title": "Add/Delete More Than 10 Autos"
+            },
+            {
+              "const": "Add_GL_Only_Location",
+              "title": "Add GL - Only Location"
+            },
+            {
+              "const": "Add_Inland_Marine_First_Time",
+              "title": "Add Inland Marine - First Time"
+            },
+            {
+              "const": "Add_Location",
+              "title": "Add Location"
+            },
+            {
+              "const": "Add_Loss_Payee",
+              "title": "Add Loss Payee - Auto"
+            },
+            {
+              "const": "Add_Named_Insured",
+              "title": "Add Named Insured"
+            },
+            {
+              "const": "Add_DO_EPLI_Coverage_Limits",
+              "title": "Add D&O/EPLI Coverage/Limits"
+            },
+            {
+              "const": "Add_PL_Coverage_Limits",
+              "title": "Add PL Coverage/Limits"
+            },
+            {
+              "const": "Add_Professional_Liability_First_Time",
+              "title": "Add Professional Liability - First Time"
+            },
+            {
+              "const": "Agency_Contact_Update",
+              "title": "Agency Contact Update"
+            },
+            {
+              "const": "Amend_Auto",
+              "title": "Amend Auto"
+            },
+            {
+              "const": "Amend_Cyber_Coverage_Limits",
+              "title": "Amend Cyber Coverage/Limits"
+            },
+            {
+              "const": "Amend_Delete_Crime_Coverage",
+              "title": "Amend/Delete Crime Coverage"
+            },
+            {
+              "const": "Amend_GL",
+              "title": "Amend GL (Class Codes/Limits/Exposures)"
+            },
+            {
+              "const": "Amend_Mailing_Address",
+              "title": "Amend Mailing Address"
+            },
+            {
+              "const": "Amend_Named_Insured",
+              "title": "Amend Named Insured"
+            },
+            {
+              "const": "Amend_DO_EPLI_Coverage_Limits",
+              "title": "Amend D&O/EPLI Coverage/Limits"
+            },
+            {
+              "const": "Amend_PL_Coverage_Limits",
+              "title": "Amend PL Coverage/Limits"
+            },
+            {
+              "const": "Amend_Remove_Items_Coverage",
+              "title": "Amend/Remove Items or Coverage on Inland Marine"
+            },
+            {
+              "const": "Amend_Umbrella_Limits",
+              "title": "Amend Umbrella Limits"
+            },
+            {
+              "const": "Automated_Emails",
+              "title": "Automated Emails"
+            },
+            {
+              "const": "BME_Request",
+              "title": "BME Request"
+            },
+            {
+              "const": "BOP_Request",
+              "title": "BOP Request"
+            },
+            {
+              "const": "BOR_Request",
+              "title": "BOR Request"
+            },
+            {
+              "const": "Backdate_Add_Delete_Auto",
+              "title": "Backdate Add Auto Greater Than 60 Days"
+            },
+            {
+              "const": "Backdate_Delete_Auto_Greater_Than_60_Day",
+              "title": "Backdate Delete Auto Greater Than 60 Days/Total Loss"
+            },
+            {
+              "const": "Billing_Address",
+              "title": "Billing Address"
+            },
+            {
+              "const": "Billing_Changes_Issues",
+              "title": "Billing Changes/Issues"
+            },
+            {
+              "const": "Bind_Orders",
+              "title": "Bind Orders"
+            },
+            {
+              "const": "Bind_Orders_E_S",
+              "title": "Bind Orders - E&S"
+            },
+            {
+              "const": "COI",
+              "title": "COI"
+            },
+            {
+              "const": "Cancellation_Request",
+              "title": "Cancellation Request"
+            },
+            {
+              "const": "Claim_Reports",
+              "title": "Claim Reports"
+            },
+            {
+              "const": "Court_Commercial_Bonds",
+              "title": "Court and Commercial Bonds"
+            },
+            {
+              "const": "Decrease_Property_Limit",
+              "title": "Decrease Property Limit"
+            },
+            {
+              "const": "Delete_Auto",
+              "title": "Delete Auto"
+            },
+            {
+              "const": "Delete_Cyber_Coverage_Limits",
+              "title": "Delete Cyber Coverage/Limits"
+            },
+            {
+              "const": "Delete_DO_EPLI_Coverage_Limits",
+              "title": "Delete D&O/EPLI Coverage/Limits"
+            },
+            {
+              "const": "Delete_PL_Coverage_Limits",
+              "title": "Delete PL Coverage/Limits"
+            },
+            {
+              "const": "Delete_Location",
+              "title": "Delete Location"
+            },
+            {
+              "const": "Delete_Loss_Payee",
+              "title": "Delete Loss Payee - Auto"
+            },
+            {
+              "const": "Delete_Named_Insured",
+              "title": "Delete Named Insured"
+            },
+            {
+              "const": "Delete_Terrorism_Coverage",
+              "title": "Delete Terrorism Coverage (TRIA)"
+            },
+            {
+              "const": "Duplicate_Request",
+              "title": "Duplicate Request"
+            },
+            {
+              "const": "EPAC_Request",
+              "title": "EPAC Request"
+            },
+            {
+              "const": "ERP",
+              "title": "ERP"
+            },
+            {
+              "const": "Endorsement_Issued_Incorrectly",
+              "title": "Endorsement Issued Incorrectly"
+            },
+            {
+              "const": "Endorsement_Status_Request",
+              "title": "Endorsement Status Request"
+            },
+            {
+              "const": "Exceptions_All_Other",
+              "title": "Exceptions - All Other"
+            },
+            {
+              "const": "Flood_Request_FloodPro",
+              "title": "Flood Request - FloodPro"
+            },
+            {
+              "const": "Flood_Request_WNCFirst",
+              "title": "Flood Request - WNCFirst"
+            },
+            {
+              "const": "Increase_Property_Limit",
+              "title": "Increase Property Limit"
+            },
+            {
+              "const": "Loss_Run_Request",
+              "title": "Loss Run Request"
+            },
+            {
+              "const": "Multiple_Changes",
+              "title": "Multiple Changes"
+            },
+            {
+              "const": "NY_Premium_Audit",
+              "title": "NY Premium Audit"
+            },
+            {
+              "const": "New_Business",
+              "title": "New Business"
+            },
+            {
+              "const": "New_Business_E_S",
+              "title": "New Business - E&S"
+            },
+            {
+              "const": "PCAC_Request",
+              "title": "PCAC Request"
+            },
+            {
+              "const": "PCAP_Request",
+              "title": "PCAP Request"
+            },
+            {
+              "const": "PHBX_Request",
+              "title": "PHBX Request"
+            },
+            {
+              "const": "PHCV_Request",
+              "title": "PHCV Request"
+            },
+            {
+              "const": "PHGT_PHBT_Request",
+              "title": "PHGT/PHBT Request"
+            },
+            {
+              "const": "PHPA_PHPC_Request",
+              "title": "PHPA/PHPC Request"
+            },
+            {
+              "const": "PHPR_PHEX_Request",
+              "title": "PHPR/PHEX Request"
+            },
+            {
+              "const": "PHSD_Cancel_Request",
+              "title": "PHSD Cancel Request"
+            },
+            {
+              "const": "PHSD_General_Inquiries",
+              "title": "PHSD General Inquiries"
+            },
+            {
+              "const": "PHSD_Loss_Run_Request",
+              "title": "PHSD Loss Run Request"
+            },
+            {
+              "const": "Policy_Corrections_Other",
+              "title": "Policy Corrections - Other"
+            },
+            {
+              "const": "Policy_Extension",
+              "title": "Policy Extension"
+            },
+            {
+              "const": "Policy_Issued_Incorrectly",
+              "title": "Policy Issued Incorrectly"
+            },
+            {
+              "const": "RS_Request",
+              "title": "RS Request"
+            },
+            {
+              "const": "RapidSure_Request",
+              "title": "RapidSure F&W Request"
+            },
+            {
+              "const": "Remove_Additional_Insured",
+              "title": "Remove Additional Insured - Auto"
+            },
+            {
+              "const": "Renewal_Business",
+              "title": "Renewal Business"
+            },
+            {
+              "const": "Renewal_Business_E_S",
+              "title": "Renewal Business - E&S"
+            },
+            {
+              "const": "STEP_Request",
+              "title": "STEP Request"
+            },
+            {
+              "const": "Surety_Contract",
+              "title": "Surety Contract"
+            },
+            {
+              "const": "VB_Request",
+              "title": "VB Request"
+            }
+          ],
+          "intent_slots": 2,
+          "policy_field_names": [],
+          "date_field_names": [],
+          "hs_base_url": "${workflow.input.hs_base_url}",
+          "transaction_type_oneof": [
+            {
+              "const": "None",
+              "title": "-- None --"
+            },
+            {
+              "const": "MidTermChange",
+              "title": "Mid Term Change"
+            },
+            {
+              "const": "MidTermQuote",
+              "title": "Mid Term Quote"
+            },
+            {
+              "const": "Exception",
+              "title": "Exception"
+            }
+          ]
+        },
+        "code": "\nfrom typing import Any, Dict, List, Tuple\nfrom blocks.base_python_block import WFEngineTaskResult\nfrom blocks.types import BlockInputs\nfrom blocks.base_python_block import Block, WFEngineTask\n\n\n# Used to deserialize json inputs by the CCB\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    submission: Any\n    intent_oneof: Any\n    intent_slots: Any\n    policy_field_names: Any\n    date_field_names: Any\n    hs_base_url: Any = None\n    transaction_type_oneof: Any = None\n\n\ndef _build_dynamic_template(\n    submission,\n    intent_oneof,\n    intent_slots,\n    policy_field_names,\n    date_field_names,\n    hs_base_url=None,\n    transaction_type_oneof=None,\n):\n    \"\"\"Build a minimal custom-supervision template: only the per-slot Intent\n    decision dropdowns. A banner row at the top renders a link back to the\n    Hyperscience submission detail page so reviewers can open the source\n    submission (and all attached documents) in a new tab.\n\n    The submission and field-name inputs are accepted for backward-\n    compatibility with the PythonBlock input contract but are unused.\n    \"\"\"\n\n    # Resolve submission id and full link URL (defensive against missing keys).\n    sub_id = None\n    if isinstance(submission, dict):\n        sub_id = submission.get(\"id\") or submission.get(\"submission_id\")\n    base_url = (hs_base_url or \"\").rstrip(\"/\")\n    link_url = (\n        f\"{base_url}/submissions/{sub_id}\"\n        if base_url and sub_id is not None\n        else None\n    )\n\n    inputs = []\n    groups = []\n\n    # Top banner: a transcription component whose visible TITLE carries the\n    # full submission URL as selectable plain text. HS populates the input\n    # box from ``data_identifier`` (not from ``value``), so the box itself\n    # will render empty -- but the URL printed in the title is selectable\n    # for copy/paste. HS still requires a well-formed UUID in\n    # ``data_identifier`` even for display-only components, so we pass the\n    # nil UUID.\n    # Top banner: a decision component with a single \"Acknowledge\" option.\n    # The decision component's title renders as a full-width label that\n    # wraps, so we put the full submission URL in the title. The dropdown\n    # below is functionally a no-op (single option, pre-selected) but is\n    # the only HS component type whose label reliably wraps long text.\n    for i in range(1, intent_slots + 1):\n        s = str(i)\n        inputs.append({\n            \"name\": f\"intent_{s}\",\n            \"type\": \"decision\",\n            \"title\": f\"Intent {s}\",\n            \"relation\": {\"type\": \"document\"},\n            \"schema\": {\"oneOf\": intent_oneof},\n        })\n        groups.append({\"title\": \"\", \"fields\": [f\"intent_{s}\"]})\n\n    # Transaction Type dropdown: required reviewer selection that drives the\n    # 'Transaction Type' field on the downstream Salesforce payload.\n    tx_oneof = transaction_type_oneof or [\n        {\"const\": \"MidTermChange\", \"title\": \"MidTermChange\"},\n        {\"const\": \"MidTermQuote\", \"title\": \"MidTermQuote\"},\n    ]\n    inputs.append({\n        \"name\": \"transaction_type\",\n        \"type\": \"decision\",\n        \"title\": \"Transaction Type\",\n        \"relation\": {\"type\": \"document\"},\n        \"required\": True,\n        \"schema\": {\"oneOf\": tx_oneof},\n    })\n    inputs.append({\n        \"name\": \"multiple_transaction_type\",\n        \"type\": \"decision\",\n        \"title\": \"Multiple Transaction Type\",\n        \"relation\": {\"type\": \"document\"},\n        \"schema\": {\n            \"oneOf\": [\n                {\"const\": \"True\", \"title\": \"True\"},\n                {\"const\": \"False\", \"title\": \"False\"},\n            ]\n        },\n    })\n    groups.append({\"title\": \"\", \"fields\": [\"transaction_type\", \"multiple_transaction_type\"]})\n\n    action = {\n        \"name\": \"endorsement_intents\",\n        \"display\": \"Endorsement Intents\",\n        \"input\": inputs,\n        \"ui\": {\"groups\": groups},\n    }\n    if link_url:\n        # Some HS UI versions render the action description prominently near\n        # the task header; this is a belt-and-braces second placement for the\n        # link in case the banner component is collapsed.\n        action[\"description\"] = f\"Submission link: {link_url}\"\n\n    return [\n        {\n            \"name\": \"three_column_template\",\n            \"version\": \"1.0\",\n            \"thumbnail\": {\"group_by_document\": True, \"group_by_case\": True},\n            \"action\": [action],\n        }\n    ]\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _build_dynamic_template(**task.inputData.dict())\n"
+      }
+    },
+    {
+      "identifier": "ROUTING",
+      "reference_name": "intent_routing",
+      "title": "Intent Supervision Routing",
+      "description": "TEMPORARY: routes around Custom Supervision when perf_test_mode=true.",
+      "branches": [
+        {
+          "case": "true",
+          "label": "perf-bypass",
+          "output": "bypass_supervision",
+          "blocks": [
+            {
+              "identifier": "PYTHON_3_14_CODE",
+              "reference_name": "bypass_supervision",
+              "input": {
+                "data": {
+                  "submission": "${perf_test_preprocessor.output.result.submission}",
+                  "supervision_data": "${perf_test_preprocessor.output.result.supervision_data}"
+                },
+                "code": "\nfrom typing import Any\nfrom blocks.base_python_block import WFEngineTaskResult, Block, WFEngineTask\nfrom blocks.types import BlockInputs\n\n\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    submission: Any\n    supervision_data: Any = None\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    inp = task.inputData\n    return {\"submission\": inp.submission, \"decisions\": inp.supervision_data or {\"selected_choices\": []}}\n"
+              },
+              "title": "Bypass Supervision (perf)",
+              "description": "TEMPORARY perf-test bypass: forwards preprocessor submission + prefilled decisions without opening a supervision task."
+            }
+          ]
+        },
+        {
+          "case": "false",
+          "label": "normal",
+          "output": "supervision_normalizer",
+          "blocks": [
+            {
+              "identifier": "IDP_CUSTOM_SUPERVISION_4",
+              "reference_name": "intent_supervision",
+              "input": {
+                "supervision_template": "${build_supervision_template.output.result}",
+                "data": "${perf_test_preprocessor.output.result.supervision_data}",
+                "task_purpose": "capture_intents",
+                "submission": "${perf_test_preprocessor.output.result.submission}",
+                "task_restrictions": [],
+                "supervision_transcription_masking": true,
+                "page_ids": [],
+                "notification_workflow": "IDP_SUBMISSION_NOTIFY"
+              },
+              "title": "IDP Custom Supervision",
+              "description": "IDP Custom Supervision"
+            },
+            {
+              "identifier": "PYTHON_3_14_CODE",
+              "reference_name": "supervision_normalizer",
+              "input": {
+                "data": {
+                  "submission": "${intent_supervision.output.submission}",
+                  "decisions": "${intent_supervision.output.decisions}"
+                },
+                "code": "\nfrom typing import Any\nfrom blocks.base_python_block import WFEngineTaskResult, Block, WFEngineTask\nfrom blocks.types import BlockInputs\n\n\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    submission: Any\n    decisions: Any = None\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    inp = task.inputData\n    return {\"submission\": inp.submission, \"decisions\": inp.decisions or {\"selected_choices\": []}}\n"
+              },
+              "title": "Supervision Normalizer",
+              "description": "Wraps supervision output under .result so downstream references are uniform across both routing branches."
+            }
+          ]
+        }
+      ],
+      "decision": "${workflow.input.perf_test_mode}"
+    },
+    {
+      "identifier": "HTTP_REST",
+      "reference_name": "get_submission_details",
+      "input": {
+        "method": "GET",
+        "sdm_app_endpoint": "api/v5/submissions/${submission_bootstrap.output.result.submission.id}?flat=false",
+        "timeout": 600
+      },
+      "title": "Get Submission Details",
+      "description": "Fetch persisted submission record (carries external_id)."
+    },
+    {
+      "identifier": "PYTHON_3_14_CODE",
+      "reference_name": "build_salesforce_payload",
+      "input": {
+        "data": {
+          "submission": "${intent_routing.output.result.submission}",
+          "decisions": "${intent_routing.output.result.decisions}",
+          "submission_record": "${get_submission_details.output.result.data}"
+        },
+        "code": "\"\"\"Hyperscience PythonBlock source for `build_salesforce_payload`.\n\nReads the native HS submission produced by `intent_supervision` and emits a\nSalesforce-shaped payload matching\n`samples/salesforce_payload/sample_endorsement_native_hs.json`.\n\nContract:\n- Output is a dict with keys: `id`, `external_id`, `classification_review_needed`,\n  `unassigned_pages`, `cases`, `document_folders`, `documents[]`.\n- For every document, the canonical 12 identification fields + `Transaction Type`\n  + `Instructions` are guaranteed present in `document_fields[]`. Missing values\n  are emitted as empty strings (`transcription: \"\"`, `transcription_normalized: \"\"`).\n- Source mapping:\n    * `transcription.source == \"machine_transcription\"` \u2192 \"machine\"\n    * `transcription.source == \"human_transcription\"`   \u2192 \"human\"\n    * Decision-derived rows (intents, single_policy_flag) \u2192 \"supervision\"\n- `layout_field_uuid` is intentionally NOT emitted (Option A).\n\nEmbedded into the flow via `refactor_export.py`.\n\"\"\"\nfrom typing import Any, Dict, List\nfrom blocks.base_python_block import WFEngineTaskResult\nfrom blocks.types import BlockInputs\nfrom blocks.base_python_block import Block, WFEngineTask\n\n\n# Used to deserialize json inputs by the CCB.\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    submission: Any\n    decisions: Any = None\n    submission_record: Any = None\n\n\n# Canonical AC field list (US-S2.5 / US-S2.9). Order is preserved on output.\nEXPECTED_FIELDS = [\n    \"Policy Endorsement Contact\",\n    \"Effective Date of Change\",\n    \"New Expiration Date\",\n    \"ERP Effective Date\",\n    \"ERP Expiration Date\",\n    \"Unlimited\",\n    \"New Mailing Address\",\n    \"Customer Account Number\",\n    \"Customer Account\",\n    \"Path Id\",\n    \"Transaction Type\",\n    \"Instructions\",\n]\n\n# Aliases observed in current layouts \u2192 canonical AC name.\nFIELD_NAME_ALIASES = {\n    \"Policy Producer Contact\": \"Policy Endorsement Contact\",\n    \"Path ID\": \"Path Id\",\n}\n\nZWSP = \"\\u200b\"\n\n\ndef _clean_name(name):\n    if not isinstance(name, str):\n        return \"\"\n    cleaned = name.replace(ZWSP, \"\").strip()\n    return FIELD_NAME_ALIASES.get(cleaned, cleaned)\n\n\ndef _map_source(raw_source):\n    if raw_source == \"machine_transcription\":\n        return \"machine\"\n    if raw_source == \"human_transcription\":\n        return \"human\"\n    if raw_source in (\"supervision\", \"machine\", \"human\"):\n        return raw_source\n    return \"machine\"\n\n\ndef _flatten_field(field):\n    \"\"\"Convert HS field dict to flat Salesforce shape.\n\n    Tolerates two shapes for the transcription block:\n      * In-flow (intent_supervision output): flat keys\n            transcription, transcription_normalized, transcription_source,\n            transcription_confidence\n      * Post-complete API: nested\n            transcription: {raw, normalized, source, ...}\n    \"\"\"\n    name = _clean_name(field.get(\"output_name\") or field.get(\"field_name\") or field.get(\"name\") or \"\")\n    occurrence = field.get(\"occurrence_index\", 0) or 0\n    # Per Salesforce contract: output_name stays bare for every occurrence;\n    # field_name is suffixed with the occurrence number for occurrences >= 1\n    # (e.g. \"Policy Number\", \"Policy Number 1\", ...).\n    field_name = name if occurrence == 0 else f\"{name} {occurrence}\"\n\n    transcription_val = field.get(\"transcription\")\n    if isinstance(transcription_val, dict):\n        raw = transcription_val.get(\"raw\") or \"\"\n        normalized = transcription_val.get(\"normalized\")\n        if normalized is None:\n            normalized = raw or \"\"\n        src_raw = transcription_val.get(\"source\")\n    else:\n        raw = transcription_val if isinstance(transcription_val, str) else \"\"\n        normalized = field.get(\"transcription_normalized\")\n        if not isinstance(normalized, str):\n            normalized = raw\n        src_raw = field.get(\"transcription_source\") or field.get(\"identification_source\")\n\n    src = _map_source(src_raw)\n\n    fda = field.get(\"field_definition_attributes\") or {}\n    required = field.get(\"required\")\n    if required is None:\n        required = fda.get(\"required\", False)\n    multiline = field.get(\"multiline\")\n    if multiline is None:\n        multiline = fda.get(\"multiline\", False)\n\n    return {\n        \"id\": field.get(\"id\"),\n        \"output_name\": name,\n        \"field_name\": field_name,\n        \"occurrence_index\": occurrence,\n        \"page_number\": field.get(\"page_number\") or 1,\n        \"identification_source\": _map_source(field.get(\"identification_source\") or src_raw),\n        \"identification_confidence\": field.get(\"identification_confidence\") or \"sure\",\n        \"transcription\": raw if isinstance(raw, str) else \"\",\n        \"transcription_normalized\": normalized if isinstance(normalized, str) else \"\",\n        \"transcription_source\": src,\n        \"transcription_confidence\": field.get(\"transcription_confidence\") or \"sure\",\n        \"required\": bool(required),\n        \"multiline\": bool(multiline),\n        \"state\": field.get(\"state\", \"complete\"),\n    }\n\n\ndef _empty_field(name, page_number=1):\n    return {\n        \"id\": None,\n        \"output_name\": name,\n        \"field_name\": name,\n        \"occurrence_index\": 0,\n        \"page_number\": page_number,\n        \"identification_source\": \"machine\",\n        \"identification_confidence\": \"sure\",\n        \"transcription\": \"\",\n        \"transcription_normalized\": \"\",\n        \"transcription_source\": \"machine\",\n        \"transcription_confidence\": \"sure\",\n        \"required\": False,\n        \"multiline\": False,\n        \"state\": \"complete\",\n    }\n\n\ndef _normalize_supervision_decisions(decisions_obj):\n    \"\"\"Convert the supervision-block `decisions` output port into a\n    per-document list of {decision, choice} dicts.\n\n    Accepts both shapes:\n      * In-flow supervision output:\n            {\"selected_choices\": [\n                {\"document_id\": 31373,\n                 \"decision_choice\": {\n                     \"decision\": {\"name\": \"intent_1\"},\n                     \"choice\":   {\"name\": \"add_auto\"}}}, ...]}\n      * Pre-flattened list (already keyed by document_id) \u2014 passthrough.\n\n    Returns: {document_id_or_None: [{\"decision\": str, \"choice\": str}, ...]}\n    \"\"\"\n    by_doc: Dict[Any, List[Dict[str, Any]]] = {}\n    if not decisions_obj:\n        return by_doc\n    if isinstance(decisions_obj, dict):\n        choices = decisions_obj.get(\"selected_choices\") or []\n    elif isinstance(decisions_obj, list):\n        choices = decisions_obj\n    else:\n        return by_doc\n    for sc in choices:\n        if not isinstance(sc, dict):\n            continue\n        # Already-flattened shape\n        if \"decision\" in sc and isinstance(sc.get(\"decision\"), str):\n            doc_id = sc.get(\"document_id\")\n            by_doc.setdefault(doc_id, []).append({\n                \"decision\": sc.get(\"decision\") or \"\",\n                \"choice\": sc.get(\"choice\"),\n            })\n            continue\n        dc = sc.get(\"decision_choice\") or {}\n        d_obj = dc.get(\"decision\") or {}\n        c_obj = dc.get(\"choice\") or {}\n        name = d_obj.get(\"name\") if isinstance(d_obj, dict) else None\n        choice = c_obj.get(\"name\") if isinstance(c_obj, dict) else None\n        if not name:\n            continue\n        doc_id = sc.get(\"document_id\")\n        by_doc.setdefault(doc_id, []).append({\n            \"decision\": name,\n            \"choice\": choice,\n        })\n    return by_doc\n\n\ndef _decisions_to_field_rows(decisions, next_id_seed):\n    \"\"\"Translate per-document decisions list into supervision field rows.\n\n    All intents share `output_name: \"Intent\"`. Their `field_name` is suffixed\n    starting at 1: \"Intent 1\", \"Intent 2\", \"Intent 3\". `occurrence_index`\n    starts at 0 and increments.\n    `single_policy_flag` \u2192 field_name \"single_policy_flag\".\n    `transaction_type` \u2192 field_name \"Transaction Type\" (the canonical\n    placeholder is removed in `_transform_document` so this is the only row).\n\n    Per-intent date / policy picks (``intent_<N>_effective_date_pick``,\n    ``intent_<N>_policy_number_pick``) emit supervision rows keyed by the\n    matching intent slot number. They are emitted *only* when the supervisor\n    actually selected a real value (skip empty / the ``__none__`` sentinel\n    used when nothing was extracted), so consumers can rely on absence to\n    mean \"no selection\".\n    \"\"\"\n    import re as _re\n\n    rows = []\n    intent_seen = 0\n    pick_re = _re.compile(r\"^intent_(\\d+)_(effective_date|policy_number)_pick$\")\n\n    def _row(output_name, field_name, occurrence, choice):\n        rows.append({\n            \"id\": next_id_seed[0],\n            \"output_name\": output_name,\n            \"field_name\": field_name,\n            \"occurrence_index\": occurrence,\n            \"page_number\": 1,\n            \"identification_source\": \"supervision\",\n            \"identification_confidence\": \"sure\",\n            \"transcription\": str(choice),\n            \"transcription_normalized\": str(choice),\n            \"transcription_source\": \"supervision\",\n            \"transcription_confidence\": \"sure\",\n            \"required\": False,\n            \"multiline\": False,\n            \"state\": \"complete\",\n        })\n        next_id_seed[0] += 1\n\n    for d in decisions or []:\n        name = d.get(\"decision\") or \"\"\n        choice = d.get(\"choice\")\n        if choice is None:\n            continue\n        # Skip placeholder sentinel emitted when no values were extracted.\n        if isinstance(choice, str) and (not choice.strip() or choice == \"__none__\"):\n            continue\n        # Skip the user-facing \"-- None --\" dropdown option: treat as \"no\n        # selection\" and omit from the Salesforce payload entirely.\n        if choice == \"None\" and (\n            (name.startswith(\"intent_\") and not name.endswith(\"_pick\"))\n            or name == \"transaction_type\"\n        ):\n            continue\n\n        m = pick_re.match(name)\n        if m:\n            slot = int(m.group(1))\n            kind = m.group(2)\n            if kind == \"effective_date\":\n                _row(\"Effective Date\", f\"Effective Date {slot}\", slot - 1, choice)\n            else:\n                _row(\"Policy Number\", f\"Policy Number {slot}\", slot - 1, choice)\n            continue\n\n        if name.startswith(\"intent_\") and not name.endswith(\"_pick\"):\n            intent_seen += 1\n            _row(\"Intent\", f\"Intent {intent_seen}\", intent_seen - 1, choice)\n        elif name == \"single_policy_flag\":\n            _row(\"Single Policy Flag\", \"single_policy_flag\", 0, choice)\n        elif name == \"transaction_type\":\n            _row(\"Transaction Type\", \"Transaction Type\", 0, choice)\n        elif name == \"multiple_transaction_type\":\n            if choice is None:\n                continue\n            if isinstance(choice, str):\n                normalized = choice.strip().lower()\n                if normalized in {\"\", \"none\", \"null\", \"false\", \"no\"}:\n                    continue\n            _row(\"Multiple Transaction Type\", \"Multiple Transaction Type\", 0, choice)\n    return rows\n\n\ndef _transform_document(doc, supervision_decisions=None):\n    src_fields = doc.get(\"document_fields\") or []\n    flat_fields = [_flatten_field(f) for f in src_fields if isinstance(f, dict)]\n\n    # Guarantee canonical fields present (empty-string default).\n    have_names = {f[\"field_name\"] for f in flat_fields if f.get(\"occurrence_index\", 0) == 0}\n    for canonical in EXPECTED_FIELDS:\n        if canonical not in have_names:\n            flat_fields.append(_empty_field(canonical))\n\n    # Append supervision rows. Prefer decisions wired in from the supervision\n    # block's `decisions` output port; fall back to post-API doc.decisions[].\n    next_id = [10_000_000]\n    decisions = supervision_decisions if supervision_decisions is not None else doc.get(\"decisions\")\n    supervision_rows = _decisions_to_field_rows(decisions, next_id)\n\n    # If supervision provided a Transaction Type, drop the empty placeholder\n    # so the payload has exactly one Transaction Type row per document.\n    sup_field_names = {r.get(\"field_name\") for r in supervision_rows}\n    if \"Transaction Type\" in sup_field_names:\n        flat_fields = [\n            f for f in flat_fields\n            if not (\n                f.get(\"field_name\") == \"Transaction Type\"\n                and f.get(\"transcription_source\") != \"supervision\"\n                and not (f.get(\"transcription\") or \"\").strip()\n            )\n        ]\n\n    flat_fields.extend(supervision_rows)\n\n    return {\n        \"id\": doc.get(\"id\"),\n        \"exceptions\": doc.get(\"exceptions\") or [],\n        \"layout_kind\": doc.get(\"type\") or doc.get(\"layout_kind\"),\n        \"layout_name\": doc.get(\"layout_name\"),\n        \"layout_language\": doc.get(\"layout_language\") or \"en\",\n        \"layout_tags\": doc.get(\"layout_tags\") or [],\n        \"layout_uuid\": doc.get(\"layout_uuid\"),\n        \"layout_version_name\": doc.get(\"layout_version_name\"),\n        \"layout_version_uuid\": doc.get(\"layout_version_uuid\"),\n        \"metadata\": doc.get(\"metadata\") or {},\n        \"pages\": doc.get(\"pages\") or [],\n        \"status\": doc.get(\"state\") or \"complete\",\n        \"document_fields\": flat_fields,\n        \"tables\": doc.get(\"document_tables\") or [],\n        \"state\": doc.get(\"state\") or \"complete\",\n        \"complete_time\": doc.get(\"complete_time\"),\n    }\n\n\ndef _resolve_external_id(submission, submission_record):\n    # Prefer the persisted submission record fetched from\n    # `GET /api/v5/submissions/{id}?flat=false` (this is the only place the\n    # platform exposes the caller-supplied external_id). Fall back to the\n    # in-flight pipeline submission if the record lookup is unavailable.\n    for src in (submission_record, submission):\n        if isinstance(src, dict):\n            ext = (\n                src.get(\"external_id\")\n                or src.get(\"source_external_id\")\n                or (src.get(\"metadata\") or {}).get(\"external_id\")\n                or (src.get(\"api_params\") or {}).get(\"external_id\")\n            )\n            if ext:\n                return ext\n    return None\n\n\ndef _build_payload(submission, decisions=None, submission_record=None):\n    submission = submission or {}\n    by_doc = _normalize_supervision_decisions(decisions)\n    docs = submission.get(\"documents\") or []\n    out_docs = []\n    for d in docs:\n        doc_id = d.get(\"id\") if isinstance(d, dict) else None\n        per_doc = [\n            dec for dec in (by_doc.get(None) or [])\n            if dec.get(\"decision\") != \"transaction_type\"\n        ]\n        per_doc.extend(by_doc.get(doc_id) or [])\n        out_docs.append(_transform_document(d, supervision_decisions=per_doc))\n    return {\n        \"id\": submission.get(\"id\"),\n        \"external_id\": _resolve_external_id(submission, submission_record),\n        \"classification_review_needed\": False,\n        \"unassigned_pages\": submission.get(\"unassigned_pages\") or [],\n        \"cases\": submission.get(\"cases\") or [],\n        \"document_folders\": submission.get(\"document_folders\") or [],\n        \"documents\": out_docs,\n    }\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _build_payload(\n        task.inputData.submission,\n        task.inputData.decisions,\n        task.inputData.submission_record,\n    )\n"
+      },
+      "title": "Build Salesforce Payload",
+      "description": "Reshape native HS submission to the Salesforce contract shape."
+    },
+    {
+      "identifier": "SUBMISSION_COMPLETE_4",
+      "reference_name": "complete_submission",
+      "input": {
+        "submission": "${intent_routing.output.result.submission}",
+        "is_reprocessing": false,
+        "nlc_qa_sampling_ratio": "${workflow.input.semi_qa_sample_rate}",
+        "field_id_qa_enabled": "${workflow.input.field_id_qa_enabled}",
+        "field_id_qa_sampling_ratio": "${workflow.input.field_id_qa_sample_rate}",
+        "table_id_qa_enabled": "${workflow.input.table_id_qa_enabled}",
+        "table_id_qa_sampling_ratio": "${workflow.input.table_id_qa_sample_rate}",
+        "transcription_qa_enabled": "${workflow.input.qa}",
+        "transcription_structured_entry_qa_sample_rate": "${workflow.input.structured_entry_qa_sample_rate}",
+        "transcription_structured_checkbox_qa_sample_rate": "${workflow.input.structured_checkbox_qa_sample_rate}",
+        "transcription_structured_signature_qa_sample_rate": "${workflow.input.structured_signature_qa_sample_rate}",
+        "transcription_semi_structured_qa_sample_rate": "${workflow.input.semi_structured_qa_sample_rate}",
+        "table_cell_transcription_qa_enabled": "${workflow.input.table_cell_transcription_qa_enabled}",
+        "table_cell_transcription_qa_sample_rate": "${workflow.input.table_cell_transcription_qa_sample_rate}",
+        "auto_qa_sampling_rate_enabled": "${workflow.input.auto_qa_sampling_rate_enabled}",
+        "exclude_auto_transcribe_fields_from_qa": "${workflow.input.exclude_auto_transcribe_fields_from_qa}"
+      },
+      "title": "Complete",
+      "description": "Finalize submission processing and update reporting data"
+    },
+    {
+      "identifier": "SET_TRANSFORMED_OUTPUT",
+      "reference_name": "set_transformed_output",
+      "input": {
+        "submission": "${complete_submission.output.submission}",
+        "transformed_output": "${build_salesforce_payload.output.result}"
+      },
+      "title": "Set Transformed Output",
+      "description": "Set transformed output to Salesforce payload so exported body contains id at top level."
+    }
+  ],
+  "input": {
+    "layout_release_uuid": "9dedc3b5-8fc5-4793-93da-097969d17a56",
+    "hs_base_url": "https://hs-dev.corp.tmnas.com"
+  },
+  "description": "Custom flow which runs IDP then attempts to identify the product code",
+  "output": {
+    "submission": "${complete_submission.output.submission}",
+    "salesforce_payload": "${build_salesforce_payload.output.result}"
+  }
+}
