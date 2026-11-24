@@ -1,15 +1,15 @@
 {
   "metadata": {
     "schema_version": 2,
-    "exported_from_hostname": "hs-dev.corp.tmnas.com",
-    "hs_tag": "41.0.35",
-    "hs_revision": "0abbb6e0345ea06bd2b34bf37f96375307f407c4",
-    "exported_version": 129,
+    "exported_from_hostname": "tmnas-dev.hyperscience.net",
+    "hs_tag": "44.1.1",
+    "hs_revision": "afc3fb7d77da14348d062d4b0f7ed2bc1cc2c860",
+    "exported_version": 10,
     "file_type": "flow_json"
   },
-  "uuid": "b2c3d4e5-f6a7-48b9-ac10-2e3f4a5b6c7d",
+  "uuid": "2271e1ef-82d9-4bb6-8b60-8e7f9cf3bb4c",
   "owner_email": "flows-sdk@hyperscience.com",
-  "title": "Endorsement Automation Dev Sample - PERF TEST",
+  "title": "Cancellation Automation Dev Sample - PERF TEST",
   "manifest": {
     "input": [
       {
@@ -34,14 +34,14 @@
         "optional": true
       }
     ],
-    "identifier": "CUSTOM_PRODUCT_CODE_IDENTIFIER__hs_b2c3d4e5-f6a7-48b9-ac10-2e3f4a5b6c7d__",
+    "identifier": "DROPDOWN_TRANSACTION_TYPE_WRAPPER",
     "roles": [
       "idp"
     ]
   },
   "blocks": [
     {
-      "identifier": "ENDORSEMENT_CUSTOM_CORE_V41",
+      "identifier": "CANCELLATION_CUSTOM_CORE_V44",
       "reference_name": "__idp_core__",
       "input": {
         "layout_release_uuid": "${workflow.input.layout_release_uuid}",
@@ -157,7 +157,7 @@
       "reference_name": "log_pre_export",
       "input": {
         "data": {
-          "submission": "${__idp_core__.output.salesforce_payload}"
+          "submission": "${__idp_core__.output.merge_outputs}"
         },
         "code": "\nfrom typing import Any\nimport hashlib\nimport json\nfrom blocks.base_python_block import WFEngineTaskResult\nfrom blocks.types import BlockInputs\nfrom blocks.base_python_block import Block, WFEngineTask\n\n\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    submission: Any = None\n\n\ndef _log_pre_export(submission: Any) -> dict:\n    sub_id = None\n    external_id = None\n    doc_count = None\n    top_level_keys = None\n\n    if isinstance(submission, dict):\n        sub_id = submission.get('id')\n        external_id = submission.get('external_id')\n        docs = submission.get('documents')\n        if isinstance(docs, list):\n            doc_count = len(docs)\n        top_level_keys = list(submission.keys())\n\n    print(\n        f'[pre_export] submission_id={sub_id} '\n        f'external_id={external_id} '\n        f'documents_count={doc_count} '\n        f'top_level_keys={top_level_keys}'\n    )\n\n    # Log first doc id if present\n    if isinstance(submission, dict):\n        docs = submission.get('documents') or []\n        for i, doc in enumerate(docs[:3]):\n            doc_id = doc.get('id') if isinstance(doc, dict) else None\n            layout_name = doc.get('layout_name') if isinstance(doc, dict) else None\n            field_count = len(doc.get('document_fields') or []) if isinstance(doc, dict) else None\n            print(f'[pre_export] doc[{i}] id={doc_id} layout={layout_name} field_count={field_count}')\n\n    # Deterministic snapshot of the exact object routed to export.\n    payload_json = json.dumps(submission, separators=(',', ':'), sort_keys=True, ensure_ascii=False)\n    payload_bytes = len(payload_json.encode('utf-8'))\n    payload_sha256 = hashlib.sha256(payload_json.encode('utf-8')).hexdigest()\n    print(f'[pre_export_exact] bytes={payload_bytes} sha256={payload_sha256}')\n    print(f'[pre_export_exact_json]{payload_json}')\n\n    return submission\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _log_pre_export(task.inputData.submission)\n"
       },
@@ -176,32 +176,11 @@
         "submission": "${log_pre_export.output.result}",
         "enabled": true
       },
-      "blocks": [
-        {
-          "identifier": "COB_HTTP_EXPORT",
-          "reference_name": "cob_http_export_sync_policy_txn_to_sf",
-          "title": "Sync Policy Txn to Salesforce",
-          "description": "POST transformed submission JSON to APIM-fronted Function App SyncHSPolicyTxnToSF via OAuth2 client credentials.",
-          "enabled": false,
-          "input": {
-            "submission": "${log_pre_export.output.result}",
-            "enabled": false,
-            "api_version": "transformed",
-            "export_type": "SUBMISSION",
-            "authorization_type": "oauth_2_client_credentials",
-            "auth_url": "https://login.microsoftonline.com/8be8e238-f32a-4b1b-b02e-44d1b7db4632/oauth2/v2.0/token",
-            "client_id": "0588ea77-cb13-4d8d-ac57-8fe4656d92e3",
-            "endpoint": "https://npapim.nonprod.corp.tmnas.io/api-01-qa4-faphyperscience-001/SyncHSPolicyTxnToSF?subscription-key={secret_token}",
-            "scope": "api://3eb38c44-fa7c-4d41-ba37-8d98b9d35969/.default",
-            "client_secret": "",
-            "endpoint_secrets": ""
-          }
-        }
-      ]
+      "blocks": []
     }
   ],
   "input": {
-    "layout_release_uuid": "9dedc3b5-8fc5-4793-93da-097969d17a56",
+    "layout_release_uuid": "1defda42-a878-4563-a904-c84cab0f7cc2",
     "hs_base_url": "https://hs-dev.corp.tmnas.com",
     "perf_test_mode": false
   },

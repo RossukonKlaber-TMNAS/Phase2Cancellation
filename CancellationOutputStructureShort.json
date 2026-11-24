@@ -1,0 +1,445 @@
+{
+    "submission": {
+        "flow_uuid": "2271e1ef-82d9-4bb6-8b60-8e7f9cf3bb4c",
+        "flow_name": "DROPDOWN_TRANSACTION_TYPE_WRAPPER",
+        "flow_version": 11,
+        "unassigned_pages": [],
+        "status": "complete",
+        "failed_pages": [],
+        "id": 4853,
+        "classification_review_needed": false,
+        "documents": [
+            {
+                "layout_name": "ACORD_35_CANCELLATION REQUEST / POLICY RELEASE_09/2011",
+                "document_fields": [
+                    {
+                        "layout_page_uuid": "5b9f5aee-3b28-45e2-9be1-d0a13182bdbb",
+                        "layout_field_uuid": "f4425b16-3bc3-4042-9b13-bdacfa851167",
+                        "output_name": "POLICY NUMBER",
+                        "transcription_target_accuracy": null,
+                        "field_name": "POLICY NUMBER",
+                        "field_number": 10,
+                        "source_uuid": "23cfa41e-adb0-4a85-97ce-9ba461a356f7",
+                        "notes": "",
+                        "multiline": false,
+                        "bounding_box": [
+                            0.5000653765690377,
+                            0.20790678879310345,
+                            0.9699487254418008,
+                            0.23814655172413793
+                        ],
+                        "transcription_sv_mode": 0,
+                        "identification_sv_mode": 0,
+                        "dropout": true,
+                        "required": false,
+                        "repeated": false,
+                        "data_type_uuid": "de928cd1-cc3e-4933-b9cb-c880951fcc0a",
+                        "language": "",
+                        "shared_field_uuid": "88dd545e-1b53-4a45-a061-c8cac7d8c40d",
+                        "uuid": "8b859fef-db00-4878-adf7-960e1bbc4882",
+                        "original_source_uuid": "23cfa41e-adb0-4a85-97ce-9ba461a356f7",
+                        "identification_source": "machine",
+                        "identification_confidence": "sure",
+                        "occurrence_index": 0,
+                        "page_number": 1,
+                        "locations": [
+                            {
+                                "position": 1,
+                                "page_number": 1,
+                                "bounding_box": [
+                                    0.5000653765690377,
+                                    0.20790678879310345,
+                                    0.9699487254418008,
+                                    0.23814655172413793
+                                ],
+                                "type": "exact"
+                            }
+                        ],
+                        "exceptions": [
+                            "machine_not_sure"
+                        ],
+                        "id": 81103,
+                        "transcription": "R2WC625759",
+                        "transcription_normalized": "R2WC625759",
+                        "transcription_source": "human",
+                        "transcription_confidence": "sure",
+                        "validation_overridden": false,
+                        "time_taken_ms": 882,
+                        "is_valid": true,
+                        "document_id": 9893,
+                        "status": "complete"
+                    },
+                    {
+                        "layout_page_uuid": "5b9f5aee-3b28-45e2-9be1-d0a13182bdbb",
+                        "layout_field_uuid": "4c61ea4d-cb20-4bb0-aaa3-a58f5ea54ae8",
+                        "output_name": "POLICY CANCELLATION DATE",
+                        "transcription_target_accuracy": null,
+                        "field_name": "POLICY CANCELLATION DATE",
+                        "field_number": 13,
+                        "source_uuid": "49e643b9-2096-4a1a-aa8a-da0a21dbaceb",
+                        "notes": "",
+                        "multiline": false,
+                        "bounding_box": [
+                            0.6897445955369595,
+                            0.24892241379310345,
+                            0.8306090057208446,
+                            0.2683189655172413
+                        ],
+                        "transcription_sv_mode": 0,
+                        "identification_sv_mode": 0,
+                        "dropout": true,
+                        "required": false,
+                        "repeated": false,
+                        "data_type_uuid": "de928cd1-cc3e-4933-b9cb-c880951fcbff",
+                        "language": "",
+                        "shared_field_uuid": "87e71481-d1a7-4dde-8121-897101ea0e2e",
+                        "uuid": "8b859fef-db00-4878-adf7-960e1bbc4885",
+                        "original_source_uuid": "49e643b9-2096-4a1a-aa8a-da0a21dbaceb",
+                        "identification_source": "machine",
+                        "identification_confidence": "sure",
+                        "occurrence_index": 0,
+                        "page_number": 1,
+                        "locations": [
+                            {
+                                "position": 1,
+                                "page_number": 1,
+                                "bounding_box": [
+                                    0.6897445955369595,
+                                    0.24892241379310345,
+                                    0.8306090057208446,
+                                    0.2683189655172413
+                                ],
+                                "type": "exact"
+                            }
+                        ],
+                        "exceptions": [
+                            "machine_not_sure"
+                        ],
+                        "id": 81106,
+                        "transcription": "07/21/2026",
+                        "transcription_normalized": "07/21/2026",
+                        "transcription_source": "human",
+                        "transcription_confidence": "sure",
+                        "validation_overridden": false,
+                        "time_taken_ms": 674,
+                        "is_valid": true,
+                        "document_id": 9893,
+                        "status": "complete"
+                    }
+                ],
+                "tables": [],
+                "complete_time": "2026-11-24T04:31:14.044600+00:00"
+            },
+            {
+                "layout_kind": "semi_structured",
+                "layout_name": "Cancellation Email Layout",
+                "document_fields": [
+                    {
+                        "exceptions": [
+                            "illegible_field"
+                        ],
+                        "original_source_uuid": "64c00dbf-c757-4f42-aa3a-e3fdb1c9a28a",
+                        "layout_page_uuid": "2cb5f3e1-20c6-4fa4-a88a-ec885ef8af5f",
+                        "layout_field_uuid": "99bd83e9-cd21-4497-8294-88cbb53e2d66",
+                        "output_name": "Policy Producer Contact",
+                        "transcription_target_accuracy": null,
+                        "field_name": "Policy Endorsement Contact",
+                        "field_number": 4,
+                        "source_uuid": "64c00dbf-c757-4f42-aa3a-e3fdb1c9a28a",
+                        "notes": "",
+                        "multiline": false,
+                        "bounding_box": null,
+                        "transcription_sv_mode": 0,
+                        "identification_sv_mode": 0,
+                        "dropout": false,
+                        "required": false,
+                        "repeated": false,
+                        "data_type_uuid": "de928cd1-cc3e-4933-b9cb-c880951fcc04",
+                        "language": "",
+                        "shared_field_uuid": "37a8a525-0a37-4bd2-a5a9-600fc938059e",
+                        "uuid": "1845e4d6-1409-48bf-8a8b-6390695242b9",
+                        "identification_source": "machine",
+                        "identification_confidence": "not_sure",
+                        "occurrence_index": 0,
+                        "page_number": 1,
+                        "locations": [],
+                        "id": 81161,
+                        "document_id": 9894,
+                        "status": "complete"
+                    },
+                    {
+                        "exceptions": [
+                            "illegible_field"
+                        ],
+                        "original_source_uuid": "f548f82b-ae44-462c-86a4-e37d8d28e1ca",
+                        "layout_page_uuid": "2cb5f3e1-20c6-4fa4-a88a-ec885ef8af5f",
+                        "layout_field_uuid": "e54e800e-6381-451b-8b2a-6b8e27e4e02e",
+                        "output_name": "Instructions​",
+                        "transcription_target_accuracy": null,
+                        "field_name": "Instructions​",
+                        "field_number": 2,
+                        "source_uuid": "f548f82b-ae44-462c-86a4-e37d8d28e1ca",
+                        "notes": "",
+                        "multiline": true,
+                        "bounding_box": null,
+                        "transcription_sv_mode": 2,
+                        "identification_sv_mode": 0,
+                        "dropout": false,
+                        "required": false,
+                        "repeated": false,
+                        "data_type_uuid": "de928cd1-cc3e-4933-b9cb-c880951fcc07",
+                        "language": "",
+                        "shared_field_uuid": "3a561904-336b-4162-a6ec-4f48c050592a",
+                        "uuid": "1845e4d6-1409-48bf-8a8b-6390695242ba",
+                        "identification_source": "machine",
+                        "identification_confidence": "not_sure",
+                        "occurrence_index": 0,
+                        "page_number": 1,
+                        "locations": [],
+                        "id": 81162,
+                        "document_id": 9894,
+                        "status": "complete"
+                    },
+                    {
+                        "exceptions": [
+                            "illegible_field"
+                        ],
+                        "original_source_uuid": "fa7acc70-1d18-4d30-bca3-c01a4e7833e3",
+                        "layout_page_uuid": "2cb5f3e1-20c6-4fa4-a88a-ec885ef8af5f",
+                        "layout_field_uuid": "73534712-9130-49dd-8f7b-a1b33c0001f0",
+                        "output_name": "Referenced PATH ID",
+                        "transcription_target_accuracy": null,
+                        "field_name": "Referenced PATH ID",
+                        "field_number": 5,
+                        "source_uuid": "fa7acc70-1d18-4d30-bca3-c01a4e7833e3",
+                        "notes": "",
+                        "multiline": false,
+                        "bounding_box": null,
+                        "transcription_sv_mode": 0,
+                        "identification_sv_mode": 0,
+                        "dropout": false,
+                        "required": false,
+                        "repeated": false,
+                        "data_type_uuid": "de928cd1-cc3e-4933-b9cb-c880951fcc0a",
+                        "language": "",
+                        "shared_field_uuid": "a78d88aa-0d78-4647-a629-4505e008cce4",
+                        "uuid": "1845e4d6-1409-48bf-8a8b-6390695242bb",
+                        "identification_source": "machine",
+                        "identification_confidence": "not_sure",
+                        "occurrence_index": 0,
+                        "page_number": 1,
+                        "locations": [],
+                        "id": 81163,
+                        "document_id": 9894,
+                        "status": "complete"
+                    },
+                    {
+                        "exceptions": [
+                            "illegible_field"
+                        ],
+                        "original_source_uuid": "cd703189-97fd-4319-a089-69fea678bfa7",
+                        "layout_page_uuid": "2cb5f3e1-20c6-4fa4-a88a-ec885ef8af5f",
+                        "layout_field_uuid": "8a03c673-54e8-458b-8f29-a98afc7fd7e7",
+                        "output_name": "Cancellation Effective Date",
+                        "transcription_target_accuracy": null,
+                        "field_name": "Cancellation Effective Date",
+                        "field_number": 1,
+                        "source_uuid": "cd703189-97fd-4319-a089-69fea678bfa7",
+                        "notes": "",
+                        "multiline": false,
+                        "bounding_box": null,
+                        "transcription_sv_mode": 0,
+                        "identification_sv_mode": 0,
+                        "dropout": false,
+                        "required": false,
+                        "repeated": false,
+                        "data_type_uuid": "de928cd1-cc3e-4933-b9cb-c880951fcbff",
+                        "language": "",
+                        "shared_field_uuid": "3ac58227-700b-47e1-8bef-c8fa5d936bf2",
+                        "uuid": "1845e4d6-1409-48bf-8a8b-6390695242bc",
+                        "identification_source": "machine",
+                        "identification_confidence": "not_sure",
+                        "occurrence_index": 0,
+                        "page_number": 1,
+                        "locations": [],
+                        "id": 81164,
+                        "document_id": 9894,
+                        "status": "complete"
+                    },
+                    {
+                        "exceptions": [
+                            "illegible_field"
+                        ],
+                        "original_source_uuid": "84275568-544b-4827-94fd-c8f576680e74",
+                        "layout_page_uuid": "2cb5f3e1-20c6-4fa4-a88a-ec885ef8af5f",
+                        "layout_field_uuid": "90b4fcff-3c48-4069-8fa4-42858bba3fd0",
+                        "output_name": "Account Name",
+                        "transcription_target_accuracy": null,
+                        "field_name": "Account Name",
+                        "field_number": 3,
+                        "source_uuid": "84275568-544b-4827-94fd-c8f576680e74",
+                        "notes": "",
+                        "multiline": false,
+                        "bounding_box": null,
+                        "transcription_sv_mode": 0,
+                        "identification_sv_mode": 0,
+                        "dropout": false,
+                        "required": false,
+                        "repeated": false,
+                        "data_type_uuid": "de928cd1-cc3e-4933-b9cb-c880951fcc0a",
+                        "language": "",
+                        "shared_field_uuid": "0401e0c2-b36b-449e-9179-89c603eb74ca",
+                        "uuid": "1845e4d6-1409-48bf-8a8b-6390695242bd",
+                        "identification_source": "machine",
+                        "identification_confidence": "not_sure",
+                        "occurrence_index": 0,
+                        "page_number": 1,
+                        "locations": [],
+                        "id": 81165,
+                        "document_id": 9894,
+                        "status": "complete"
+                    },
+                    {
+                        "exceptions": [
+                            "illegible_field"
+                        ],
+                        "original_source_uuid": "ca5f7e76-a7d4-4683-9899-a6adab6c9692",
+                        "layout_page_uuid": "2cb5f3e1-20c6-4fa4-a88a-ec885ef8af5f",
+                        "layout_field_uuid": "16714fa7-860e-45bd-87fa-77c9cbfcb6a5",
+                        "output_name": "External Account Number",
+                        "transcription_target_accuracy": null,
+                        "field_name": "External Account Number",
+                        "field_number": 6,
+                        "source_uuid": "ca5f7e76-a7d4-4683-9899-a6adab6c9692",
+                        "notes": "",
+                        "multiline": false,
+                        "bounding_box": null,
+                        "transcription_sv_mode": 0,
+                        "identification_sv_mode": 0,
+                        "dropout": false,
+                        "required": false,
+                        "repeated": false,
+                        "data_type_uuid": "de928cd1-cc3e-4933-b9cb-c880951fcc0a",
+                        "language": "",
+                        "shared_field_uuid": "7f25c567-b34b-444e-a0c6-8363127bcf6b",
+                        "uuid": "1845e4d6-1409-48bf-8a8b-6390695242be",
+                        "identification_source": "machine",
+                        "identification_confidence": "not_sure",
+                        "occurrence_index": 0,
+                        "page_number": 1,
+                        "locations": [],
+                        "id": 81166,
+                        "document_id": 9894,
+                        "status": "complete"
+                    },
+                    {
+                        "exceptions": [
+                            "supervision_always_field_autoidentified",
+                            "illegible_field"
+                        ],
+                        "original_source_uuid": "52d9462a-2416-4353-80dc-f4734173ee44",
+                        "layout_page_uuid": "2cb5f3e1-20c6-4fa4-a88a-ec885ef8af5f",
+                        "layout_field_uuid": "63c26f2a-d79a-4e19-97b6-37fc0339623f",
+                        "output_name": "Policy Number",
+                        "transcription_target_accuracy": null,
+                        "field_name": "Policy Number",
+                        "field_number": 0,
+                        "source_uuid": "52d9462a-2416-4353-80dc-f4734173ee44",
+                        "notes": "",
+                        "multiline": false,
+                        "bounding_box": null,
+                        "transcription_sv_mode": 0,
+                        "identification_sv_mode": 3,
+                        "dropout": false,
+                        "required": false,
+                        "repeated": false,
+                        "data_type_uuid": "c4769aa9-aa42-4312-8ef8-acd3cc12ea5a",
+                        "language": "",
+                        "shared_field_uuid": "7e35e7f6-12b9-43af-bfe1-0c554534341a",
+                        "uuid": "1845e4d6-1409-48bf-8a8b-6390695242bf",
+                        "identification_source": "machine",
+                        "identification_confidence": "not_sure",
+                        "occurrence_index": 0,
+                        "page_number": 1,
+                        "locations": [],
+                        "id": 81167,
+                        "document_id": 9894,
+                        "status": "complete"
+                    }
+                ],
+                "tables": [],
+                "complete_time": "2026-11-24T04:36:49.804929+00:00"
+            }
+        ],
+        "uuid_to_field_mapping": {},
+        "custom_decisions": {
+            "selected_choices": [
+                {
+                    "id": 62,
+                    "decision_choice": {
+                        "id": 107,
+                        "decision": {
+                            "id": 2,
+                            "name": "transaction_type",
+                            "title": "Transaction Type"
+                        },
+                        "choice": {
+                            "id": 105,
+                            "name": "Cancellation"
+                        }
+                    },
+                    "task_purpose_id": 2006,
+                    "case_id": null,
+                    "document_id": 9893,
+                    "field_id": null,
+                    "page_id": null,
+                    "document_cell_uuid": null
+                },
+                {
+                    "id": 63,
+                    "decision_choice": {
+                        "id": 111,
+                        "decision": {
+                            "id": 4,
+                            "name": "multiple_transaction_type",
+                            "title": "Multiple Transaction Type"
+                        },
+                        "choice": {
+                            "id": 109,
+                            "name": "False"
+                        }
+                    },
+                    "task_purpose_id": 2006,
+                    "case_id": null,
+                    "document_id": 9893,
+                    "field_id": null,
+                    "page_id": null,
+                    "document_cell_uuid": null
+                },
+                {
+                    "id": 64,
+                    "decision_choice": {
+                        "id": 106,
+                        "decision": {
+                            "id": 3,
+                            "name": "flat_cancellation",
+                            "title": "Flat Cancellation"
+                        },
+                        "choice": {
+                            "id": 104,
+                            "name": "No"
+                        }
+                    },
+                    "task_purpose_id": 2006,
+                    "case_id": null,
+                    "document_id": 9893,
+                    "field_id": null,
+                    "page_id": null,
+                    "document_cell_uuid": null
+                }
+            ],
+            "user_id": 47
+        },
+        "complete_time": "2026-11-24T04:31:14.044600+00:00"
+    }
+}

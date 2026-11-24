@@ -1,15 +1,12 @@
 {
   "metadata": {
+    "file_type": "workflow_dsl",
     "schema_version": 2,
-    "exported_from_hostname": "hs-dev.corp.tmnas.com",
-    "hs_tag": "41.0.35",
-    "hs_revision": "0abbb6e0345ea06bd2b34bf37f96375307f407c4",
-    "exported_version": 79,
-    "file_type": "flow_json"
+    "sdk_version": "2.11.3"
   },
-  "uuid": "a1b2c3d4-e5f6-47a8-9b10-1d2e3f4a5b6c",
+  "uuid": "2271e1ef-82d9-4bb6-8b60-8e7f9cf3bb4c",
   "owner_email": "flows.sdk@hyperscience.com",
-  "title": "Endorsement Custom Core Flow_V41",
+  "title": "Cancellation Automation Dev Sample - PERF TEST",
   "manifest": {
     "input": [
       {
@@ -2005,7 +2002,7 @@
         "name": "structured_text_threshold",
         "type": "TranscriptionThreshold",
         "title": "Structured Text Threshold",
-        "value": 0.95,
+        "value": 0.52,
         "schema": {
           "type": "number",
           "minimum": 0,
@@ -2090,7 +2087,7 @@
         "name": "structured_checkbox_threshold",
         "type": "TranscriptionThreshold",
         "title": "Structured Checkbox Threshold",
-        "value": 0.95,
+        "value": 0.56,
         "schema": {
           "type": "number",
           "minimum": 0,
@@ -2175,7 +2172,7 @@
         "name": "structured_signature_threshold",
         "type": "TranscriptionThreshold",
         "title": "Structured Signature Threshold",
-        "value": 0.95,
+        "value": 0.99,
         "schema": {
           "type": "number",
           "minimum": 0,
@@ -2543,7 +2540,7 @@
         "name": "semi_structured_text_threshold",
         "type": "TranscriptionThreshold",
         "title": "Semi-Structured Text Threshold",
-        "value": 0.95,
+        "value": 0.52,
         "schema": {
           "type": "number",
           "minimum": 0,
@@ -2820,7 +2817,7 @@
         "name": "semi_structured_table_threshold",
         "type": "TranscriptionThreshold",
         "title": "Table Threshold",
-        "value": 0.95,
+        "value": 0.52,
         "schema": {
           "type": "number",
           "minimum": 0,
@@ -3097,7 +3094,7 @@
         "name": "semi_structured_checkbox_threshold",
         "type": "TranscriptionThreshold",
         "title": "Semi-Structured Checkbox Threshold",
-        "value": 0.95,
+        "value": 0.56,
         "schema": {
           "type": "number",
           "minimum": 0,
@@ -3609,30 +3606,15 @@
         ]
       },
       {
-        "name": "Layout-Product code Mapping",
-        "type": "string",
-        "title": "Layout-Product code Mapping",
-        "description": "Layout Name and the Product code mapping",
-        "value": "",
-        "optional": false,
-        "ui": {
-          "hidden": false
-        }
-      },
-      {
-        "name": "hs_base_url",
-        "type": "string",
-        "title": "Hyperscience UI base URL",
-        "description": "Used to render the 'Open submission in HS' link inside the Custom Supervision task. Override per environment.",
-        "value": "https://hs-dev.corp.tmnas.com",
-        "optional": true
-      },
-      {
-        "name": "perf_test_mode",
+        "name": "reprocessing_enabled",
         "type": "boolean",
-        "title": "Perf Test Mode (auto-fill supervision)",
-        "description": "TEMPORARY: When true, the custom supervision step is auto-filled with intent_1='Add_Named_Insured' + transaction_type='MidTermChange', and Policy Number / Effective Date / Instructions are populated with hardcoded values. Also set manual_field_id_enabled=false and manual_transcription_enabled=false for a fully hands-off run. Leave FALSE for regular UAT / prod runs.",
-        "value": false,
+        "title": "Reprocessing Enabled",
+        "value": true
+      },
+      {
+        "name": "submission",
+        "type": "object",
+        "title": "Submission",
         "optional": true
       }
     ],
@@ -3805,13 +3787,18 @@
             "document_rendering_height",
             "document_rendering_quality"
           ]
+        },
+        {
+          "title": "Reprocessing",
+          "fields": [
+            "reprocessing_enabled"
+          ]
         }
       ]
     },
-    "identifier": "ENDORSEMENT_CUSTOM_CORE_V41",
+    "identifier": "DROPDOWN_TRANSACTION_TYPE_WRAPPER",
     "roles": [
-      "idp_core",
-      "supporting"
+      "idp"
     ],
     "output": [
       {
@@ -3819,755 +3806,312 @@
         "type": "Submission",
         "title": "Submission",
         "description": "The processed submission"
-      },
-      {
-        "name": "salesforce_payload",
-        "type": "object",
-        "title": "Salesforce Payload",
-        "description": "Salesforce-shaped JSON payload built by build_salesforce_payload; use as the POST body for SyncHSPolicyTxnToSF"
       }
     ],
     "enable_overrides": true
   },
   "blocks": [
     {
-      "identifier": "SUBMISSION_BOOTSTRAP_2",
-      "reference_name": "submission_bootstrap",
+      "identifier": "CANCELLATION_CUSTOM_CORE_V44",
+      "reference_name": "__idp_core__",
       "input": {
-        "$trigger": "${workflow.input.$trigger}",
         "layout_release_uuid": "${workflow.input.layout_release_uuid}",
-        "s3_config": "${workflow.input.submission_bootstrap_s3_config}",
-        "s3_endpoint_url": "${workflow.input.submission_bootstrap_s3_endpoint_url}",
-        "ocs_config": "${workflow.input.submission_bootstrap_ocs_config}",
-        "http_config": "${workflow.input.submission_bootstrap_http_config}",
-        "abs_auth_type": "${workflow.input.submission_bootstrap_abs_auth_type}",
-        "abs_account_url": "${workflow.input.submission_bootstrap_abs_account_url}",
-        "abs_tenant_id": "${workflow.input.submission_bootstrap_abs_tenant_id}",
-        "abs_client_id": "${workflow.input.submission_bootstrap_abs_client_id}",
-        "abs_client_secret": "${workflow.input.submission_bootstrap_abs_client_secret}",
-        "abs_authority_host": "${workflow.input.submission_bootstrap_abs_authority_host}",
-        "abs_account_name": "${workflow.input.submission_bootstrap_abs_account_name}",
-        "abs_account_key": "${workflow.input.submission_bootstrap_abs_account_key}",
-        "notification_workflow": "${workflow.input.notification_workflow_initialization}",
         "workflow_uuid": "${workflow.input.workflow_uuid}",
         "workflow_name": "${workflow.input.workflow_name}",
         "workflow_version": "${workflow.input.workflow_version}",
-        "submission": "${workflow.input.submission}"
+        "submission_bootstrap_s3_config": "${system.secrets.s3_downloader}",
+        "submission_bootstrap_ocs_config": "${system.secrets.ocs_downloader}",
+        "submission_bootstrap_http_config": null,
+        "notification_workflow_initialization": null,
+        "structured_layout_match_threshold": 0.6,
+        "semi_structured_classification": true,
+        "semi_target_accuracy": 0.99,
+        "manual_nlc_enabled": false,
+        "semi_doc_grouping_logic": "group_pages",
+        "semi_qa_sample_rate": 0.05,
+        "machine_classification_rotation_correction_enabled": true,
+        "machine_classification_mobile_processing_enabled": false,
+        "machine_classification_file_transcription_enabled": false,
+        "notification_workflow_classification": null,
+        "field_id_target_accuracy": 0.95,
+        "table_id_target_accuracy": 0.96,
+        "manual_field_id_enabled": true,
+        "notification_workflow_identification": null,
+        "field_id_qa_enabled": true,
+        "field_id_qa_sample_rate": 0.05,
+        "table_id_qa_enabled": true,
+        "table_id_qa_sample_rate": 0.05,
+        "structured_transcription_training": false,
+        "structured_improved_transcr_threshold_accuracy": true,
+        "structured_transcription_training_period": 30,
+        "semi_structured_transcription_training": false,
+        "semi_structured_transcription_training_period": 30,
+        "semi_structured_improved_transcr_threshold_accuracy": true,
+        "transcription_model": "IDP",
+        "structured_text_min_training_records": 5000,
+        "structured_text_max_training_records": 50000,
+        "structured_text_target_accuracy": 0.95,
+        "structured_text_threshold": 0.52,
+        "structured_min_leg_threshold": 0.1,
+        "semi_structured_text_min_training_records": 2000,
+        "semi_structured_text_max_training_records": 50000,
+        "semi_structured_text_target_accuracy": 0.95,
+        "semi_structured_text_threshold": 0.52,
+        "semi_structured_min_leg_threshold": 0.1,
+        "semi_structured_table_min_training_records": 2000,
+        "semi_structured_table_max_training_records": 50000,
+        "semi_structured_table_target_accuracy": 0.95,
+        "semi_structured_table_threshold": 0.52,
+        "semi_structured_table_min_leg_threshold": 0.1,
+        "structured_checkbox_min_training_records": 2000,
+        "structured_checkbox_max_training_records": 50000,
+        "structured_checkbox_target_accuracy": 0.95,
+        "structured_checkbox_threshold": 0.56,
+        "checkbox_min_leg_threshold": 0.5,
+        "structured_signature_min_training_records": 2000,
+        "structured_signature_max_training_records": 50000,
+        "structured_signature_target_accuracy": 0.95,
+        "structured_signature_threshold": 0.99,
+        "signature_min_leg_threshold": 0.5,
+        "semi_structured_checkbox_min_training_records": 2000,
+        "semi_structured_checkbox_max_training_records": 50000,
+        "semi_structured_checkbox_target_accuracy": 0.95,
+        "semi_structured_checkbox_threshold": 0.56,
+        "semi_structured_checkbox_min_leg_threshold": 0.5,
+        "manual_transcription_enabled": true,
+        "notification_workflow_transcription": null,
+        "manual_transcription_supervision_transcription_masking": true,
+        "manual_transcription_task_restrictions": [],
+        "manual_transcription_table_output_manual_review": false,
+        "manual_transcription_always_supervise_blank_cells": true,
+        "qa": true,
+        "structured_entry_qa_sample_rate": 0.05,
+        "structured_checkbox_qa_sample_rate": 0.05,
+        "structured_signature_qa_sample_rate": 0.05,
+        "semi_structured_qa_sample_rate": 0.05,
+        "exclude_auto_transcribe_fields_from_qa": false,
+        "table_cell_transcription_qa_enabled": true,
+        "table_cell_transcription_qa_sample_rate": 0.05,
+        "finetuning_only_trained_layouts": true,
+        "force_normalization_errors_to_sv": false,
+        "force_required_entries_to_sv": false,
+        "auto_qa_sampling_rate_enabled": false,
+        "notification_workflow_flexible_extraction": null,
+        "flexible_extraction_supervision_transcription_masking": true,
+        "flexible_extraction_task_restrictions": [],
+        "document_rendering_enabled": false,
+        "document_rendering_height": 11,
+        "document_rendering_width": 8.5,
+        "document_rendering_quality": 50,
+        "document_rendering_mime_type": "application/pdf",
+        "document_rendering_unit": "in",
+        "field_transcription_target_accuracies": [],
+        "identification_target_accuracies": [],
+        "layout_id_dealbreaker": false,
+        "layout_id_dealbreaker_bypass": false,
+        "reprocessing_enabled": true,
+        "file_filter_filter_type": "ALL_FILES",
+        "file_filter_minimum_image_width": null,
+        "file_filter_minimum_image_height": null,
+        "file_filter_minimum_file_size_kb": null,
+        "file_filter_file_extensions_action": "NONE",
+        "file_filter_file_extensions": null,
+        "file_filter_file_extensions_other": null,
+        "submission": "${workflow.input.submission}",
+        "$trigger": "${workflow.input.$trigger}"
       },
-      "title": "Submission Initialization",
-      "description": "Initialize submission and, if necessary, fetch and prepare external images or other submission data"
-    },
-    {
-      "identifier": "MACHINE_COLLATION_2",
-      "reference_name": "auto_machine_collation_2__1",
-      "input": {
-        "submission": "${submission_bootstrap.output.result.submission}",
-        "cases": "${submission_bootstrap.output.result.api_params.cases}",
-        "dedupe_files": "${workflow.input.machine_collation_dedupe_files}",
-        "remove_from_cases": "${workflow.input.machine_collation_remove_from_cases}",
-        "retention_period": "${workflow.input.machine_collation_retention_period}",
-        "refresh_retention_period": "${workflow.input.machine_collation_refresh_retention_period}"
-      },
-      "title": "Machine Collation",
-      "description": "Group files, documents, and pages into cases"
-    },
-    {
-      "identifier": "MACHINE_CLASSIFICATION_7",
-      "reference_name": "machine_classification",
-      "input": {
-        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
-        "submission": "${auto_machine_collation_2__1.output.submission}",
-        "api_params": "${submission_bootstrap.output.result.api_params}",
-        "vpc_registration_threshold": "${workflow.input.structured_layout_match_threshold}",
-        "nlc_enabled": "${workflow.input.semi_structured_classification}",
-        "nlc_target_accuracy": "${workflow.input.semi_target_accuracy}",
-        "nlc_doc_grouping_logic": "${workflow.input.semi_doc_grouping_logic}",
-        "rotation_correction_enabled": "${workflow.input.machine_classification_rotation_correction_enabled}",
-        "mobile_processing_enabled": "${workflow.input.machine_classification_mobile_processing_enabled}",
-        "file_transcription_enabled": "${workflow.input.machine_classification_file_transcription_enabled}",
-        "layout_id_dealbreaker": "${workflow.input.layout_id_dealbreaker}",
-        "layout_id_dealbreaker_bypass": "${workflow.input.layout_id_dealbreaker_bypass}"
-      },
-      "title": "Machine Classification",
-      "description": "Automatically classify documents"
-    },
-    {
-      "identifier": "MANUAL_CLASSIFICATION_7",
-      "reference_name": "manual_classification",
-      "input": {
-        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
-        "manual_nlc_enabled": "${workflow.input.manual_nlc_enabled}",
-        "task_restrictions": "${workflow.input.manual_classification_task_restrictions}",
-        "api_params": "${submission_bootstrap.output.result.api_params}",
-        "submission": "${machine_classification.output.submission}",
-        "notification_workflow": "${workflow.input.notification_workflow_classification}",
-        "vpc_registration_threshold": "${workflow.input.structured_layout_match_threshold}",
-        "nlc_metadata": null
-      },
-      "title": "Manual Classification",
-      "description": "Manually classify documents that could not be automatically classified"
-    },
-    {
-      "identifier": "MACHINE_IDENTIFICATION_8",
-      "reference_name": "machine_identification",
-      "input": {
-        "submission": "${manual_classification.output.submission}",
-        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
-        "api_params": "${submission_bootstrap.output.result.api_params}",
-        "manual_field_id_enabled": "${workflow.input.manual_field_id_enabled}",
-        "force_required_missing_entries_to_sv": "${workflow.input.force_required_entries_to_sv}",
-        "field_id_target_accuracy": "${workflow.input.field_id_target_accuracy}",
-        "table_id_target_accuracy": "${workflow.input.table_id_target_accuracy}",
-        "id_target_accuracies": "${workflow.input.identification_target_accuracies}"
-      },
-      "title": "Machine Identification",
-      "description": "Automatically locate fields on semi-structured documents"
-    },
-    {
-      "identifier": "MANUAL_IDENTIFICATION_6",
-      "reference_name": "manual_identification",
-      "input": {
-        "submission": "${machine_identification.output.submission}",
-        "api_params": "${submission_bootstrap.output.result.api_params}",
-        "manual_field_id_enabled": "${workflow.input.manual_field_id_enabled}",
-        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
-        "notification_workflow": "${workflow.input.notification_workflow_identification}",
-        "task_restrictions": "${workflow.input.manual_identification_task_restrictions}"
-      },
-      "title": "Manual Identification",
-      "description": "Manually locate fields on semi-structured documents that could not be automatically located"
-    },
-    {
-      "identifier": "MACHINE_TRANSCRIPTION_9",
-      "reference_name": "machine_transcription",
-      "input": {
-        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
-        "submission": "${manual_identification.output.submission}",
-        "api_params": "${submission_bootstrap.output.result.api_params}",
-        "transcription_model": "${workflow.input.transcription_model}",
-        "finetuning_only_trained_layouts": "${workflow.input.finetuning_only_trained_layouts}",
-        "force_normalization_errors_to_sv": "${workflow.input.force_normalization_errors_to_sv}",
-        "force_required_blank_entries_to_sv": "${workflow.input.force_required_entries_to_sv}",
-        "transcription_overrides": "${workflow.input.transcription_overrides}",
-        "structured_text_target_accuracy": "${workflow.input.structured_text_target_accuracy}",
-        "structured_text_confidence_threshold": "${workflow.input.structured_text_threshold}",
-        "structured_text_acceptable_confidence": "${workflow.input.structured_min_leg_threshold}",
-        "semi_structured_text_target_accuracy": "${workflow.input.semi_structured_text_target_accuracy}",
-        "semi_structured_text_confidence_threshold": "${workflow.input.semi_structured_text_threshold}",
-        "semi_structured_text_acceptable_confidence": "${workflow.input.semi_structured_min_leg_threshold}",
-        "semi_structured_table_target_accuracy": "${workflow.input.semi_structured_table_target_accuracy}",
-        "semi_structured_table_confidence_threshold": "${workflow.input.semi_structured_table_threshold}",
-        "semi_structured_table_acceptable_confidence": "${workflow.input.semi_structured_table_min_leg_threshold}",
-        "structured_checkbox_target_accuracy": "${workflow.input.structured_checkbox_target_accuracy}",
-        "structured_checkbox_confidence_threshold": "${workflow.input.structured_checkbox_threshold}",
-        "structured_checkbox_acceptable_confidence": "${workflow.input.checkbox_min_leg_threshold}",
-        "structured_signature_target_accuracy": "${workflow.input.structured_signature_target_accuracy}",
-        "structured_signature_confidence_threshold": "${workflow.input.structured_signature_threshold}",
-        "structured_signature_acceptable_confidence": "${workflow.input.signature_min_leg_threshold}",
-        "semi_structured_checkbox_target_accuracy": "${workflow.input.semi_structured_checkbox_target_accuracy}",
-        "semi_structured_checkbox_confidence_threshold": "${workflow.input.semi_structured_checkbox_threshold}",
-        "semi_structured_checkbox_acceptable_confidence": "${workflow.input.semi_structured_checkbox_min_leg_threshold}",
-        "field_target_accuracies": "${workflow.input.field_transcription_target_accuracies}",
-        "column_target_accuracies": "${workflow.input.column_transcription_target_accuracies}"
-      },
-      "title": "Machine Transcription",
-      "description": "Automatically transcribe fields"
-    },
-    {
-      "identifier": "MANUAL_TRANSCRIPTION_6",
-      "reference_name": "manual_transcription",
-      "input": {
-        "submission": "${machine_transcription.output.submission}",
-        "api_params": "${submission_bootstrap.output.result.api_params}",
-        "task_restrictions": "${workflow.input.manual_transcription_task_restrictions}",
-        "manual_transcription_enabled": "${workflow.input.manual_transcription_enabled}",
-        "supervision_transcription_masking": "${workflow.input.manual_transcription_supervision_transcription_masking}",
-        "table_output_manual_review": "${workflow.input.manual_transcription_table_output_manual_review}",
-        "always_supervise_blank_cells": "${workflow.input.manual_transcription_always_supervise_blank_cells}",
-        "notification_workflow": "${workflow.input.notification_workflow_transcription}",
-        "address_parsing_enabled": false,
-        "address_parser_api_provider": "none",
-        "address_parser_api_key": null,
-        "address_parser_api_options": null
-      },
-      "title": "Manual Transcription",
-      "description": "Manually transcribe fields that could not be automatically transcribed"
-    },
-    {
-      "identifier": "PYTHON_3_14_CODE",
-      "reference_name": "perf_test_preprocessor",
-      "input": {
-        "data": {
-          "submission": "${manual_transcription.output.submission}",
-          "perf_test_mode": "${workflow.input.perf_test_mode}"
-        },
-        "code": "\nfrom typing import Any\nfrom blocks.base_python_block import WFEngineTaskResult, Block, WFEngineTask\nfrom blocks.types import BlockInputs\n\n\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    submission: Any\n    perf_test_mode: Any = False\n\n\nPERF_EFFECTIVE_DATE = \"08/26/2026\"\nPERF_INSTRUCTIONS = \"add john doe to the policy\"\nPERF_INTENT_1 = \"Add_Named_Insured\"\nPERF_TRANSACTION_TYPE = \"MidTermChange\"\n\nFIELD_DEFAULTS = {\n    \"Effective Date of Change\": PERF_EFFECTIVE_DATE,\n    \"Instructions\": PERF_INSTRUCTIONS,\n}\n\n# Mirrors build_salesforce_payload._clean_name so we match fields the way the\n# downstream connector does (ZWSP-strip + alias-resolve).\nZWSP = \"\\u200b\"\nFIELD_NAME_ALIASES = {\n    \"Policy Producer Contact\": \"Policy Endorsement Contact\",\n    \"Path ID\": \"Path Id\",\n}\n\n\ndef _clean(name):\n    if not isinstance(name, str):\n        return \"\"\n    cleaned = name.replace(ZWSP, \"\").strip()\n    return FIELD_NAME_ALIASES.get(cleaned, cleaned)\n\n\ndef _target_document(submission):\n    documents = [d for d in submission.get(\"documents\") or [] if isinstance(d, dict)]\n    if not documents:\n        return None\n    for doc in documents:\n        metadata = doc.get(\"metadata\") or {}\n        filename = \" \".join(\n            str(doc.get(key) or metadata.get(key) or \"\")\n            for key in (\"filename\", \"file_name\", \"name\", \"original_filename\", \"source_filename\")\n        )\n        if \"email\" in filename.lower():\n            return doc\n    return documents[0]\n\n\ndef _inject_field_defaults(submission):\n    if not isinstance(submission, dict):\n        return submission\n    doc = _target_document(submission)\n    if doc is None:\n        return submission\n    fields = doc.setdefault(\"document_fields\", [])\n    by_name = {}\n    for f in fields:\n        if not isinstance(f, dict):\n            continue\n        if f.get(\"occurrence_index\", 0) != 0:\n            continue\n        key = _clean(f.get(\"output_name\") or f.get(\"field_name\") or f.get(\"name\"))\n        if key and key not in by_name:\n            by_name[key] = f\n    for name, value in FIELD_DEFAULTS.items():\n        existing = by_name.get(name)\n        if existing is not None:\n            existing[\"transcription\"] = value\n            existing[\"transcription_normalized\"] = value\n            existing[\"transcription_source\"] = \"human_transcription\"\n            existing[\"transcription_confidence\"] = \"sure\"\n            existing[\"state\"] = \"complete\"\n        else:\n            fields.append({\n                \"id\": None,\n                \"output_name\": name,\n                \"field_name\": name,\n                \"occurrence_index\": 0,\n                \"page_number\": 1,\n                \"identification_source\": \"human_identification\",\n                \"identification_confidence\": \"sure\",\n                \"transcription\": value,\n                \"transcription_normalized\": value,\n                \"transcription_source\": \"human_transcription\",\n                \"transcription_confidence\": \"sure\",\n                \"required\": False,\n                \"multiline\": False,\n                \"state\": \"complete\",\n            })\n    return submission\n\n\ndef _perf_prefill(submission):\n    doc = _target_document(submission) if isinstance(submission, dict) else None\n    doc_ids = [doc.get(\"id\") if doc is not None else None]\n    selected = []\n    for did in doc_ids:\n        selected.append({\n            \"document_id\": did,\n            \"decision\": \"intent_1\",\n            \"choice\": PERF_INTENT_1,\n            \"task_purpose_id\": 2005,\n        })\n    selected.append({\n        \"document_id\": doc_ids[0],\n        \"decision\": \"transaction_type\",\n        \"choice\": PERF_TRANSACTION_TYPE,\n        \"task_purpose_id\": 2005,\n    })\n    return {\"selected_choices\": selected}\n\n\ndef _preprocess(submission, perf_test_mode=False):\n    if not perf_test_mode:\n        return {\"submission\": submission, \"supervision_data\": {}}\n    modified = _inject_field_defaults(submission)\n    return {\"submission\": modified, \"supervision_data\": _perf_prefill(modified)}\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _preprocess(**task.inputData.dict())\n"
-      },
-      "title": "Perf Test Preprocessor",
-      "description": "TEMPORARY: When perf_test_mode=true, injects default field values into the submission and pre-fills supervision decisions so the custom supervision step auto-completes without a UI task."
-    },
-    {
-      "identifier": "PYTHON_3_14_CODE",
-      "reference_name": "build_supervision_template",
-      "input": {
-        "data": {
-          "submission": "${perf_test_preprocessor.output.result.submission}",
-          "intent_oneof": [
-            {
-              "const": "None",
-              "title": "-- None --"
-            },
-            {
-              "const": "Account_Contact_Update",
-              "title": "Account Contact Update"
-            },
-            {
-              "const": "Add_Additional_Insured_Auto",
-              "title": "Add Additional Insured - Auto"
-            },
-            {
-              "const": "Add_Additional_Insured_Property",
-              "title": "Add Additional Insured - Property"
-            },
-            {
-              "const": "Add_Additional_Property_Coverage_Forms",
-              "title": "Add Additional Property Coverage Forms"
-            },
-            {
-              "const": "Add_Amend_Delete_Additional_Insured_GL",
-              "title": "Add/Amend/Delete  Additional Insured- GL"
-            },
-            {
-              "const": "Add_Amend_Delete_Additional_Insured_DO",
-              "title": "Add/Amend/Delete  Additional Insured- D&O"
-            },
-            {
-              "const": "Add_Amend_Delete_Additional_Insured_EPLI",
-              "title": "Add/Amend/Delete  Additional Insured- EPLI"
-            },
-            {
-              "const": "Add_Amend_Delete_Additional_Insured_Ot",
-              "title": "Add/Amend/Delete Additional Insured - Other"
-            },
-            {
-              "const": "Add_Amend_Delete_Additional_Insured_PL",
-              "title": "Add/Amend/Delete  Additional Insured- PL"
-            },
-            {
-              "const": "Add_Amend_Delete_Driver",
-              "title": "Add/Amend/Delete Driver Request"
-            },
-            {
-              "const": "Add_Amend_Delete_Med",
-              "title": "Add/Amend/Delete Med Mal Coverage"
-            },
-            {
-              "const": "Add_Amend_Delete_PL_Coverage",
-              "title": "Add/Amend/Delete PL Coverage/Limits"
-            },
-            {
-              "const": "Add_Amend_Delete_Special_Events",
-              "title": "Add/Amend/Delete Special Events"
-            },
-            {
-              "const": "Add_Amend_Delete_Underlying_Coverages",
-              "title": "Add/Amend/Delete Underlying Coverages"
-            },
-            {
-              "const": "Add_Auto",
-              "title": "Add Auto"
-            },
-            {
-              "const": "Add_Auto_First_Time",
-              "title": "Add Auto - First Time"
-            },
-            {
-              "const": "Add_Crime_First_Time",
-              "title": "Add Crime - First Time"
-            },
-            {
-              "const": "Add_Cyber_Coverage_Limits",
-              "title": "Add Cyber Coverage/Limits"
-            },
-            {
-              "const": "Add_Delete_Less_Than_10_Autos",
-              "title": "Add/Delete Less Than 10 Autos"
-            },
-            {
-              "const": "Add_Delete_Location_s",
-              "title": "Add/Delete Location(s)"
-            },
-            {
-              "const": "Add_Delete_More_Than_10_Autos",
-              "title": "Add/Delete More Than 10 Autos"
-            },
-            {
-              "const": "Add_GL_Only_Location",
-              "title": "Add GL - Only Location"
-            },
-            {
-              "const": "Add_Inland_Marine_First_Time",
-              "title": "Add Inland Marine - First Time"
-            },
-            {
-              "const": "Add_Location",
-              "title": "Add Location"
-            },
-            {
-              "const": "Add_Loss_Payee",
-              "title": "Add Loss Payee - Auto"
-            },
-            {
-              "const": "Add_Named_Insured",
-              "title": "Add Named Insured"
-            },
-            {
-              "const": "Add_DO_EPLI_Coverage_Limits",
-              "title": "Add D&O/EPLI Coverage/Limits"
-            },
-            {
-              "const": "Add_PL_Coverage_Limits",
-              "title": "Add PL Coverage/Limits"
-            },
-            {
-              "const": "Add_Professional_Liability_First_Time",
-              "title": "Add Professional Liability - First Time"
-            },
-            {
-              "const": "Agency_Contact_Update",
-              "title": "Agency Contact Update"
-            },
-            {
-              "const": "Amend_Auto",
-              "title": "Amend Auto"
-            },
-            {
-              "const": "Amend_Cyber_Coverage_Limits",
-              "title": "Amend Cyber Coverage/Limits"
-            },
-            {
-              "const": "Amend_Delete_Crime_Coverage",
-              "title": "Amend/Delete Crime Coverage"
-            },
-            {
-              "const": "Amend_GL",
-              "title": "Amend GL (Class Codes/Limits/Exposures)"
-            },
-            {
-              "const": "Amend_Mailing_Address",
-              "title": "Amend Mailing Address"
-            },
-            {
-              "const": "Amend_Named_Insured",
-              "title": "Amend Named Insured"
-            },
-            {
-              "const": "Amend_DO_EPLI_Coverage_Limits",
-              "title": "Amend D&O/EPLI Coverage/Limits"
-            },
-            {
-              "const": "Amend_PL_Coverage_Limits",
-              "title": "Amend PL Coverage/Limits"
-            },
-            {
-              "const": "Amend_Remove_Items_Coverage",
-              "title": "Amend/Remove Items or Coverage on Inland Marine"
-            },
-            {
-              "const": "Amend_Umbrella_Limits",
-              "title": "Amend Umbrella Limits"
-            },
-            {
-              "const": "Automated_Emails",
-              "title": "Automated Emails"
-            },
-            {
-              "const": "BME_Request",
-              "title": "BME Request"
-            },
-            {
-              "const": "BOP_Request",
-              "title": "BOP Request"
-            },
-            {
-              "const": "BOR_Request",
-              "title": "BOR Request"
-            },
-            {
-              "const": "Backdate_Add_Delete_Auto",
-              "title": "Backdate Add Auto Greater Than 60 Days"
-            },
-            {
-              "const": "Backdate_Delete_Auto_Greater_Than_60_Day",
-              "title": "Backdate Delete Auto Greater Than 60 Days/Total Loss"
-            },
-            {
-              "const": "Billing_Address",
-              "title": "Billing Address"
-            },
-            {
-              "const": "Billing_Changes_Issues",
-              "title": "Billing Changes/Issues"
-            },
-            {
-              "const": "Bind_Orders",
-              "title": "Bind Orders"
-            },
-            {
-              "const": "Bind_Orders_E_S",
-              "title": "Bind Orders - E&S"
-            },
-            {
-              "const": "COI",
-              "title": "COI"
-            },
-            {
-              "const": "Cancellation_Request",
-              "title": "Cancellation Request"
-            },
-            {
-              "const": "Claim_Reports",
-              "title": "Claim Reports"
-            },
-            {
-              "const": "Court_Commercial_Bonds",
-              "title": "Court and Commercial Bonds"
-            },
-            {
-              "const": "Decrease_Property_Limit",
-              "title": "Decrease Property Limit"
-            },
-            {
-              "const": "Delete_Auto",
-              "title": "Delete Auto"
-            },
-            {
-              "const": "Delete_Cyber_Coverage_Limits",
-              "title": "Delete Cyber Coverage/Limits"
-            },
-            {
-              "const": "Delete_DO_EPLI_Coverage_Limits",
-              "title": "Delete D&O/EPLI Coverage/Limits"
-            },
-            {
-              "const": "Delete_PL_Coverage_Limits",
-              "title": "Delete PL Coverage/Limits"
-            },
-            {
-              "const": "Delete_Location",
-              "title": "Delete Location"
-            },
-            {
-              "const": "Delete_Loss_Payee",
-              "title": "Delete Loss Payee - Auto"
-            },
-            {
-              "const": "Delete_Named_Insured",
-              "title": "Delete Named Insured"
-            },
-            {
-              "const": "Delete_Terrorism_Coverage",
-              "title": "Delete Terrorism Coverage (TRIA)"
-            },
-            {
-              "const": "Duplicate_Request",
-              "title": "Duplicate Request"
-            },
-            {
-              "const": "EPAC_Request",
-              "title": "EPAC Request"
-            },
-            {
-              "const": "ERP",
-              "title": "ERP"
-            },
-            {
-              "const": "Endorsement_Issued_Incorrectly",
-              "title": "Endorsement Issued Incorrectly"
-            },
-            {
-              "const": "Endorsement_Status_Request",
-              "title": "Endorsement Status Request"
-            },
-            {
-              "const": "Exceptions_All_Other",
-              "title": "Exceptions - All Other"
-            },
-            {
-              "const": "Flood_Request_FloodPro",
-              "title": "Flood Request - FloodPro"
-            },
-            {
-              "const": "Flood_Request_WNCFirst",
-              "title": "Flood Request - WNCFirst"
-            },
-            {
-              "const": "Increase_Property_Limit",
-              "title": "Increase Property Limit"
-            },
-            {
-              "const": "Loss_Run_Request",
-              "title": "Loss Run Request"
-            },
-            {
-              "const": "Multiple_Changes",
-              "title": "Multiple Changes"
-            },
-            {
-              "const": "NY_Premium_Audit",
-              "title": "NY Premium Audit"
-            },
-            {
-              "const": "New_Business",
-              "title": "New Business"
-            },
-            {
-              "const": "New_Business_E_S",
-              "title": "New Business - E&S"
-            },
-            {
-              "const": "PCAC_Request",
-              "title": "PCAC Request"
-            },
-            {
-              "const": "PCAP_Request",
-              "title": "PCAP Request"
-            },
-            {
-              "const": "PHBX_Request",
-              "title": "PHBX Request"
-            },
-            {
-              "const": "PHCV_Request",
-              "title": "PHCV Request"
-            },
-            {
-              "const": "PHGT_PHBT_Request",
-              "title": "PHGT/PHBT Request"
-            },
-            {
-              "const": "PHPA_PHPC_Request",
-              "title": "PHPA/PHPC Request"
-            },
-            {
-              "const": "PHPR_PHEX_Request",
-              "title": "PHPR/PHEX Request"
-            },
-            {
-              "const": "PHSD_Cancel_Request",
-              "title": "PHSD Cancel Request"
-            },
-            {
-              "const": "PHSD_General_Inquiries",
-              "title": "PHSD General Inquiries"
-            },
-            {
-              "const": "PHSD_Loss_Run_Request",
-              "title": "PHSD Loss Run Request"
-            },
-            {
-              "const": "Policy_Corrections_Other",
-              "title": "Policy Corrections - Other"
-            },
-            {
-              "const": "Policy_Extension",
-              "title": "Policy Extension"
-            },
-            {
-              "const": "Policy_Issued_Incorrectly",
-              "title": "Policy Issued Incorrectly"
-            },
-            {
-              "const": "RS_Request",
-              "title": "RS Request"
-            },
-            {
-              "const": "RapidSure_Request",
-              "title": "RapidSure F&W Request"
-            },
-            {
-              "const": "Remove_Additional_Insured",
-              "title": "Remove Additional Insured - Auto"
-            },
-            {
-              "const": "Renewal_Business",
-              "title": "Renewal Business"
-            },
-            {
-              "const": "Renewal_Business_E_S",
-              "title": "Renewal Business - E&S"
-            },
-            {
-              "const": "STEP_Request",
-              "title": "STEP Request"
-            },
-            {
-              "const": "Surety_Contract",
-              "title": "Surety Contract"
-            },
-            {
-              "const": "VB_Request",
-              "title": "VB Request"
-            }
-          ],
-          "intent_slots": 2,
-          "policy_field_names": [],
-          "date_field_names": [],
-          "hs_base_url": "${workflow.input.hs_base_url}",
-          "transaction_type_oneof": [
-            {
-              "const": "None",
-              "title": "-- None --"
-            },
-            {
-              "const": "MidTermChange",
-              "title": "Mid Term Change"
-            },
-            {
-              "const": "MidTermQuote",
-              "title": "Mid Term Quote"
-            },
-            {
-              "const": "Exception",
-              "title": "Exception"
-            }
-          ]
-        },
-        "code": "\nfrom typing import Any, Dict, List, Tuple\nfrom blocks.base_python_block import WFEngineTaskResult\nfrom blocks.types import BlockInputs\nfrom blocks.base_python_block import Block, WFEngineTask\n\n\n# Used to deserialize json inputs by the CCB\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    submission: Any\n    intent_oneof: Any\n    intent_slots: Any\n    policy_field_names: Any\n    date_field_names: Any\n    hs_base_url: Any = None\n    transaction_type_oneof: Any = None\n\n\ndef _build_dynamic_template(\n    submission,\n    intent_oneof,\n    intent_slots,\n    policy_field_names,\n    date_field_names,\n    hs_base_url=None,\n    transaction_type_oneof=None,\n):\n    \"\"\"Build a minimal custom-supervision template: only the per-slot Intent\n    decision dropdowns. A banner row at the top renders a link back to the\n    Hyperscience submission detail page so reviewers can open the source\n    submission (and all attached documents) in a new tab.\n\n    The submission and field-name inputs are accepted for backward-\n    compatibility with the PythonBlock input contract but are unused.\n    \"\"\"\n\n    # Resolve submission id and full link URL (defensive against missing keys).\n    sub_id = None\n    if isinstance(submission, dict):\n        sub_id = submission.get(\"id\") or submission.get(\"submission_id\")\n    base_url = (hs_base_url or \"\").rstrip(\"/\")\n    link_url = (\n        f\"{base_url}/submissions/{sub_id}\"\n        if base_url and sub_id is not None\n        else None\n    )\n\n    inputs = []\n    groups = []\n\n    # Top banner: a transcription component whose visible TITLE carries the\n    # full submission URL as selectable plain text. HS populates the input\n    # box from ``data_identifier`` (not from ``value``), so the box itself\n    # will render empty -- but the URL printed in the title is selectable\n    # for copy/paste. HS still requires a well-formed UUID in\n    # ``data_identifier`` even for display-only components, so we pass the\n    # nil UUID.\n    # Top banner: a decision component with a single \"Acknowledge\" option.\n    # The decision component's title renders as a full-width label that\n    # wraps, so we put the full submission URL in the title. The dropdown\n    # below is functionally a no-op (single option, pre-selected) but is\n    # the only HS component type whose label reliably wraps long text.\n    for i in range(1, intent_slots + 1):\n        s = str(i)\n        inputs.append({\n            \"name\": f\"intent_{s}\",\n            \"type\": \"decision\",\n            \"title\": f\"Intent {s}\",\n            \"relation\": {\"type\": \"document\"},\n            \"schema\": {\"oneOf\": intent_oneof},\n        })\n        groups.append({\"title\": \"\", \"fields\": [f\"intent_{s}\"]})\n\n    # Transaction Type dropdown: required reviewer selection that drives the\n    # 'Transaction Type' field on the downstream Salesforce payload.\n    tx_oneof = transaction_type_oneof or [\n        {\"const\": \"MidTermChange\", \"title\": \"MidTermChange\"},\n        {\"const\": \"MidTermQuote\", \"title\": \"MidTermQuote\"},\n    ]\n    inputs.append({\n        \"name\": \"transaction_type\",\n        \"type\": \"decision\",\n        \"title\": \"Transaction Type\",\n        \"relation\": {\"type\": \"document\"},\n        \"required\": True,\n        \"schema\": {\"oneOf\": tx_oneof},\n    })\n    inputs.append({\n        \"name\": \"multiple_transaction_type\",\n        \"type\": \"decision\",\n        \"title\": \"Multiple Transaction Type\",\n        \"relation\": {\"type\": \"document\"},\n        \"schema\": {\n            \"oneOf\": [\n                {\"const\": \"True\", \"title\": \"True\"},\n                {\"const\": \"False\", \"title\": \"False\"},\n            ]\n        },\n    })\n    groups.append({\"title\": \"\", \"fields\": [\"transaction_type\", \"multiple_transaction_type\"]})\n\n    action = {\n        \"name\": \"endorsement_intents\",\n        \"display\": \"Endorsement Intents\",\n        \"input\": inputs,\n        \"ui\": {\"groups\": groups},\n    }\n    if link_url:\n        # Some HS UI versions render the action description prominently near\n        # the task header; this is a belt-and-braces second placement for the\n        # link in case the banner component is collapsed.\n        action[\"description\"] = f\"Submission link: {link_url}\"\n\n    return [\n        {\n            \"name\": \"three_column_template\",\n            \"version\": \"1.0\",\n            \"thumbnail\": {\"group_by_document\": True, \"group_by_case\": True},\n            \"action\": [action],\n        }\n    ]\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _build_dynamic_template(**task.inputData.dict())\n"
+      "title": "Start Document Processing Subflow",
+      "description": "Calls the Document Processing Subflow with the specified settings.",
+      "compatibility_spec": {
+        "filter_roles": [
+          "idp_core"
+        ]
       }
-    },
-    {
-      "identifier": "ROUTING",
-      "reference_name": "intent_routing",
-      "title": "Intent Supervision Routing",
-      "description": "TEMPORARY: routes around Custom Supervision when perf_test_mode=true.",
-      "branches": [
-        {
-          "case": "true",
-          "label": "perf-bypass",
-          "output": "bypass_supervision",
-          "blocks": [
-            {
-              "identifier": "PYTHON_3_14_CODE",
-              "reference_name": "bypass_supervision",
-              "input": {
-                "data": {
-                  "submission": "${perf_test_preprocessor.output.result.submission}",
-                  "supervision_data": "${perf_test_preprocessor.output.result.supervision_data}"
-                },
-                "code": "\nfrom typing import Any\nfrom blocks.base_python_block import WFEngineTaskResult, Block, WFEngineTask\nfrom blocks.types import BlockInputs\n\n\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    submission: Any\n    supervision_data: Any = None\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    inp = task.inputData\n    return {\"submission\": inp.submission, \"decisions\": inp.supervision_data or {\"selected_choices\": []}}\n"
-              },
-              "title": "Bypass Supervision (perf)",
-              "description": "TEMPORARY perf-test bypass: forwards preprocessor submission + prefilled decisions without opening a supervision task."
-            }
-          ]
-        },
-        {
-          "case": "false",
-          "label": "normal",
-          "output": "supervision_normalizer",
-          "blocks": [
-            {
-              "identifier": "IDP_CUSTOM_SUPERVISION_4",
-              "reference_name": "intent_supervision",
-              "input": {
-                "supervision_template": "${build_supervision_template.output.result}",
-                "data": "${perf_test_preprocessor.output.result.supervision_data}",
-                "task_purpose": "capture_intents",
-                "submission": "${perf_test_preprocessor.output.result.submission}",
-                "task_restrictions": [],
-                "supervision_transcription_masking": true,
-                "page_ids": [],
-                "notification_workflow": "IDP_SUBMISSION_NOTIFY"
-              },
-              "title": "IDP Custom Supervision",
-              "description": "IDP Custom Supervision"
-            },
-            {
-              "identifier": "PYTHON_3_14_CODE",
-              "reference_name": "supervision_normalizer",
-              "input": {
-                "data": {
-                  "submission": "${intent_supervision.output.submission}",
-                  "decisions": "${intent_supervision.output.decisions}"
-                },
-                "code": "\nfrom typing import Any\nfrom blocks.base_python_block import WFEngineTaskResult, Block, WFEngineTask\nfrom blocks.types import BlockInputs\n\n\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    submission: Any\n    decisions: Any = None\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    inp = task.inputData\n    return {\"submission\": inp.submission, \"decisions\": inp.decisions or {\"selected_choices\": []}}\n"
-              },
-              "title": "Supervision Normalizer",
-              "description": "Wraps supervision output under .result so downstream references are uniform across both routing branches."
-            }
-          ]
-        }
-      ],
-      "decision": "${workflow.input.perf_test_mode}"
-    },
-    {
-      "identifier": "HTTP_REST",
-      "reference_name": "get_submission_details",
-      "input": {
-        "method": "GET",
-        "sdm_app_endpoint": "api/v5/submissions/${submission_bootstrap.output.result.submission.id}?flat=false",
-        "timeout": 600
-      },
-      "title": "Get Submission Details",
-      "description": "Fetch persisted submission record (carries external_id)."
-    },
-    {
-      "identifier": "PYTHON_3_14_CODE",
-      "reference_name": "build_salesforce_payload",
-      "input": {
-        "data": {
-          "submission": "${intent_routing.output.result.submission}",
-          "decisions": "${intent_routing.output.result.decisions}",
-          "submission_record": "${get_submission_details.output.result.data}"
-        },
-        "code": "\"\"\"Hyperscience PythonBlock source for `build_salesforce_payload`.\n\nReads the native HS submission produced by `intent_supervision` and emits a\nSalesforce-shaped payload matching\n`samples/salesforce_payload/sample_endorsement_native_hs.json`.\n\nContract:\n- Output is a dict with keys: `id`, `external_id`, `classification_review_needed`,\n  `unassigned_pages`, `cases`, `document_folders`, `documents[]`.\n- For every document, the canonical 12 identification fields + `Transaction Type`\n  + `Instructions` are guaranteed present in `document_fields[]`. Missing values\n  are emitted as empty strings (`transcription: \"\"`, `transcription_normalized: \"\"`).\n- Source mapping:\n    * `transcription.source == \"machine_transcription\"` \u2192 \"machine\"\n    * `transcription.source == \"human_transcription\"`   \u2192 \"human\"\n    * Decision-derived rows (intents, single_policy_flag) \u2192 \"supervision\"\n- `layout_field_uuid` is intentionally NOT emitted (Option A).\n\nEmbedded into the flow via `refactor_export.py`.\n\"\"\"\nfrom typing import Any, Dict, List\nfrom blocks.base_python_block import WFEngineTaskResult\nfrom blocks.types import BlockInputs\nfrom blocks.base_python_block import Block, WFEngineTask\n\n\n# Used to deserialize json inputs by the CCB.\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    submission: Any\n    decisions: Any = None\n    submission_record: Any = None\n\n\n# Canonical AC field list (US-S2.5 / US-S2.9). Order is preserved on output.\nEXPECTED_FIELDS = [\n    \"Policy Endorsement Contact\",\n    \"Effective Date of Change\",\n    \"New Expiration Date\",\n    \"ERP Effective Date\",\n    \"ERP Expiration Date\",\n    \"Unlimited\",\n    \"New Mailing Address\",\n    \"Customer Account Number\",\n    \"Customer Account\",\n    \"Path Id\",\n    \"Transaction Type\",\n    \"Instructions\",\n]\n\n# Aliases observed in current layouts \u2192 canonical AC name.\nFIELD_NAME_ALIASES = {\n    \"Policy Producer Contact\": \"Policy Endorsement Contact\",\n    \"Path ID\": \"Path Id\",\n}\n\nZWSP = \"\\u200b\"\n\n\ndef _clean_name(name):\n    if not isinstance(name, str):\n        return \"\"\n    cleaned = name.replace(ZWSP, \"\").strip()\n    return FIELD_NAME_ALIASES.get(cleaned, cleaned)\n\n\ndef _map_source(raw_source):\n    if raw_source == \"machine_transcription\":\n        return \"machine\"\n    if raw_source == \"human_transcription\":\n        return \"human\"\n    if raw_source in (\"supervision\", \"machine\", \"human\"):\n        return raw_source\n    return \"machine\"\n\n\ndef _flatten_field(field):\n    \"\"\"Convert HS field dict to flat Salesforce shape.\n\n    Tolerates two shapes for the transcription block:\n      * In-flow (intent_supervision output): flat keys\n            transcription, transcription_normalized, transcription_source,\n            transcription_confidence\n      * Post-complete API: nested\n            transcription: {raw, normalized, source, ...}\n    \"\"\"\n    name = _clean_name(field.get(\"output_name\") or field.get(\"field_name\") or field.get(\"name\") or \"\")\n    occurrence = field.get(\"occurrence_index\", 0) or 0\n    # Per Salesforce contract: output_name stays bare for every occurrence;\n    # field_name is suffixed with the occurrence number for occurrences >= 1\n    # (e.g. \"Policy Number\", \"Policy Number 1\", ...).\n    field_name = name if occurrence == 0 else f\"{name} {occurrence}\"\n\n    transcription_val = field.get(\"transcription\")\n    if isinstance(transcription_val, dict):\n        raw = transcription_val.get(\"raw\") or \"\"\n        normalized = transcription_val.get(\"normalized\")\n        if normalized is None:\n            normalized = raw or \"\"\n        src_raw = transcription_val.get(\"source\")\n    else:\n        raw = transcription_val if isinstance(transcription_val, str) else \"\"\n        normalized = field.get(\"transcription_normalized\")\n        if not isinstance(normalized, str):\n            normalized = raw\n        src_raw = field.get(\"transcription_source\") or field.get(\"identification_source\")\n\n    src = _map_source(src_raw)\n\n    fda = field.get(\"field_definition_attributes\") or {}\n    required = field.get(\"required\")\n    if required is None:\n        required = fda.get(\"required\", False)\n    multiline = field.get(\"multiline\")\n    if multiline is None:\n        multiline = fda.get(\"multiline\", False)\n\n    return {\n        \"id\": field.get(\"id\"),\n        \"output_name\": name,\n        \"field_name\": field_name,\n        \"occurrence_index\": occurrence,\n        \"page_number\": field.get(\"page_number\") or 1,\n        \"identification_source\": _map_source(field.get(\"identification_source\") or src_raw),\n        \"identification_confidence\": field.get(\"identification_confidence\") or \"sure\",\n        \"transcription\": raw if isinstance(raw, str) else \"\",\n        \"transcription_normalized\": normalized if isinstance(normalized, str) else \"\",\n        \"transcription_source\": src,\n        \"transcription_confidence\": field.get(\"transcription_confidence\") or \"sure\",\n        \"required\": bool(required),\n        \"multiline\": bool(multiline),\n        \"state\": field.get(\"state\", \"complete\"),\n    }\n\n\ndef _empty_field(name, page_number=1):\n    return {\n        \"id\": None,\n        \"output_name\": name,\n        \"field_name\": name,\n        \"occurrence_index\": 0,\n        \"page_number\": page_number,\n        \"identification_source\": \"machine\",\n        \"identification_confidence\": \"sure\",\n        \"transcription\": \"\",\n        \"transcription_normalized\": \"\",\n        \"transcription_source\": \"machine\",\n        \"transcription_confidence\": \"sure\",\n        \"required\": False,\n        \"multiline\": False,\n        \"state\": \"complete\",\n    }\n\n\ndef _normalize_supervision_decisions(decisions_obj):\n    \"\"\"Convert the supervision-block `decisions` output port into a\n    per-document list of {decision, choice} dicts.\n\n    Accepts both shapes:\n      * In-flow supervision output:\n            {\"selected_choices\": [\n                {\"document_id\": 31373,\n                 \"decision_choice\": {\n                     \"decision\": {\"name\": \"intent_1\"},\n                     \"choice\":   {\"name\": \"add_auto\"}}}, ...]}\n      * Pre-flattened list (already keyed by document_id) \u2014 passthrough.\n\n    Returns: {document_id_or_None: [{\"decision\": str, \"choice\": str}, ...]}\n    \"\"\"\n    by_doc: Dict[Any, List[Dict[str, Any]]] = {}\n    if not decisions_obj:\n        return by_doc\n    if isinstance(decisions_obj, dict):\n        choices = decisions_obj.get(\"selected_choices\") or []\n    elif isinstance(decisions_obj, list):\n        choices = decisions_obj\n    else:\n        return by_doc\n    for sc in choices:\n        if not isinstance(sc, dict):\n            continue\n        # Already-flattened shape\n        if \"decision\" in sc and isinstance(sc.get(\"decision\"), str):\n            doc_id = sc.get(\"document_id\")\n            by_doc.setdefault(doc_id, []).append({\n                \"decision\": sc.get(\"decision\") or \"\",\n                \"choice\": sc.get(\"choice\"),\n            })\n            continue\n        dc = sc.get(\"decision_choice\") or {}\n        d_obj = dc.get(\"decision\") or {}\n        c_obj = dc.get(\"choice\") or {}\n        name = d_obj.get(\"name\") if isinstance(d_obj, dict) else None\n        choice = c_obj.get(\"name\") if isinstance(c_obj, dict) else None\n        if not name:\n            continue\n        doc_id = sc.get(\"document_id\")\n        by_doc.setdefault(doc_id, []).append({\n            \"decision\": name,\n            \"choice\": choice,\n        })\n    return by_doc\n\n\ndef _decisions_to_field_rows(decisions, next_id_seed):\n    \"\"\"Translate per-document decisions list into supervision field rows.\n\n    All intents share `output_name: \"Intent\"`. Their `field_name` is suffixed\n    starting at 1: \"Intent 1\", \"Intent 2\", \"Intent 3\". `occurrence_index`\n    starts at 0 and increments.\n    `single_policy_flag` \u2192 field_name \"single_policy_flag\".\n    `transaction_type` \u2192 field_name \"Transaction Type\" (the canonical\n    placeholder is removed in `_transform_document` so this is the only row).\n\n    Per-intent date / policy picks (``intent_<N>_effective_date_pick``,\n    ``intent_<N>_policy_number_pick``) emit supervision rows keyed by the\n    matching intent slot number. They are emitted *only* when the supervisor\n    actually selected a real value (skip empty / the ``__none__`` sentinel\n    used when nothing was extracted), so consumers can rely on absence to\n    mean \"no selection\".\n    \"\"\"\n    import re as _re\n\n    rows = []\n    intent_seen = 0\n    pick_re = _re.compile(r\"^intent_(\\d+)_(effective_date|policy_number)_pick$\")\n\n    def _row(output_name, field_name, occurrence, choice):\n        rows.append({\n            \"id\": next_id_seed[0],\n            \"output_name\": output_name,\n            \"field_name\": field_name,\n            \"occurrence_index\": occurrence,\n            \"page_number\": 1,\n            \"identification_source\": \"supervision\",\n            \"identification_confidence\": \"sure\",\n            \"transcription\": str(choice),\n            \"transcription_normalized\": str(choice),\n            \"transcription_source\": \"supervision\",\n            \"transcription_confidence\": \"sure\",\n            \"required\": False,\n            \"multiline\": False,\n            \"state\": \"complete\",\n        })\n        next_id_seed[0] += 1\n\n    for d in decisions or []:\n        name = d.get(\"decision\") or \"\"\n        choice = d.get(\"choice\")\n        if choice is None:\n            continue\n        # Skip placeholder sentinel emitted when no values were extracted.\n        if isinstance(choice, str) and (not choice.strip() or choice == \"__none__\"):\n            continue\n        # Skip the user-facing \"-- None --\" dropdown option: treat as \"no\n        # selection\" and omit from the Salesforce payload entirely.\n        if choice == \"None\" and (\n            (name.startswith(\"intent_\") and not name.endswith(\"_pick\"))\n            or name == \"transaction_type\"\n        ):\n            continue\n\n        m = pick_re.match(name)\n        if m:\n            slot = int(m.group(1))\n            kind = m.group(2)\n            if kind == \"effective_date\":\n                _row(\"Effective Date\", f\"Effective Date {slot}\", slot - 1, choice)\n            else:\n                _row(\"Policy Number\", f\"Policy Number {slot}\", slot - 1, choice)\n            continue\n\n        if name.startswith(\"intent_\") and not name.endswith(\"_pick\"):\n            intent_seen += 1\n            _row(\"Intent\", f\"Intent {intent_seen}\", intent_seen - 1, choice)\n        elif name == \"single_policy_flag\":\n            _row(\"Single Policy Flag\", \"single_policy_flag\", 0, choice)\n        elif name == \"transaction_type\":\n            _row(\"Transaction Type\", \"Transaction Type\", 0, choice)\n        elif name == \"multiple_transaction_type\":\n            if choice is None:\n                continue\n            if isinstance(choice, str):\n                normalized = choice.strip().lower()\n                if normalized in {\"\", \"none\", \"null\", \"false\", \"no\"}:\n                    continue\n            _row(\"Multiple Transaction Type\", \"Multiple Transaction Type\", 0, choice)\n    return rows\n\n\ndef _transform_document(doc, supervision_decisions=None):\n    src_fields = doc.get(\"document_fields\") or []\n    flat_fields = [_flatten_field(f) for f in src_fields if isinstance(f, dict)]\n\n    # Guarantee canonical fields present (empty-string default).\n    have_names = {f[\"field_name\"] for f in flat_fields if f.get(\"occurrence_index\", 0) == 0}\n    for canonical in EXPECTED_FIELDS:\n        if canonical not in have_names:\n            flat_fields.append(_empty_field(canonical))\n\n    # Append supervision rows. Prefer decisions wired in from the supervision\n    # block's `decisions` output port; fall back to post-API doc.decisions[].\n    next_id = [10_000_000]\n    decisions = supervision_decisions if supervision_decisions is not None else doc.get(\"decisions\")\n    supervision_rows = _decisions_to_field_rows(decisions, next_id)\n\n    # If supervision provided a Transaction Type, drop the empty placeholder\n    # so the payload has exactly one Transaction Type row per document.\n    sup_field_names = {r.get(\"field_name\") for r in supervision_rows}\n    if \"Transaction Type\" in sup_field_names:\n        flat_fields = [\n            f for f in flat_fields\n            if not (\n                f.get(\"field_name\") == \"Transaction Type\"\n                and f.get(\"transcription_source\") != \"supervision\"\n                and not (f.get(\"transcription\") or \"\").strip()\n            )\n        ]\n\n    flat_fields.extend(supervision_rows)\n\n    return {\n        \"id\": doc.get(\"id\"),\n        \"exceptions\": doc.get(\"exceptions\") or [],\n        \"layout_kind\": doc.get(\"type\") or doc.get(\"layout_kind\"),\n        \"layout_name\": doc.get(\"layout_name\"),\n        \"layout_language\": doc.get(\"layout_language\") or \"en\",\n        \"layout_tags\": doc.get(\"layout_tags\") or [],\n        \"layout_uuid\": doc.get(\"layout_uuid\"),\n        \"layout_version_name\": doc.get(\"layout_version_name\"),\n        \"layout_version_uuid\": doc.get(\"layout_version_uuid\"),\n        \"metadata\": doc.get(\"metadata\") or {},\n        \"pages\": doc.get(\"pages\") or [],\n        \"status\": doc.get(\"state\") or \"complete\",\n        \"document_fields\": flat_fields,\n        \"tables\": doc.get(\"document_tables\") or [],\n        \"state\": doc.get(\"state\") or \"complete\",\n        \"complete_time\": doc.get(\"complete_time\"),\n    }\n\n\ndef _resolve_external_id(submission, submission_record):\n    # Prefer the persisted submission record fetched from\n    # `GET /api/v5/submissions/{id}?flat=false` (this is the only place the\n    # platform exposes the caller-supplied external_id). Fall back to the\n    # in-flight pipeline submission if the record lookup is unavailable.\n    for src in (submission_record, submission):\n        if isinstance(src, dict):\n            ext = (\n                src.get(\"external_id\")\n                or src.get(\"source_external_id\")\n                or (src.get(\"metadata\") or {}).get(\"external_id\")\n                or (src.get(\"api_params\") or {}).get(\"external_id\")\n            )\n            if ext:\n                return ext\n    return None\n\n\ndef _build_payload(submission, decisions=None, submission_record=None):\n    submission = submission or {}\n    by_doc = _normalize_supervision_decisions(decisions)\n    docs = submission.get(\"documents\") or []\n    out_docs = []\n    for d in docs:\n        doc_id = d.get(\"id\") if isinstance(d, dict) else None\n        per_doc = [\n            dec for dec in (by_doc.get(None) or [])\n            if dec.get(\"decision\") != \"transaction_type\"\n        ]\n        per_doc.extend(by_doc.get(doc_id) or [])\n        out_docs.append(_transform_document(d, supervision_decisions=per_doc))\n    return {\n        \"id\": submission.get(\"id\"),\n        \"external_id\": _resolve_external_id(submission, submission_record),\n        \"classification_review_needed\": False,\n        \"unassigned_pages\": submission.get(\"unassigned_pages\") or [],\n        \"cases\": submission.get(\"cases\") or [],\n        \"document_folders\": submission.get(\"document_folders\") or [],\n        \"documents\": out_docs,\n    }\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _build_payload(\n        task.inputData.submission,\n        task.inputData.decisions,\n        task.inputData.submission_record,\n    )\n"
-      },
-      "title": "Build Salesforce Payload",
-      "description": "Reshape native HS submission to the Salesforce contract shape."
-    },
-    {
-      "identifier": "SUBMISSION_COMPLETE_4",
-      "reference_name": "complete_submission",
-      "input": {
-        "submission": "${intent_routing.output.result.submission}",
-        "is_reprocessing": false,
-        "nlc_qa_sampling_ratio": "${workflow.input.semi_qa_sample_rate}",
-        "field_id_qa_enabled": "${workflow.input.field_id_qa_enabled}",
-        "field_id_qa_sampling_ratio": "${workflow.input.field_id_qa_sample_rate}",
-        "table_id_qa_enabled": "${workflow.input.table_id_qa_enabled}",
-        "table_id_qa_sampling_ratio": "${workflow.input.table_id_qa_sample_rate}",
-        "transcription_qa_enabled": "${workflow.input.qa}",
-        "transcription_structured_entry_qa_sample_rate": "${workflow.input.structured_entry_qa_sample_rate}",
-        "transcription_structured_checkbox_qa_sample_rate": "${workflow.input.structured_checkbox_qa_sample_rate}",
-        "transcription_structured_signature_qa_sample_rate": "${workflow.input.structured_signature_qa_sample_rate}",
-        "transcription_semi_structured_qa_sample_rate": "${workflow.input.semi_structured_qa_sample_rate}",
-        "table_cell_transcription_qa_enabled": "${workflow.input.table_cell_transcription_qa_enabled}",
-        "table_cell_transcription_qa_sample_rate": "${workflow.input.table_cell_transcription_qa_sample_rate}",
-        "auto_qa_sampling_rate_enabled": "${workflow.input.auto_qa_sampling_rate_enabled}",
-        "exclude_auto_transcribe_fields_from_qa": "${workflow.input.exclude_auto_transcribe_fields_from_qa}"
-      },
-      "title": "Complete",
-      "description": "Finalize submission processing and update reporting data"
-    },
-    {
-      "identifier": "SET_TRANSFORMED_OUTPUT",
-      "reference_name": "set_transformed_output",
-      "input": {
-        "submission": "${complete_submission.output.submission}",
-        "transformed_output": "${build_salesforce_payload.output.result}"
-      },
-      "title": "Set Transformed Output",
-      "description": "Set transformed output to Salesforce payload so exported body contains id at top level."
     }
   ],
   "input": {
-    "layout_release_uuid": "9dedc3b5-8fc5-4793-93da-097969d17a56",
-    "hs_base_url": "https://hs-dev.corp.tmnas.com"
+    "layout_release_uuid": null,
+    "workflow_uuid": null,
+    "workflow_name": null,
+    "workflow_version": null,
+    "submission_bootstrap_s3_config": "${system.secrets.s3_downloader}",
+    "submission_bootstrap_ocs_config": "${system.secrets.ocs_downloader}",
+    "submission_bootstrap_http_config": null,
+    "notification_workflow_initialization": null,
+    "structured_layout_match_threshold": 0.6,
+    "semi_structured_classification": true,
+    "semi_target_accuracy": 0.99,
+    "manual_nlc_enabled": false,
+    "semi_doc_grouping_logic": "group_pages",
+    "semi_qa_sample_rate": 0.05,
+    "machine_classification_rotation_correction_enabled": true,
+    "machine_classification_mobile_processing_enabled": false,
+    "machine_classification_file_transcription_enabled": false,
+    "notification_workflow_classification": null,
+    "field_id_target_accuracy": 0.95,
+    "table_id_target_accuracy": 0.96,
+    "manual_field_id_enabled": true,
+    "notification_workflow_identification": null,
+    "field_id_qa_enabled": true,
+    "field_id_qa_sample_rate": 0.05,
+    "table_id_qa_enabled": true,
+    "table_id_qa_sample_rate": 0.05,
+    "structured_transcription_training": false,
+    "structured_improved_transcr_threshold_accuracy": true,
+    "structured_transcription_training_period": 30,
+    "semi_structured_transcription_training": false,
+    "semi_structured_transcription_training_period": 30,
+    "semi_structured_improved_transcr_threshold_accuracy": true,
+    "transcription_model": "IDP",
+    "structured_text_min_training_records": 5000,
+    "structured_text_max_training_records": 50000,
+    "structured_text_target_accuracy": 0.95,
+    "structured_text_threshold": 0.52,
+    "structured_min_leg_threshold": 0.1,
+    "semi_structured_text_min_training_records": 2000,
+    "semi_structured_text_max_training_records": 50000,
+    "semi_structured_text_target_accuracy": 0.95,
+    "semi_structured_text_threshold": 0.52,
+    "semi_structured_min_leg_threshold": 0.1,
+    "semi_structured_table_min_training_records": 2000,
+    "semi_structured_table_max_training_records": 50000,
+    "semi_structured_table_target_accuracy": 0.95,
+    "semi_structured_table_threshold": 0.52,
+    "semi_structured_table_min_leg_threshold": 0.1,
+    "structured_checkbox_min_training_records": 2000,
+    "structured_checkbox_max_training_records": 50000,
+    "structured_checkbox_target_accuracy": 0.95,
+    "structured_checkbox_threshold": 0.56,
+    "checkbox_min_leg_threshold": 0.5,
+    "structured_signature_min_training_records": 2000,
+    "structured_signature_max_training_records": 50000,
+    "structured_signature_target_accuracy": 0.95,
+    "structured_signature_threshold": 0.99,
+    "signature_min_leg_threshold": 0.5,
+    "semi_structured_checkbox_min_training_records": 2000,
+    "semi_structured_checkbox_max_training_records": 50000,
+    "semi_structured_checkbox_target_accuracy": 0.95,
+    "semi_structured_checkbox_threshold": 0.56,
+    "semi_structured_checkbox_min_leg_threshold": 0.5,
+    "manual_transcription_enabled": true,
+    "notification_workflow_transcription": null,
+    "manual_transcription_supervision_transcription_masking": true,
+    "manual_transcription_task_restrictions": [],
+    "manual_transcription_table_output_manual_review": false,
+    "manual_transcription_always_supervise_blank_cells": true,
+    "qa": true,
+    "structured_entry_qa_sample_rate": 0.05,
+    "structured_checkbox_qa_sample_rate": 0.05,
+    "structured_signature_qa_sample_rate": 0.05,
+    "semi_structured_qa_sample_rate": 0.05,
+    "exclude_auto_transcribe_fields_from_qa": false,
+    "table_cell_transcription_qa_enabled": true,
+    "table_cell_transcription_qa_sample_rate": 0.05,
+    "finetuning_only_trained_layouts": true,
+    "force_normalization_errors_to_sv": false,
+    "force_required_entries_to_sv": false,
+    "auto_qa_sampling_rate_enabled": false,
+    "notification_workflow_flexible_extraction": null,
+    "flexible_extraction_supervision_transcription_masking": true,
+    "flexible_extraction_task_restrictions": [],
+    "document_rendering_enabled": false,
+    "document_rendering_height": 11,
+    "document_rendering_width": 8.5,
+    "document_rendering_quality": 50,
+    "document_rendering_mime_type": "application/pdf",
+    "document_rendering_unit": "in",
+    "field_transcription_target_accuracies": [],
+    "identification_target_accuracies": [],
+    "layout_id_dealbreaker": false,
+    "layout_id_dealbreaker_bypass": false,
+    "reprocessing_enabled": true,
+    "file_filter_filter_type": "ALL_FILES",
+    "file_filter_minimum_image_width": null,
+    "file_filter_minimum_image_height": null,
+    "file_filter_minimum_file_size_kb": null,
+    "file_filter_file_extensions_action": "NONE",
+    "file_filter_file_extensions": null,
+    "file_filter_file_extensions_other": null
   },
-  "description": "Custom flow which runs IDP then attempts to identify the product code",
-  "output": {
-    "submission": "${complete_submission.output.submission}",
-    "salesforce_payload": "${build_salesforce_payload.output.result}"
+  "description": "Top-level wrapper for the Cancellation Custom Core Flow. Delegates document processing + Transaction Type supervision to the DROPDOWN_TRANSACTION_TYPE_CORE subflow.",
+  "triggers": {
+    "title": "Inputs",
+    "description": "Ingest submission data from an external source, and trigger submission processing",
+    "reference_name": "triggers",
+    "api_params_manifest": {
+      "input": [
+        {
+          "name": "restrictions",
+          "type": "TaskRestrictions",
+          "title": "Task Restrictions",
+          "description": "Supervision tasks for submissions created via this input connection will only be accessible to users associated with the specified Task Restrictions.",
+          "value": [],
+          "optional": true
+        },
+        {
+          "name": "goal_time_rule",
+          "type": "GoalTimeRule",
+          "title": "Submission Processing Deadline",
+          "description": "Dynamic processing deadline for submissions coming via this connection. This will impact how manual tasks get prioritized in the Work Queue.",
+          "value": null,
+          "optional": true
+        },
+        {
+          "name": "layout_uuid",
+          "type": "LayoutUUID",
+          "title": "Layout UUID",
+          "description": "The UUID of a Semi-Structured layout that's part of an active release can be specified. When specified, all submitted pages in the request will be matched to it and machine page classification will be skipped.",
+          "value": null,
+          "optional": true
+        },
+        {
+          "name": "fallback_layout_uuid",
+          "type": "LayoutUUID",
+          "title": "Fallback Layout UUID",
+          "description": "The UUID of a Semi-Structured layout that's part of an active release can be specified. When specified only pages that are not matched to a live Structured layout in the request will be matched to the specified Semi-structured layout.",
+          "value": null,
+          "optional": true
+        },
+        {
+          "name": "source_routing_tag_comma_separated",
+          "type": "string",
+          "title": "Source Tags",
+          "description": "Comma-separated values. Source tags can be used to filter what status change notifications are sent to each output connection.",
+          "value": null,
+          "optional": true
+        },
+        {
+          "name": "machine_only",
+          "type": "boolean",
+          "title": "Machine Only",
+          "description": "Process the submission using an automated flow only.",
+          "value": false
+        },
+        {
+          "name": "single_document_per_page",
+          "type": "boolean",
+          "title": "Single Document Per Page",
+          "description": "Force creation of separate documents for each uploaded page in each file.",
+          "value": false
+        }
+      ],
+      "ui": {
+        "groups": [
+          {
+            "title": "Submission Processing Settings",
+            "fields": [
+              "restrictions",
+              "goal_time_rule",
+              "layout_uuid",
+              "fallback_layout_uuid",
+              "source_routing_tag_comma_separated",
+              "machine_only",
+              "single_document_per_page"
+            ]
+          }
+        ]
+      }
+    },
+    "blocks": []
   }
 }

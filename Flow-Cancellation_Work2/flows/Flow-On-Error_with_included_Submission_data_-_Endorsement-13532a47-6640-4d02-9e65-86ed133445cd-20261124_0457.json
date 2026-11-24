@@ -1,0 +1,95 @@
+{
+  "metadata": {
+    "schema_version": 2,
+    "exported_from_hostname": "tmnas-dev.hyperscience.net",
+    "hs_tag": "44.1.1",
+    "hs_revision": "afc3fb7d77da14348d062d4b0f7ed2bc1cc2c860",
+    "exported_version": 4,
+    "file_type": "flow_json"
+  },
+  "uuid": "13532a47-6640-4d02-9e65-86ed133445cd",
+  "owner_email": "flows-sdk@hyperscience.com",
+  "title": "On-Error with included Submission data - Endorsement",
+  "manifest": {
+    "input": [
+      {
+        "name": "failed_run_uuid",
+        "type": "string",
+        "title": "Failed Flow Run UUID",
+        "description": "UUID of the failed flow run that triggered this on_error flow",
+        "optional": false,
+        "ui": {
+          "hidden": true
+        }
+      }
+    ],
+    "identifier": "SUBMISSION_AWARE_ON_ERROR_FLOW_EXAMPLE",
+    "roles": [
+      "on_error",
+      "supporting"
+    ]
+  },
+  "blocks": [
+    {
+      "identifier": "HTTP_REST",
+      "reference_name": "flow_run_rest_api_block",
+      "input": {
+        "method": "GET",
+        "sdm_app_endpoint": "/api/v5/flow_runs/${workflow.input.failed_run_uuid}",
+        "timeout": 600
+      },
+      "title": "Get Flow Run",
+      "description": "Get the full metadata of the failed flow run"
+    },
+    {
+      "identifier": "PYTHON_3_14_CODE",
+      "reference_name": "get_correlation_id",
+      "input": {
+        "data": {},
+        "code": "\nfrom typing import Any, Dict, List, Tuple\nfrom blocks.base_python_block import WFEngineTaskResult\nfrom blocks.types import BlockInputs\nfrom flows_sdk.types import *\n\n\n# Used to deserialize json inputs by the CCB\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    pass\n\ndef _get_correlation_id(_hs_task: HsTask) -> dict:\n    return {'correlation_id': _hs_task.correlation_id}\n\n\n\ndef process_task_flows_sdk_types(\n    _hs_block_instance: HsBlockInstance, _hs_task: HsTask, input_data: CustomCodeBlockProxyInputs\n) -> WFEngineTaskResult:\n    return _get_correlation_id(**input_data.dict(), _hs_task=_hs_task)\n\n"
+      },
+      "title": "Get Correlation ID",
+      "description": "Get the correlation ID for the failed Submission / Flow Run"
+    },
+    {
+      "identifier": "HTTP_REST",
+      "reference_name": "fetch_submission",
+      "input": {
+        "method": "GET",
+        "sdm_app_endpoint": "/api/v5/submissions?debug=true&correlation_id=${get_correlation_id.output.result.correlation_id}",
+        "timeout": 600
+      },
+      "title": "Fetch Submission",
+      "description": "Fetch the submission data for the failed flow run"
+    },
+    {
+      "identifier": "PYTHON_3_14_CODE",
+      "reference_name": "auto_python_code__1",
+      "input": {
+        "data": {
+          "flow_run": "${flow_run_rest_api_block.output.result.data}",
+          "get_submissions_response": "${fetch_submission.output.result.data}"
+        },
+        "code": "\nfrom typing import Any, Dict, List, Tuple\nfrom blocks.base_python_block import WFEngineTaskResult\nfrom blocks.types import BlockInputs\nfrom blocks.base_python_block import Block, WFEngineTask\n\n\n# Used to deserialize json inputs by the CCB\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    flow_run: Any\n    get_submissions_response: Any\n\ndef _prep_output_data(flow_run: dict, get_submissions_response: dict) -> dict:\n    submissions_in_response = get_submissions_response.get('results', [])\n    submission = None if not submissions_in_response else submissions_in_response[0]\n    return {'flow_run': flow_run, 'submission': submission}\n\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _prep_output_data(**task.inputData.dict())\n\n"
+      },
+      "title": "Format Submission Response",
+      "description": "Prepare the output data to be sent to the user-configured outputunder the keys \"flow_run\" and \"submission\""
+    },
+    {
+      "identifier": "OUTPUTS",
+      "reference_name": "json_outputs",
+      "title": "JSON Outputs",
+      "description": "Send JSON submission data to external systems",
+      "role_filter": [
+        "json_output"
+      ],
+      "input_template": {
+        "payload": "${auto_python_code__1.output.result}"
+      },
+      "blocks": []
+    }
+  ],
+  "input": {},
+  "description": "Flow designed to be used as an \"on-error\" handler for\n submission-based flows.\n\nWith the on-error flow configured, when the original flow fails for any reason, and all\n    the configured auto-retries have been exhausted, the on-error flow will be triggered.\n\n\nIn this on-error flow implementation,\n    we fetch the full metadata of the failed flow run, alongside with the full submission metadata\n    (if the submission ID was found), and then send it to a user-configured output.\n    The data format of the output conforms to\n    the schema documented here: https://docs.hyperscience.com/#flows-runs and\n    here: https://docs.hyperscience.com/#submissions, under the respective keys\n    \"flow_run\" and \"submission\".\n\n\nIf you need more complex logic in this flow\n    please consult the documentation of Flows SDK (https://flows-sdk.hyperscience.com)\n    and the available public APIs (https://docs.hyperscience.com)\n",
+  "output": {}
+}

@@ -4,7 +4,7 @@ Architecture (per HS team guidance):
 
     1. **Core subflow** (`dropdown_core.json`): standard IDP pipeline
        (classification -> identification -> transcription) followed by our
-       custom supervision task that captures endorsement intents. Roles default
+       custom supervision task that captures cancellation intents. Roles default # TODO updated endorsement to cancellation
        to ['supporting', 'idp_core'] so it can be assigned as the IDP Core
        implementation inside the wrapper.
 
@@ -44,8 +44,9 @@ from flows_sdk.implementations.idp_v44 import idp_blocks as v44_blocks
 
 # Stable UUIDs so rebuilds don't churn the file (and so HS treats re-imports
 # as new versions of the same flow rather than creating new flows).
-CORE_FLOW_UUID = UUID("6113ffb0-31c5-431c-93ec-a5bb233a3672")
-WRAPPER_FLOW_UUID = UUID("2271e1ef-82d9-4bb6-8b60-8e7f9cf3bb4b")
+
+CORE_FLOW_UUID = UUID("b87e2988-f94c-4642-b298-16fed14109d5") # TODO Updated from the old UUID 6113ffb0-31c5-431c-93ec-a5bb233a3672
+WRAPPER_FLOW_UUID = UUID("2271e1ef-82d9-4bb6-8b60-8e7f9cf3bb4c") # TODO Updated from the old 2271e1ef-82d9-4bb6-8b60-8e7f9cf3bb4b
 
 
 # --------------------------------------------------------------------------- #
@@ -62,6 +63,7 @@ WRAPPER_FLOW_UUID = UUID("2271e1ef-82d9-4bb6-8b60-8e7f9cf3bb4b")
 # alphabetical order so the Supervision dropdown matches the source of truth.
 # When adding a new intent, add ONE entry here; ALLOWED_INTENTS and
 # INTENT_SCHEMA_ONEOF are derived from this dict so the two never drift.
+# TODO Confirm the intent lists for allow lists
 INTENT_LABELS: "dict[str, str]" = {
     "Account_Contact_Update": "Account Contact Update",
     "Add_Additional_Insured_Auto": "Add Additional Insured - Auto",
@@ -169,23 +171,26 @@ ALLOWED_INTENTS = list(INTENT_LABELS.keys())
 # Number of intent slots rendered on the supervision screen. Kept at 2 to
 # match the current production reference export; bump only after coordinating
 # with the downstream Salesforce payload builder + build_salesforce_payload.py.
-INTENT_SLOTS = 2
+# TODO update INTENT_SLOTS = 1?
+# INTENT_SLOTS = 2
 
 # Real HS Studio data-type UUIDs (one per logical field, reused across slots).
-REAL_DATA_TYPES = {
-    "intent":         "e19aa0b5-91e8-4f6d-a465-6cec1e8b8332",
-    "policy_number":  "7fc603ff-6ac9-4db7-92a3-c7d23f70e41f",
-    "effective_date": "ed9aa0b5-91e8-4f6d-a465-6cec1e8b8332",
-}
+# TODO If any, Update Custom Data Type if needed for Cancellation 
 
-DATA_IDENTIFIERS = {
-    f"{base}_{i}": REAL_DATA_TYPES[base]
-    for i in range(1, INTENT_SLOTS + 1)
-    for base in REAL_DATA_TYPES
-}
+# REAL_DATA_TYPES = {
+#     "intent":         "e19aa0b5-91e8-4f6d-a465-6cec1e8b8332",
+#     "policy_number":  "7fc603ff-6ac9-4db7-92a3-c7d23f70e41f",
+#     "effective_date": "ed9aa0b5-91e8-4f6d-a465-6cec1e8b8332",
+# }
 
-CORE_FLOW_IDENTIFIER = "DROPDOWN_INTENT_CORE"
-WRAPPER_FLOW_IDENTIFIER = "DROPDOWN_INTENT_WRAPPER"
+# DATA_IDENTIFIERS = {
+#     f"{base}_{i}": REAL_DATA_TYPES[base]
+#     for i in range(1, INTENT_SLOTS + 1)
+#     for base in REAL_DATA_TYPES
+# }
+
+CORE_FLOW_IDENTIFIER = "CANCELLATION_CUSTOM_CORE_V44"
+WRAPPER_FLOW_IDENTIFIER = "DROPDOWN_TRANSACTION_TYPE_WRAPPER"
 SAAS_PYTHON_BLOCK_VERSION = PythonBlock.SupportedPythonBlockPythonVersion.PYTHON_3_14
 SAAS_PYTHON_BLOCK_IDENTIFIER = "PYTHON_3_14_CODE"
 
@@ -193,95 +198,103 @@ SAAS_PYTHON_BLOCK_IDENTIFIER = "PYTHON_3_14_CODE"
 # doc-level Transaction Type). Policy / effective-date pickers were removed
 # from the UI, so these lists are intentionally empty. The PythonBlock still
 # accepts them for backward-compatibility with the input contract.
-POLICY_FIELD_NAMES: list = []
-DATE_FIELD_NAMES: list = []
+# POLICY_FIELD_NAMES: list = []
+# DATE_FIELD_NAMES: list = []
 
 
 # --------------------------------------------------------------------------- #
 # Custom Supervision template
 # --------------------------------------------------------------------------- #
 
-def _intent_const(intent: str) -> str:
-    """Convert a display intent ('Add/Delete Less Than 10 Autos') into a
-    stable snake_case const ('add_delete_less_than_10_autos').
+# def _intent_const(intent: str) -> str:
+#     """Convert a display intent ('Add/Delete Less Than 10 Autos') into a
+#     stable snake_case const ('add_delete_less_than_10_autos').
 
-    Strategy: lowercase, replace any non-alphanumeric character with '_',
-    collapse runs of '_', and strip leading / trailing '_'. Idempotent.
-    """
-    import re
-    slug = re.sub(r"[^a-z0-9]+", "_", intent.lower())
-    return slug.strip("_")
+#     Strategy: lowercase, replace any non-alphanumeric character with '_',
+#     collapse runs of '_', and strip leading / trailing '_'. Idempotent.
+#     """
+#     import re
+#     slug = re.sub(r"[^a-z0-9]+", "_", intent.lower())
+#     return slug.strip("_")
 
 
 # `const` keeps the exact underscore value (persisted by Supervision and
 # exported to Salesforce); `title` is the client-approved UI label shown
 # in the dropdown, sourced from INTENT_LABELS so the two never drift.
-INTENT_SCHEMA_ONEOF = [
-    {"const": "None", "title": "-- None --"},
-] + [
-    {"const": i, "title": INTENT_LABELS[i]} for i in ALLOWED_INTENTS
-]
+# INTENT_SCHEMA_ONEOF = [
+#     {"const": "None", "title": "-- None --"},
+# ] + [
+#     {"const": i, "title": INTENT_LABELS[i]} for i in ALLOWED_INTENTS
+# ]
 
 # Transaction Type per-slot dropdown. `const` is the value persisted by
 # Supervision (and sent to Salesforce); `title` is the label shown to the
 # keyer. Consts stay CamelCase (no spaces) per client contract.
+FLAT_CANCELLATION_SCHEMA_ONEOF = [
+    {"const": "None", "title": "-- None --"},
+    {"const": "Yes", "title": "Yes"},
+    {"const": "No", "title": "No"},
+]
+
 TRANSACTION_TYPE_SCHEMA_ONEOF = [
     {"const": "None", "title": "-- None --"},
-    {"const": "MidTermChange", "title": "Mid Term Change"},
-    {"const": "MidTermQuote", "title": "Mid Term Quote"},
+    {"const": "Cancellation", "title": "Cancellation"},
+    {"const": "Endorsement", "title": "Endorsement"},
     {"const": "Exception", "title": "Exception"},
+    {"const": "Combination", "title": "Combination(Cancellation and Endorsement)"},
 ]
 
 # Defensive check: surface duplicate consts (different display names that
 # slugify to the same const) at build time rather than silently dropping
 # options in the supervision dropdown.
-_seen = set()
-for _opt in INTENT_SCHEMA_ONEOF:
-    if _opt["const"] in _seen:
-        raise SystemExit(
-            f"Duplicate intent const {_opt['const']!r} from display "
-            f"name {_opt['title']!r}. Rename the display variant in "
-            f"ALLOWED_INTENTS."
-        )
-    _seen.add(_opt["const"])
+# _seen = set()
+# for _opt in INTENT_SCHEMA_ONEOF:
+#     if _opt["const"] in _seen:
+#         raise SystemExit(
+#             f"Duplicate intent const {_opt['const']!r} from display "
+#             f"name {_opt['title']!r}. Rename the display variant in "
+#             f"ALLOWED_INTENTS."
+#         )
+#     _seen.add(_opt["const"])
 
+# TODO Update value in dic of return IF data in DATA_IDENTIFIERS has changed
 
-def _intent_slot_inputs(slot: int):
-    """Static placeholder slot inputs. The dynamic template builder
-    (PythonBlock) replaces effective_date / policy_number components per slot
-    with decision dropdowns whose options are the actual extracted values
-    from the submission. The intent decision is static (controlled list).
-    """
-    s = str(slot)
-    return [
-        # Decision component renders as a true click-to-open dropdown.
-        # Per HS docs: "Decisions, or decision components, are drop-down menus
-        # with options from a predetermined set of choices set in the JSON
-        # configuration." schema.oneOf = single-select dropdown.
-        {
-            "name": f"intent_{s}",
-            "type": "decision",
-            "title": f"Intent {s}",
-            "relation": {"type": "document"},
-            "schema": {"oneOf": INTENT_SCHEMA_ONEOF},
-        },
-        # Editable transcription of the policy field (so keyer can correct).
-        {
-            "name": f"policy_number_{s}",
-            "type": "transcription",
-            "data_identifier": DATA_IDENTIFIERS[f"policy_number_{s}"],
-            "title": f"Policy Number {s}",
-            "description": "Policy that is being modified.",
-        },
-        # Editable transcription of the effective_date field.
-        {
-            "name": f"effective_date_{s}",
-            "type": "transcription",
-            "data_identifier": DATA_IDENTIFIERS[f"effective_date_{s}"],
-            "title": f"Effective Date {s}",
-            "description": "MM/DD/YYYY",
-        },
-    ]
+# def _intent_slot_inputs(slot: int):
+#     """Static placeholder slot inputs. The dynamic template builder
+#     (PythonBlock) replaces effective_date / policy_number components per slot
+#     with decision dropdowns whose options are the actual extracted values
+#     from the submission. The intent decision is static (controlled list).
+#     """
+#     s = str(slot)
+#     return [
+#         # Decision component renders as a true click-to-open dropdown.
+#         # Per HS docs: "Decisions, or decision components, are drop-down menus
+#         # with options from a predetermined set of choices set in the JSON
+#         # configuration." schema.oneOf = single-select dropdown.
+#         {
+#             "name": f"intent_{s}",
+#             "type": "decision",
+#             "title": f"Intent {s}",
+#             "relation": {"type": "document"},
+#             "schema": {"oneOf": INTENT_SCHEMA_ONEOF},
+#         },
+#         # Editable transcription of the policy field (so keyer can correct).
+#         {
+#             "name": f"policy_number_{s}",
+#             "type": "transcription",
+#             "data_identifier": DATA_IDENTIFIERS[f"policy_number_{s}"],
+#             "title": f"Policy Number {s}",
+#             "description": "Policy that is being modified.",
+#         },
+#         # Editable transcription of the effective_date field.
+#         {
+#             "name": f"effective_date_{s}",
+#             "type": "transcription",
+#             "data_identifier": DATA_IDENTIFIERS[f"effective_date_{s}"],
+#             "title": f"Effective Date {s}",
+#             "description": "MM/DD/YYYY",
+#         },
+#     ]
 
 
 # --------------------------------------------------------------------------- #
@@ -290,12 +303,14 @@ def _intent_slot_inputs(slot: int):
 
 def _build_dynamic_template(
     submission,
-    intent_oneof,
-    intent_slots,
-    policy_field_names,
-    date_field_names,
+    
+    # intent_oneof,
+    # intent_slots,
+    # policy_field_names,
+    # date_field_names,
     hs_base_url=None,
     transaction_type_oneof=None,
+    flat_cancellation_oneof=None,
 ):
     """Build a minimal custom-supervision template: only the per-slot Intent
     decision dropdowns. A banner row at the top renders a link back to the
@@ -332,23 +347,24 @@ def _build_dynamic_template(
     # wraps, so we put the full submission URL in the title. The dropdown
     # below is functionally a no-op (single option, pre-selected) but is
     # the only HS component type whose label reliably wraps long text.
-    for i in range(1, intent_slots + 1):
-        s = str(i)
-        inputs.append({
-            "name": f"intent_{s}",
-            "type": "decision",
-            "title": f"Intent {s}",
-            "relation": {"type": "document"},
-            "schema": {"oneOf": intent_oneof},
-        })
-        groups.append({"title": "", "fields": [f"intent_{s}"]})
+    # for i in range(1, intent_slots + 1):
+    #     s = str(i)
+    #     inputs.append({
+    #         "name": f"intent_{s}",
+    #         "type": "decision",
+    #         "title": f"Intent {s}",
+    #         "relation": {"type": "document"},
+    #         "schema": {"oneOf": intent_oneof},
+    #     })
+    #     groups.append({"title": "", "fields": [f"intent_{s}"]})
 
     # Transaction Type dropdown: required reviewer selection that drives the
     # 'Transaction Type' field on the downstream Salesforce payload.
     tx_oneof = transaction_type_oneof or [
-        {"const": "MidTermChange", "title": "MidTermChange"},
-        {"const": "MidTermQuote", "title": "MidTermQuote"},
+        {"const": "Cancellation", "title": "Cancellation"},
+        {"const": "Endorsement", "title": "Endorsement"},
         {"const": "Exception", "title": "Exception"},
+        {"const": "Combination", "title": "Combination"},
     ]
     inputs.append({
         "name": "transaction_type",
@@ -371,11 +387,21 @@ def _build_dynamic_template(
             ]
         },
     })
-    groups.append({"title": "", "fields": ["transaction_type", "multiple_transaction_type"]})
+ 
+    inputs.append({
+        "name": "flat_cancellation",
+        "type": "decision",
+        "title": "Flat Cancellation",
+        "relation": {"type": "document"},
+        "schema": {"oneOf": flat_cancellation_oneof},
+    })
+
+    groups.append({"title": "", "fields": ["transaction_type", "multiple_transaction_type","flat_cancellation"]})
+    
 
     action = {
-        "name": "endorsement_intents",
-        "display": "Endorsement Intents",
+        "name": "cancellation_transaction_type", # TODO udpate endorsement_intents to cancellation_instents?
+        "display": "Cancellation Transaction Type", # TODO update Cancellation Transaction Type to Cancellation Transaction Type?
         "input": inputs,
         "ui": {"groups": groups},
     }
@@ -395,95 +421,94 @@ def _build_dynamic_template(
     ]
 
 
-def _single_policy_decision():
-    """Document-level checkboxes for policy scope.
-    Multi-select (anyOf) renders each option as a checkbox."""
-    return {
-        "name": "single_policy_flag",
-        "type": "decision",
-        "title": "Do all intents apply to a single policy?",
-        "relation": {"type": "document"},
-        "schema": {
-            "anyOf": [
-                {"const": "yes", "title": "Yes - single policy"},
-                {"const": "no", "title": "No - multiple policies"},
-            ]
-        },
-    }
+# def _single_policy_decision():
+#     """Document-level checkboxes for policy scope.
+#     Multi-select (anyOf) renders each option as a checkbox."""
+#     return {
+#         "name": "single_policy_flag",
+#         "type": "decision",
+#         "title": "Do all intents apply to a single policy?",
+#         "relation": {"type": "document"},
+#         "schema": {
+#             "anyOf": [
+#                 {"const": "yes", "title": "Yes - single policy"},
+#                 {"const": "no", "title": "No - multiple policies"},
+#             ]
+#         },
+#     }
+
+# def _multiple_transaction_type_decision():
+#     """Optional document-level yes/no decision for whether there are
+#     multiple transaction types in the submission. This is a supported
+#     dropdown-style choice in HS v41 and should be treated as 'None' when
+#     unset or no to avoid sending a blank/false indicator downstream."""
+#     return {
+#         "name": "multiple_transaction_type",
+#         "type": "decision",
+#         "title": "Multiple Transaction Type",
+#         "relation": {"type": "document"},
+#         "schema": {
+#             "oneOf": [
+#                 {"const": "True", "title": "True"},
+#                 {"const": "False", "title": "False"},
+#             ]
+#         },
+#     }
 
 
-def _multiple_transaction_type_decision():
-    """Optional document-level yes/no decision for whether there are
-    multiple transaction types in the submission. This is a supported
-    dropdown-style choice in HS v41 and should be treated as 'None' when
-    unset or no to avoid sending a blank/false indicator downstream."""
-    return {
-        "name": "multiple_transaction_type",
-        "type": "decision",
-        "title": "Multiple Transaction Type",
-        "relation": {"type": "document"},
-        "schema": {
-            "oneOf": [
-                {"const": "True", "title": "True"},
-                {"const": "False", "title": "False"},
-            ]
-        },
-    }
+# def _supervision_template():
+#     inputs = [_single_policy_decision()]
+#     groups = [
+#         {
+#             "title": "Policy Scope",
+#             "fields": ["single_policy_flag", "multiple_transaction_type"],
+#         }
+#     ]
+#     for i in range(1, INTENT_SLOTS + 1):
+#         inputs.extend(_intent_slot_inputs(i))
+#         groups.append(
+#             {
+#                 "title": f"Intent #{i}",
+#                 "fields": [
+#                     f"intent_{i}",
+#                     f"policy_number_{i}",
+#                     f"effective_date_{i}",
+#                 ],
+#             }
+#         )
 
+#     inputs.append({
+#         "name": "transaction_type",
+#         "type": "decision",
+#         "title": "Transaction Type",
+#         "relation": {"type": "document"},
+#         "required": True,
+#         "schema": {"oneOf": TRANSACTION_TYPE_SCHEMA_ONEOF},
+#     })
+#     inputs.append(_multiple_transaction_type_decision())
+#     groups.append({
+#         "title": "",
+#         "fields": ["transaction_type", "multiple_transaction_type"],
+#     })
 
-def _supervision_template():
-    inputs = [_single_policy_decision()]
-    groups = [
-        {
-            "title": "Policy Scope",
-            "fields": ["single_policy_flag", "multiple_transaction_type"],
-        }
-    ]
-    for i in range(1, INTENT_SLOTS + 1):
-        inputs.extend(_intent_slot_inputs(i))
-        groups.append(
-            {
-                "title": f"Intent #{i}",
-                "fields": [
-                    f"intent_{i}",
-                    f"policy_number_{i}",
-                    f"effective_date_{i}",
-                ],
-            }
-        )
-
-    inputs.append({
-        "name": "transaction_type",
-        "type": "decision",
-        "title": "Transaction Type",
-        "relation": {"type": "document"},
-        "required": True,
-        "schema": {"oneOf": TRANSACTION_TYPE_SCHEMA_ONEOF},
-    })
-    inputs.append(_multiple_transaction_type_decision())
-    groups.append({
-        "title": "",
-        "fields": ["transaction_type", "multiple_transaction_type"],
-    })
-
-    return [
-        {
-            "name": "three_column_template",
-            "version": "1.0",
-            "thumbnail": {
-                "group_by_document": True,
-                "group_by_case": True,
-            },
-            "action": [
-                {
-                    "name": "endorsement_intents",
-                    "display": "Endorsement Intents",
-                    "input": inputs,
-                    "ui": {"groups": groups},
-                }
-            ],
-        }
-    ]
+#     return [
+#         {
+#             "name": "three_column_template",
+#             "version": "1.0",
+#             "thumbnail": {
+#                 "group_by_document": True,
+#                 "group_by_case": True,
+#             },
+#             "action": [
+#                 {
+#                     "name": "endorsement_intents", # TODO update endorsement_intents to cancellation_intents
+#                     "display": "Endorsement Intents", # TODO update Endorsement Intents to Cancellation Intents
+#                     "input": inputs,
+#                     "ui": {"groups": groups},
+#                 }
+#             ],
+#         }
+#     ]
 
 
 # --------------------------------------------------------------------------- #
@@ -548,53 +573,121 @@ def build_core_flow() -> Flow:
         submission=machine_transcription.output("submission"),
         api_params=bootstrap.output("api_params"),
     )
-
-    # Dynamic supervision-template builder: reads extracted dates/policies
-    # from the upstream submission and produces a supervision_template
-    # whose per-slot date / policy dropdowns list the actual extracted values.
     build_template = PythonBlock(
-        reference_name="build_supervision_template",
-        code=_build_dynamic_template,
-        python_version=SAAS_PYTHON_BLOCK_VERSION,
-        code_input={
-            "submission": manual_transcription.output("submission"),
-            "intent_oneof": INTENT_SCHEMA_ONEOF,
-            "intent_slots": INTENT_SLOTS,
-            # Identify policy / effective-date fields by their layout field
-            # *name* (case-insensitive, zero-width-space tolerant). Names are
-            # stable across HS environments; UUIDs are not. Add any layout
-            # variants your tenant uses here.
-            "policy_field_names": POLICY_FIELD_NAMES,
-            "date_field_names": DATE_FIELD_NAMES,
-            # Base URL of the HS tenant; used by the runtime template to
-            # render a copyable link back to the submission detail page.
-            "hs_base_url": "${workflow.input.hs_base_url}",
-            "transaction_type_oneof": TRANSACTION_TYPE_SCHEMA_ONEOF,
-        },
+            reference_name="build_supervision_template",
+            code=_build_dynamic_template,
+            python_version=SAAS_PYTHON_BLOCK_VERSION,
+            code_input={
+                "submission": manual_transcription.output("submission"),
+                # "intent_oneof": INTENT_SCHEMA_ONEOF,
+                # "intent_slots": INTENT_SLOTS,
+
+                # Identify policy / effective-date fields by their layout field
+                # *name* (case-insensitive, zero-width-space tolerant). Names are
+                # stable across HS environments; UUIDs are not. Add any layout
+                # variants your tenant uses here.
+                # "policy_field_names": POLICY_FIELD_NAMES,
+                # "date_field_names": DATE_FIELD_NAMES,
+                # Base URL of the HS tenant; used by the runtime template to
+                # render a copyable link back to the submission detail page.
+                "hs_base_url": "${workflow.input.hs_base_url}",
+                "transaction_type_oneof": TRANSACTION_TYPE_SCHEMA_ONEOF,
+                "flat_cancellation_oneof": FLAT_CANCELLATION_SCHEMA_ONEOF,
+            },
+        )
+    
+    transaction_supervision = ib.IdpCustomSupervisionBlock(
+        reference_name="transaction_supervision",
+        submission=manual_transcription.output("submission"),
+        task_purpose="capture_transcription",
+        supervision_template=build_template.output(),
     )
 
-    intent_supervision = ib.IdpCustomSupervisionBlock(
-        reference_name="intent_supervision",
-        submission=manual_transcription.output("submission"),
-        task_purpose="capture_intents",
-        supervision_template=build_template.output(),
+    def _merge_outputs(submission: dict, decisions: dict) -> dict:
+        # Extract selected decision choices into a clean dictionary (e.g., {"transaction_type": "Cancellation"})
+        extracted_decisions = {}
+        for item in decisions.get("selected_choices", []):
+            dc = item.get("decision_choice", {})
+            decision_name = dc.get("decision", {}).get("name")
+            choice_name = dc.get("choice", {}).get("name")
+            if decision_name:
+                extracted_decisions[decision_name] = choice_name
+
+        # Attach to submission external_metadata (or inject into a specific document's fields)
+        # metadata = submission.get("external_metadata") or {}
+        # metadata["custom_decisions"] = extracted_decisions
+        # metadata["raw_decisions"] = decisions
+        # submission["external_metadata"] = metadata
+
+        submission["custom_decisions"] = decisions
+
+        return submission
+
+    merge_outputs = PythonBlock(
+        reference_name="merge_outputs",
+        code=_merge_outputs,
+        python_version=SAAS_PYTHON_BLOCK_VERSION,
+        code_input={
+            "submission": transaction_supervision.output("submission"),
+            "decisions": transaction_supervision.output("decisions"),
+        },
     )
 
     complete = ib.SubmissionCompleteBlock(
         reference_name="complete",
-        submission=intent_supervision.output("submission"),
+        submission=merge_outputs.output(),
     )
-
+    #     payload={
+    #     "submission": transaction_supervision.output("submission"),
+    #     "decisions": transaction_supervision.output("decisions"),
+    # },
+    """
+    # Dynamic supervision-template builder: reads extracted dates/policies
+        # from the upstream submission and produces a supervision_template
+        # whose per-slot date / policy dropdowns list the actual extracted values.
+        build_template = PythonBlock(
+            reference_name="build_supervision_template",
+            code=_build_dynamic_template,
+            python_version=SAAS_PYTHON_BLOCK_VERSION,
+            code_input={
+                "submission": manual_transcription.output("submission"),
+                "intent_oneof": INTENT_SCHEMA_ONEOF,
+                "intent_slots": INTENT_SLOTS,
+                # Identify policy / effective-date fields by their layout field
+                # *name* (case-insensitive, zero-width-space tolerant). Names are
+                # stable across HS environments; UUIDs are not. Add any layout
+                # variants your tenant uses here.
+                "policy_field_names": POLICY_FIELD_NAMES,
+                "date_field_names": DATE_FIELD_NAMES,
+                # Base URL of the HS tenant; used by the runtime template to
+                # render a copyable link back to the submission detail page.
+                "hs_base_url": "${workflow.input.hs_base_url}",
+                "transaction_type_oneof": TRANSACTION_TYPE_SCHEMA_ONEOF,
+            },
+        )
+        intent_supervision = ib.IdpCustomSupervisionBlock(
+            reference_name="intent_supervision",
+            submission=manual_transcription.output("submission"),
+            task_purpose="capture_intents",
+            supervision_template=build_template.output(),
+        )
+        complete = ib.SubmissionCompleteBlock(
+            reference_name="complete",
+            submission=intent_supervision.output("submission"),
+        )
+      
+    """
+    
     # Default IDPCoreManifest roles are ['supporting', 'idp_core'] which is
     # exactly what we want for a subflow.
     return Flow(
         uuid=CORE_FLOW_UUID,
         owner_email="flows.sdk@hyperscience.com",
-        title="Drop Down Intent Capture - Core",
+        title="Cancellation Custom Core Flow_V44",
         description=(
             "IDP Core subflow: standard pipeline (classification -> "
             "identification -> transcription) + custom supervision that "
-            "captures endorsement intents per document."
+            "captures cancellation transaction type per document." # TODO updated endorsement to cancellation
         ),
         manifest=iv.IDPCoreManifest(flow_identifier=CORE_FLOW_IDENTIFIER),
         blocks=[
@@ -606,7 +699,8 @@ def build_core_flow() -> Flow:
             machine_transcription,
             manual_transcription,
             build_template,
-            intent_supervision,
+            transaction_supervision,
+            merge_outputs,
             complete,
         ],
         input=_sanitize_top_input(iv.get_idp_wf_inputs(iv.get_idp_wf_config())),
@@ -645,11 +739,11 @@ def build_wrapper_flow() -> Flow:
     return Flow(
         uuid=WRAPPER_FLOW_UUID,
         owner_email="flows.sdk@hyperscience.com",
-        title="Drop Down Intent Capture - Wrapper",
+        title="Cancellation Automation Dev Sample - PERF TEST",
         description=(
-            "Top-level wrapper for the Drop Down Intent Capture POC. "
-            "Delegates document processing + intent supervision to the "
-            "DROPDOWN_INTENT_CORE subflow."
+            "Top-level wrapper for the Cancellation Custom Core Flow. "
+            "Delegates document processing + Transaction Type supervision to the "
+            "DROPDOWN_TRANSACTION_TYPE_CORE subflow."
         ),
         manifest=iv.IDPCoreManifest(flow_identifier=WRAPPER_FLOW_IDENTIFIER),
         blocks=[idp_core],
@@ -804,69 +898,73 @@ def _write(flow: Flow, filename: str, role_override: list | None = None,
     out_path.write_text(json.dumps(rendered, indent=2), encoding="utf-8")
     return out_path
 
+# def build_core_with_intent_catalog(core: dict) -> dict:
+#     """Generate a core object from its structure and the Python intent catalog.
 
-def build_core_with_intent_catalog(core: dict) -> dict:
-    """Generate a core object from its structure and the Python intent catalog.
+#     Flow structure and unrelated settings are retained from the supplied core
+#     export. The intent list is generated from INTENT_LABELS. The input mapping
+#     is never mutated.
+#     """
+#     candidate = copy.deepcopy(core)
+#     """
+#     if candidate.get("title") != "Endorsement Custom Core Flow_V41":
+#         raise ValueError("Input is not the expected Endorsement core flow.")
+#     """
+   
+#     if candidate.get("title") != "Cancellation Custom Core Flow_V44":
+#         raise ValueError("Input is not the expected Cancellation core flow.")
 
-    Flow structure and unrelated settings are retained from the supplied core
-    export. The intent list is generated from INTENT_LABELS. The input mapping
-    is never mutated.
-    """
-    candidate = copy.deepcopy(core)
-    if candidate.get("title") != "Endorsement Custom Core Flow_V41":
-        raise ValueError("Input is not the expected Endorsement core flow.")
+#     builders = [
+#         block for block in candidate.get("blocks", [])
+#         if block.get("reference_name") == "build_supervision_template"
+#     ]
+#     print("builders : ",builders)
+#     if len(builders) != 1:
+#         raise ValueError(
+#             "Expected exactly one build_supervision_template block."
+#         )
 
-    builders = [
-        block for block in candidate.get("blocks", [])
-        if block.get("reference_name") == "build_supervision_template"
-    ]
-    if len(builders) != 1:
-        raise ValueError(
-            "Expected exactly one build_supervision_template block."
-        )
+#     builder_data = builders[0].get("input", {}).get("data", {})
 
-    builder_data = builders[0].get("input", {}).get("data", {})
-    if not isinstance(builder_data, dict) or "intent_oneof" not in builder_data:
-        raise ValueError(
-            "Core supervision builder does not contain intent_oneof."
-        )
+#     if not isinstance(builder_data, dict) or "transaction_type_oneof" not in builder_data:
+#         raise ValueError(
+#             "Core supervision builder does not contain transaction_type_oneof."
+#         )
 
-    existing_options = builder_data["intent_oneof"]
-    source_options = {
-        option["const"]: option for option in INTENT_SCHEMA_ONEOF
-    }
-    existing_consts = [option.get("const") for option in existing_options]
-    if len(existing_consts) != len(set(existing_consts)):
-        raise ValueError("Baseline intent catalog contains duplicate const values.")
-    if set(existing_consts) != set(source_options):
-        raise ValueError(
-            "Baseline and Python intent catalogs contain different const values; "
-            "refusing to add or remove options in a label-only change."
-        )
+#     # existing_options = builder_data["transaction_type_oneof"]
+#     # source_options = {
+#     #     option["const"]: option for option in INTENT_SCHEMA_ONEOF
+#     # }
+#     # existing_consts = [option.get("const") for option in existing_options]
+#     # if len(existing_consts) != len(set(existing_consts)):
+#     #     raise ValueError("Baseline intent catalog contains duplicate const values.")
+#     # if set(existing_consts) != set(source_options):
+#     #     raise ValueError(
+#     #         "Baseline and Python intent catalogs contain different const values; "
+#     #         "refusing to add or remove options in a label-only change."
+#     #     )
+#     # Keep the exported UI order stable while sourcing each display title from
+#     # the canonical Python catalog.
+#     # builder_data["intent_oneof"] = [
+#     #     {**copy.deepcopy(option), "title": source_options[option["const"]]["title"]}
+#     #     for option in existing_options
+#     # ]
 
-    # Keep the exported UI order stable while sourcing each display title from
-    # the canonical Python catalog.
-    builder_data["intent_oneof"] = [
-        {**copy.deepcopy(option), "title": source_options[option["const"]]["title"]}
-        for option in existing_options
-    ]
-    return candidate
+#     return candidate
 
+# def regenerate_core_intents(
+#     source_core_path: Path,
+# ) -> Path:
+#     """Regenerate the selected core artifact's intent options in place.
 
-def regenerate_core_intents(
-    source_core_path: Path,
-) -> Path:
-    """Regenerate the selected core artifact's intent options in place.
-
-    The selected core provides the existing flow structure; Python source
-    provides the generated intent labels and values. The wrapper is untouched.
-    """
-    source_path = source_core_path.resolve()
-    baseline = json.loads(source_path.read_text(encoding="utf-8"))
-    generated = build_core_with_intent_catalog(baseline)
-    source_path.write_text(json.dumps(generated, indent=2), encoding="utf-8")
-    return source_path
-
+#     The selected core provides the existing flow structure; Python source
+#     provides the generated intent labels and values. The wrapper is untouched.
+#     """
+#     source_path = source_core_path.resolve()
+#     baseline = json.loads(source_path.read_text(encoding="utf-8"))
+#     generated = build_core_with_intent_catalog(baseline)
+#     source_path.write_text(json.dumps(generated, indent=2), encoding="utf-8")
+#     return source_path
 
 def _recompile_python_block_identifiers(flow: dict) -> int:
     """Set pre-3.14 Python blocks to the V44 SaaS Python 3.14 identifier."""
@@ -887,6 +985,7 @@ def _recompile_python_block_identifiers(flow: dict) -> int:
                 continue
             if block.get("identifier") in unsupported_identifiers:
                 block["identifier"] = SAAS_PYTHON_BLOCK_IDENTIFIER
+                print("identifier : ",block["identifier"])
                 changed += 1
             visit(block.get("blocks"))
             for branch in block.get("branches", []):
@@ -895,7 +994,6 @@ def _recompile_python_block_identifiers(flow: dict) -> int:
 
     visit(flow.get("blocks"))
     return changed
-
 
 def build_core_with_supported_manual_classification(core: dict) -> dict:
     import copy
@@ -911,7 +1009,6 @@ def build_core_with_supported_manual_classification(core: dict) -> dict:
     node["identifier"] = ManualClassificationBlock.IDENTIFIER
     node["input"].setdefault("nlc_metadata", None)
     return upgraded
-
 
 def build_core_with_supported_supervision(core: dict) -> dict:
     import copy
@@ -944,7 +1041,6 @@ def build_core_with_supported_supervision(core: dict) -> dict:
     visit(upgraded.get("blocks", []))
     return upgraded
 
-
 def regenerate_supported_manual_classification(core_path: Path, *, supervision: bool = False) -> Path:
     core_path = core_path.resolve()
     core = json.loads(core_path.read_text(encoding="utf-8"))
@@ -965,7 +1061,6 @@ def regenerate_supported_manual_classification(core_path: Path, *, supervision: 
         core_temp.unlink(missing_ok=True)
     return core_path
 
-
 def migrate_saas_v44_python_runtime(
     core_path: Path,
     wrapper_path: Path,
@@ -984,10 +1079,14 @@ def migrate_saas_v44_python_runtime(
 
     core = json.loads(core_path.read_text(encoding="utf-8"))
     wrapper = json.loads(wrapper_path.read_text(encoding="utf-8"))
-    if core.get("title") != "Endorsement Custom Core Flow_V41":
-        raise ValueError("Core source is not Endorsement Custom Core Flow_V41.")
-    if not str(wrapper.get("title", "")).startswith("Endorsement Automation"):
-        raise ValueError("Wrapper source is not an Endorsement Automation flow.")
+    # if core.get("title") != "Endorsement Custom Core Flow_V41":
+    #     raise ValueError("Core source is not Endorsement Custom Core Flow_V41.")
+    # if not str(wrapper.get("title", "")).startswith("Endorsement Automation"):
+    #         raise ValueError("Wrapper source is not an Endorsement Automation flow.")
+    if core.get("title") != "Cancellation Custom Core Flow_V44":
+            raise ValueError("Core source is not Cancellation Custom Core Flow_V44.")
+    if not str(wrapper.get("title", "")).startswith("Cancellation Automation"):
+        raise ValueError("Wrapper source is not an Cancellation Automation flow.")
 
     flows = {core_path: core, wrapper_path: wrapper}
     for path in additional_paths or []:
@@ -1022,13 +1121,12 @@ def migrate_saas_v44_python_runtime(
 
     return core_path, wrapper_path, total
 
-
 def main() -> None:
     if sys.argv[1:]:
         import argparse
 
         parser = argparse.ArgumentParser(description="Build Hyperscience flows")
-        parser.add_argument("--core-intents-only", action="store_true")
+        # parser.add_argument("--core-intents-only", action="store_true")
         parser.add_argument("--supported-manual-classification", action="store_true")
         parser.add_argument("--supported-supervision", action="store_true")
         parser.add_argument("--core-source", type=Path, required=True)
@@ -1057,12 +1155,14 @@ def main() -> None:
             print(f"Core: {core_path}")
             print(f"Wrapper: {wrapper_path}")
             return
-        if not args.core_intents_only:
-            parser.error("Use --core-intents-only or --saas-v44-python-runtime with options")
+        # if not args.core_intents_only:
+        #     parser.error("Use --core-intents-only or --saas-v44-python-runtime with options")
         if args.core_source is None:
             parser.error("--core-source must identify the approved core baseline JSON")
-        core_path = regenerate_core_intents(args.core_source)
-        print(f"Regenerated the single selected core flow: {core_path}")
+    
+        # core_path = regenerate_core_intents(args.core_source)
+        # print(f"Regenerated the single selected core flow: {core_path}")
+        
         print("The wrapper was not regenerated.")
         return
 
@@ -1076,7 +1176,7 @@ def main() -> None:
         extra_inputs=[
             # Core's bootstrap reads ${workflow.input.submission}, so the
             # subflow manifest must declare it (otherwise HS reports
-            # "Input key submission not present in dropdown_intent_core
+            # "Input key submission not present in dropdown_transaction_type_core
             # manifest" when the wrapper passes it down).
             {
                 "name": "submission",
@@ -1110,12 +1210,12 @@ def main() -> None:
     print("  1. Import dropdown_core.json")
     print("  2. Import dropdown_wrapper.json")
     print("  3. Open the wrapper -> 'Start Document Processing Subflow' block ->")
-    print("     pick 'Drop Down Intent Capture - Core' as IDP Core")
+    print("     pick 'Drop Down Transaction Type Capture - Core' as IDP Core")
     print("  4. Attach Layout Release on the wrapper, then toggle Live")
     print()
     print("Custom supervision data identifiers (already created in HS Studio):")
-    for k, v in DATA_IDENTIFIERS.items():
-        print(f"  {k:24s} -> {v}")
+    # for k, v in DATA_IDENTIFIERS.items():
+    #     print(f"  {k:24s} -> {v}")
 
 
 if __name__ == "__main__":

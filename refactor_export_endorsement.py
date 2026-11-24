@@ -230,14 +230,14 @@ def refactor_wrapper(flow: dict, new_core_title: str) -> dict:
 def refactor_on_error(flow: dict) -> dict:
     flow = copy.deepcopy(flow)
     if isinstance(flow.get("title"), str):
-        flow["title"] = flow["title"].replace(" - NB", " - Cancellation").replace(" NB ", " Cancellation ")
+        flow["title"] = flow["title"].replace(" - NB", " - Endorsement").replace(" NB ", " Endorsement ")
     return flow
 
 
 def rename_file(name: str) -> str:
     return (
-        name.replace("NB_SF_Custom_Product_Code_Core_Flow_V41", "Cancellation_Custom_Core_Flow_V44")
-        .replace("On-Error_with_included_Submission_data_-_NB", "On-Error_with_included_Submission_data_-_Cancellation")
+        name.replace("NB_SF_Custom_Product_Code_Core_Flow_V41", "Endorsement_Custom_Core_Flow_V41")
+        .replace("On-Error_with_included_Submission_data_-_NB", "On-Error_with_included_Submission_data_-_Endorsement")
         .replace("bc01b5ef-f9e4-49dd-aa0f-a8e3bd89fa00", NEW_CORE_UUID)
         .replace(ORIGINAL_WRAPPER_UUID, NEW_WRAPPER_UUID)
     )

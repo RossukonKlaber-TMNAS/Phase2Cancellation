@@ -1,0 +1,4171 @@
+{
+  "metadata": {
+    "schema_version": 2,
+    "exported_from_hostname": "tmnas-dev.hyperscience.net",
+    "hs_tag": "44.1.1",
+    "hs_revision": "afc3fb7d77da14348d062d4b0f7ed2bc1cc2c860",
+    "exported_version": 46,
+    "file_type": "flow_json"
+  },
+  "uuid": "b87e2988-f94c-4642-b298-16fed14109d5",
+  "owner_email": "flows.sdk@hyperscience.com",
+  "title": "Cancellation Custom Core Flow_V44",
+  "manifest": {
+    "input": [
+      {
+        "name": "layout_release_uuid",
+        "type": "ReleaseUUID",
+        "title": "Layout Release"
+      },
+      {
+        "name": "workflow_uuid",
+        "type": "string",
+        "title": "Root workflow UUID",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "workflow_name",
+        "type": "string",
+        "title": "Root workflow name",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "workflow_version",
+        "type": "string",
+        "title": "Root workflow version",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "$trigger",
+        "type": "object",
+        "title": "Trigger",
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "file_filter_filter_type",
+        "type": "string",
+        "title": "All files or images only",
+        "description": "Determines whether filters will be applied to all files or only to image files",
+        "value": "ALL_FILES",
+        "schema": {
+          "type": "string",
+          "oneOf": [
+            {
+              "title": "Apply to all files",
+              "const": "ALL_FILES"
+            },
+            {
+              "title": "Apply to images only",
+              "const": "IMAGES_ONLY"
+            }
+          ]
+        }
+      },
+      {
+        "name": "file_filter_minimum_image_width",
+        "type": "number",
+        "title": "Minimum image width (px)",
+        "description": "Minimum width (in pixels) for an image to be processed. This filter is only applied to images and has no impact on other files.",
+        "optional": true
+      },
+      {
+        "name": "file_filter_minimum_image_height",
+        "type": "number",
+        "title": "Minimum image height (px)",
+        "description": "Minimum height (in pixels) for an image to be processed. This filter is only applied to images and has no impact on other files.",
+        "optional": true
+      },
+      {
+        "name": "file_filter_minimum_file_size_kb",
+        "type": "number",
+        "title": "Minimum file size (KB)",
+        "description": "Minimum file size (in KB) for a file to be processed",
+        "optional": true
+      },
+      {
+        "name": "file_filter_file_extensions_action",
+        "type": "string",
+        "title": "File extension action",
+        "description": "Allow or deny files based on extensions",
+        "value": "NONE",
+        "schema": {
+          "type": "string",
+          "oneOf": [
+            {
+              "title": "Do not filter files by extension",
+              "const": "NONE"
+            },
+            {
+              "title": "Allow only these file extensions",
+              "const": "ALLOW"
+            },
+            {
+              "title": "Deny files with these extensions",
+              "const": "DENY"
+            }
+          ]
+        }
+      },
+      {
+        "name": "file_filter_file_extensions",
+        "type": "array",
+        "title": "File extensions",
+        "description": "List of file extensions to use for filtering. Select the \u201cother\u201d option to specify any file extensions you want to filter by that do not appear in this list.",
+        "optional": true,
+        "schema": {
+          "type": "array",
+          "minItems": 1,
+          "values": {
+            "oneOf": [
+              {
+                "const": "png",
+                "title": "png"
+              },
+              {
+                "const": "pdf",
+                "title": "pdf"
+              },
+              {
+                "const": "jpg",
+                "title": "jpg"
+              },
+              {
+                "const": "jpeg",
+                "title": "jpeg"
+              },
+              {
+                "const": "heic",
+                "title": "heic"
+              },
+              {
+                "const": "heif",
+                "title": "heif"
+              },
+              {
+                "const": "xps",
+                "title": "xps"
+              },
+              {
+                "const": "tif",
+                "title": "tif"
+              },
+              {
+                "const": "tiff",
+                "title": "tiff"
+              },
+              {
+                "const": "zip",
+                "title": "zip"
+              },
+              {
+                "const": "gif",
+                "title": "gif"
+              },
+              {
+                "const": "",
+                "title": "<no extension>"
+              },
+              {
+                "const": "other",
+                "title": "other"
+              }
+            ]
+          }
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "file_filter_file_extensions_action"
+              ],
+              "properties": {
+                "file_filter_file_extensions_action": {
+                  "not": {
+                    "const": "NONE"
+                  }
+                }
+              }
+            },
+            "override": {
+              "optional": false,
+              "ui": {
+                "hidden": false
+              }
+            }
+          },
+          {
+            "condition": {
+              "required": [
+                "file_filter_filter_type"
+              ],
+              "properties": {
+                "file_filter_filter_type": {
+                  "const": "IMAGES_ONLY"
+                }
+              }
+            },
+            "override": {
+              "schema": {
+                "type": "array",
+                "minItems": 1,
+                "values": {
+                  "oneOf": [
+                    {
+                      "const": "png",
+                      "title": "png"
+                    },
+                    {
+                      "const": "jpg",
+                      "title": "jpg"
+                    },
+                    {
+                      "const": "jpeg",
+                      "title": "jpeg"
+                    },
+                    {
+                      "const": "heic",
+                      "title": "heic"
+                    },
+                    {
+                      "const": "heif",
+                      "title": "heif"
+                    },
+                    {
+                      "const": "tif",
+                      "title": "tif"
+                    },
+                    {
+                      "const": "tiff",
+                      "title": "tiff"
+                    },
+                    {
+                      "const": "gif",
+                      "title": "gif"
+                    },
+                    {
+                      "const": "",
+                      "title": "<no extension>"
+                    },
+                    {
+                      "const": "other",
+                      "title": "other"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "file_filter_file_extensions_other",
+        "type": "string",
+        "title": "Other file extensions",
+        "description": "Comma-separated list of additional file extensions to use for filtering",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "file_filter_file_extensions"
+              ],
+              "properties": {
+                "file_filter_file_extensions": {
+                  "contains": {
+                    "enum": [
+                      "other"
+                    ]
+                  },
+                  "not": {
+                    "const": null
+                  }
+                }
+              }
+            },
+            "override": {
+              "optional": false,
+              "schema": {
+                "type": "string",
+                "minLength": 1
+              },
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "notification_workflow_initialization",
+        "type": "FlowIdentifier",
+        "type_spec": {
+          "filter_roles": [
+            "notifications"
+          ],
+          "label": "If task needed"
+        },
+        "title": "Submission Initialization Notification Flow",
+        "value": null,
+        "optional": true
+      },
+      {
+        "name": "submission_bootstrap_s3_config",
+        "type": "object",
+        "title": "S3 Submission Retrieval Store Configuration",
+        "description": "Specify Amazon S3 credentials for submission retrieval store. Expects a json expression: {\"aws_access_key_id\": \"X\", \"aws_secret_access_key\": \"Y\"}",
+        "optional": true,
+        "secret": true
+      },
+      {
+        "name": "submission_bootstrap_s3_endpoint_url",
+        "type": "string",
+        "title": "S3 Submission Retrieval Endpoint URL",
+        "description": "Endpoint URL for S3 Submission Retrieval Store. Do not use when your submission retrieval store is in a public cloud.",
+        "optional": true
+      },
+      {
+        "name": "submission_bootstrap_ocs_config",
+        "type": "object",
+        "title": "OCS Configuration",
+        "description": "OCS configuration for submission retrieval store. Expects a json expression: {\"host_url\": \"X\", \"username\": \"Y\", \"password\": \"Z\", \"ssl_cert\": \"CA bundle filename\"}. ssl_cert is the CA bundle filename inside $HS_PATH/certs directory. Set it to \"SKIP\" to disable certificate validation.",
+        "optional": true,
+        "secret": true
+      },
+      {
+        "name": "submission_bootstrap_http_config",
+        "type": "object",
+        "title": "Generic Web Storage (HTTP/HTTPS) Configuration",
+        "description": "Specify relevant Generic Web Storage configuration variables for submission retrieval store. Expects a JSON expression: {\"username\": \"X\", \"password\": \"Y\", \"ssl_cert\": \"CA bundle filename\"}. ssl_cert is the CA bundle filename inside $HS_PATH/certs directory. Set it to \"SKIP\" to disable certificate validation.",
+        "optional": true,
+        "secret": true
+      },
+      {
+        "name": "submission_bootstrap_abs_auth_type",
+        "type": "string",
+        "title": "Azure Blob Storage Authentication Type",
+        "description": "The type of authentication to use.",
+        "optional": true,
+        "schema": {
+          "type": "string",
+          "oneOf": [
+            {
+              "title": "SAS Token Only",
+              "const": "sas_token_only"
+            },
+            {
+              "title": "Service Principal",
+              "const": "service_principal"
+            },
+            {
+              "title": "Managed Identity",
+              "const": "managed_identity"
+            },
+            {
+              "title": "Account Key",
+              "const": "account_key"
+            }
+          ]
+        }
+      },
+      {
+        "name": "submission_bootstrap_abs_account_url",
+        "type": "string",
+        "title": "Azure Blob Storage Account URL",
+        "description": "The URL of the storage account.",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ]
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              },
+              "optional": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "submission_bootstrap_abs_tenant_id",
+        "type": "string",
+        "title": "Azure Blob Storage Tenant ID",
+        "description": "The tenant ID of the service principal.",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ],
+              "properties": {
+                "submission_bootstrap_abs_auth_type": {
+                  "const": "service_principal"
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "submission_bootstrap_abs_client_id",
+        "type": "string",
+        "title": "Azure Blob Storage Client ID",
+        "description": "The client ID of the service principal or managed identity.",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ],
+              "properties": {
+                "submission_bootstrap_abs_auth_type": {
+                  "enum": [
+                    "service_principal",
+                    "managed_identity"
+                  ]
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "submission_bootstrap_abs_client_secret",
+        "type": "string",
+        "title": "Azure Blob Storage Client Secret",
+        "description": "The client secret of the service principal.",
+        "optional": true,
+        "secret": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ],
+              "properties": {
+                "submission_bootstrap_abs_auth_type": {
+                  "const": "service_principal"
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "submission_bootstrap_abs_authority_host",
+        "type": "string",
+        "title": "Azure Blob Storage Authority Host",
+        "description": "The authority host of the service principal.",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ],
+              "properties": {
+                "submission_bootstrap_abs_auth_type": {
+                  "const": "service_principal"
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "submission_bootstrap_abs_account_name",
+        "type": "string",
+        "title": "Azure Blob Storage Account Name",
+        "description": "The account name of the storage account.",
+        "optional": true,
+        "secret": false,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ],
+              "properties": {
+                "submission_bootstrap_abs_auth_type": {
+                  "const": "account_key"
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "submission_bootstrap_abs_account_key",
+        "type": "string",
+        "title": "Azure Blob Storage Account Key",
+        "description": "The account key of the storage account.",
+        "optional": true,
+        "secret": true,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "required": [
+                "submission_bootstrap_abs_auth_type"
+              ],
+              "properties": {
+                "submission_bootstrap_abs_auth_type": {
+                  "const": "account_key"
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "machine_collation_dedupe_files",
+        "type": "boolean",
+        "title": "Replace case data from duplicate file names",
+        "description": "Enabling this setting will replace case data from repeated file names within the same case. Cases will retain data from the most recently submitted version of a particular file. Note that this setting does not delete the old data, it just removes it from the case. Keep in mind this option is only relevant when adding to cases",
+        "value": false
+      },
+      {
+        "name": "machine_collation_remove_from_cases",
+        "type": "array",
+        "title": "Remove from Cases Information",
+        "description": "This parameter accepts an array of JSON objects that contains information on how documents or pages should be removed from a pre-existing case. Currently, the only way to de-collate from a case is by the ids of the Documents or Pages within a given case",
+        "optional": true,
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "machine_collation_retention_period",
+        "type": "integer",
+        "title": "Retention Period",
+        "description": "The number of days to retain cases after they are updated by this block. If None, no changes to the deletion date will be made.",
+        "value": null,
+        "optional": true
+      },
+      {
+        "name": "machine_collation_refresh_retention_period",
+        "type": "boolean",
+        "title": "Refresh Retention Period",
+        "description": "If True, applies Retention Period to all cases in the block. If False, only updates those without a pre-existing deletion date.",
+        "value": true,
+        "optional": true
+      },
+      {
+        "name": "machine_classification_rotation_correction_enabled",
+        "type": "boolean",
+        "title": "Image correction",
+        "description": "Identifies and corrects the orientation of semi-structured images.",
+        "value": true
+      },
+      {
+        "name": "machine_classification_mobile_processing_enabled",
+        "type": "boolean",
+        "title": "Mobile processing",
+        "description": "Improves the machine readability of photo captured documents",
+        "value": false
+      },
+      {
+        "name": "machine_classification_file_transcription_enabled",
+        "type": "boolean",
+        "title": "Faster PDF transcription",
+        "description": "Improves the transcription speed of pdf files. Make sure that the \"Image Correction\" option is disabled and the pdfs you submit do not contain any rotated images",
+        "value": false
+      },
+      {
+        "name": "layout_id_dealbreaker",
+        "type": "boolean",
+        "title": "Validate classification using LayoutID",
+        "description": "Validates structured document matching by ensuring that the Form ID on the document matches the Layout ID on the corresponding layout.",
+        "value": false
+      },
+      {
+        "name": "layout_id_dealbreaker_bypass",
+        "type": "boolean",
+        "title": "Bypass validation if LayoutID missing",
+        "description": "Bypasses Form ID and Layout ID validation if there is no Layout ID present on the Layout Page.",
+        "value": false,
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "layout_id_dealbreaker": {
+                  "const": true
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "structured_layout_match_threshold",
+        "type": "number",
+        "title": "Structured Layout Match Threshold",
+        "description": "Matches structured layouts above this threshold to a layout variation automatically. Pages below this threshold will be sent to Document Classification, if enabled. If disabled, such pages will be marked as \"No Layout Variation Found.\"",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      {
+        "name": "semi_structured_classification",
+        "type": "boolean",
+        "title": "Semi-Structured Classification",
+        "description": "Enables workflow to manage a model for automated classification of semi-structured and additional layout variations.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "manual_nlc_enabled",
+        "type": "boolean",
+        "title": "Manual Classification Supervision",
+        "description": "Enables manual classification when applicable"
+      },
+      {
+        "name": "semi_target_accuracy",
+        "type": "Percentage",
+        "title": "Semi-Structured Classification Target Accuracy",
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_doc_grouping_logic",
+        "type": "string",
+        "title": "Semi-Structured Classification Grouping Logic",
+        "description": "Flow level grouping logic setting will default to the defined layout level grouping logic when configured.",
+        "schema": {
+          "type": "string",
+          "oneOf": [
+            {
+              "title": "Consecutive pages as a document",
+              "const": "group_pages"
+            },
+            {
+              "title": "Consecutive pages as separate documents",
+              "const": "split_pages"
+            },
+            {
+              "title": "Manual review of consecutive pages",
+              "const": "manual"
+            }
+          ]
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Semi-Structured Classification QA Sample Rate",
+        "description": "Defines the percentage of documents sampled for QA.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "notification_workflow_classification",
+        "type": "FlowIdentifier",
+        "type_spec": {
+          "filter_roles": [
+            "notifications"
+          ],
+          "label": "If task needed"
+        },
+        "title": "Manual Classification Notification Flow",
+        "value": null,
+        "optional": true
+      },
+      {
+        "name": "manual_classification_task_restrictions",
+        "type": "TaskRestrictions",
+        "title": "Default Task Restrictions",
+        "description": "Defines what users can access Supervision tasks created by this block.",
+        "optional": true
+      },
+      {
+        "name": "field_id_target_accuracy",
+        "type": "Percentage",
+        "title": "Field Identification Target Accuracy",
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "anyOf": [
+                            {
+                              "not": {
+                                "allOf": [
+                                  {
+                                    "contains": {
+                                      "const": 1003
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "not": {
+                                "allOf": [
+                                  {
+                                    "contains": {
+                                      "const": 1007
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "table_id_target_accuracy",
+        "type": "Percentage",
+        "title": "Table Identification Target Accuracy",
+        "value": 0.96,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "anyOf": [
+                            {
+                              "not": {
+                                "allOf": [
+                                  {
+                                    "contains": {
+                                      "const": 1003
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "not": {
+                                "anyOf": [
+                                  {
+                                    "contains": {
+                                      "const": 1008
+                                    }
+                                  },
+                                  {
+                                    "contains": {
+                                      "const": 1018
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "identification_target_accuracies",
+        "type": "IdentificationTargetAccuracies",
+        "title": "Identification Target Accuracies",
+        "description": "Identification Target Accuracies",
+        "value": [],
+        "optional": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_uuid": {
+                "type": "string"
+              },
+              "target_accuracy": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "ui": {
+          "hidden": false
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "anyOf": [
+                            {
+                              "not": {
+                                "allOf": [
+                                  {
+                                    "contains": {
+                                      "const": 1003
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "allOf": [
+                                {
+                                  "not": {
+                                    "allOf": [
+                                      {
+                                        "contains": {
+                                          "const": 1007
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "not": {
+                                    "anyOf": [
+                                      {
+                                        "contains": {
+                                          "const": 1008
+                                        }
+                                      },
+                                      {
+                                        "contains": {
+                                          "const": 1018
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "manual_field_id_enabled",
+        "type": "boolean",
+        "title": "Manual Identification Supervision",
+        "description": "Enables manual identification when applicable",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "field_id_qa_enabled",
+        "type": "boolean",
+        "title": "Field Identification Quality Assurance",
+        "description": "Allows users to verify the location or presence of fields on semi-structured documents.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "field_id_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Field Identification QA Sample Rate",
+        "description": "Defines the percentage of documents the system samples for QA.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "field_id_qa_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Field Identification Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "table_id_qa_enabled",
+        "type": "boolean",
+        "title": "TABLE IDENTIFICATION QUALITY ASSURANCE",
+        "description": "Allows users to verify the location of table cells.",
+        "value": true,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "table_id_qa_sample_rate",
+        "type": "Percentage",
+        "title": "TABLE IDENTIFICATION QA SAMPLE RATE",
+        "description": "Defines the percentage of tables the system samples for QA.",
+        "value": 0.05,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "table_id_qa_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Table Identification Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "notification_workflow_identification",
+        "type": "FlowIdentifier",
+        "type_spec": {
+          "filter_roles": [
+            "notifications"
+          ],
+          "label": "If task needed"
+        },
+        "title": "Manual Identification Notification Flow",
+        "value": null,
+        "optional": true,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "manual_identification_task_restrictions",
+        "type": "TaskRestrictions",
+        "title": "Default Task Restrictions",
+        "description": "Defines what users can access Supervision tasks created by this block.",
+        "optional": true,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "field_transcription_target_accuracies",
+        "type": "FieldTranscriptionTargetAccuracies",
+        "title": "Field Transcription Accuracy Targets",
+        "description": "Field Transcription Accuracy Targets",
+        "value": [],
+        "optional": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_uuid": {
+                "type": "string"
+              },
+              "target_accuracy": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "ui": {
+          "hidden": false
+        }
+      },
+      {
+        "name": "manual_transcription_enabled",
+        "type": "boolean",
+        "title": "Manual Transcription Supervision",
+        "description": "Enables manual transcription when applicable"
+      },
+      {
+        "name": "qa",
+        "type": "boolean",
+        "title": "Transcription Quality Assurance"
+      },
+      {
+        "name": "auto_qa_sampling_rate_enabled",
+        "type": "boolean",
+        "title": "Automatic QA Sample Rate",
+        "description": "Updates QA rate daily based on submission volume.",
+        "value": false,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "qa": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "structured_entry_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Structured Text Transcription QA Sample Rate",
+        "description": "Defines the percentage of structured text fields the system samples for QA.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "qa": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "auto_qa_sampling_rate_enabled": {
+                  "const": true
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "disabled": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "structured_checkbox_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Structured Checkbox Transcription QA Sample Rate",
+        "description": "Defines the percentage of structured checkbox fields the system samples for QA.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "qa": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "auto_qa_sampling_rate_enabled": {
+                  "const": true
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "disabled": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "structured_signature_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Structured Signature Transcription QA Sample Rate",
+        "description": "Defines the percentage of structured signature fields the system samples for QA.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "qa": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "auto_qa_sampling_rate_enabled": {
+                  "const": true
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "disabled": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Semi-Structured Transcription QA Sample Rate",
+        "description": "Defines the percentage of semi-structured fields the system samples for QA.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "qa": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "auto_qa_sampling_rate_enabled": {
+                  "const": true
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "disabled": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "table_cell_transcription_qa_enabled",
+        "type": "boolean",
+        "title": "Table Transcription Quality Assurance",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "table_cell_transcription_qa_sample_rate",
+        "type": "Percentage",
+        "title": "Table Transcription QA Sample Rate",
+        "description": "Defines the percentage of cells the system samples for QA. This value is likely to be lower than \"Transcription QA Sample Rate\" sincethere are more table cells than fields on any given page.",
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "table_cell_transcription_qa_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Table Transcription Quality Assurance is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "transcription_overrides",
+        "type": "object",
+        "title": "Transcription Overrides",
+        "value": {},
+        "optional": true,
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "finetuning_only_trained_layouts",
+        "type": "boolean",
+        "title": "Finetuning only for trained layouts",
+        "description": "Run finetuning only for trained layouts."
+      },
+      {
+        "name": "force_normalization_errors_to_sv",
+        "type": "boolean",
+        "title": "Force normalization errors to Supervision",
+        "description": "Enable this option to ensure that fields or table cells with normalization errors are sent to Supervision for additional human review, preventing uncorrected errors from proceeding to downstream processing.",
+        "value": false
+      },
+      {
+        "name": "force_required_entries_to_sv",
+        "type": "boolean",
+        "title": "Force missing/blank Fields to Supervision",
+        "description": "Enable this option to route fields marked as \"Required\" to Supervision for review if they are missing or left blank, ensuring important data is present in downstream processes.",
+        "value": false
+      },
+      {
+        "name": "exclude_auto_transcribe_fields_from_qa",
+        "type": "boolean",
+        "title": "Exclude Auto-Transcribe Fields From QA",
+        "value": false
+      },
+      {
+        "name": "notification_workflow_transcription",
+        "type": "FlowIdentifier",
+        "type_spec": {
+          "filter_roles": [
+            "notifications"
+          ],
+          "label": "If task needed"
+        },
+        "title": "Manual Transcription Notification Flow",
+        "value": null,
+        "optional": true
+      },
+      {
+        "name": "manual_transcription_supervision_transcription_masking",
+        "type": "boolean",
+        "title": "Supervision Transcription Masking",
+        "description": "Prevents users from inputting invalid characters during Supervision Transcription tasks.",
+        "value": true
+      },
+      {
+        "name": "manual_transcription_table_output_manual_review",
+        "type": "boolean",
+        "title": "Table Output Manual Review",
+        "description": "Always generates a table transcription task if the layout contains a table. If disabled, a table transcription task will only be generated if one or more cells have transcribed values below the defined thresholds.",
+        "value": false,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "manual_transcription_always_supervise_blank_cells",
+        "type": "boolean",
+        "title": "Create Manual Transcription Task For Tables With Blank Cells",
+        "description": "If enabled, always send blank cells in transcribed tables to be supervised manually, regardless of confidence.",
+        "value": true,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "manual_transcription_task_restrictions",
+        "type": "TaskRestrictions",
+        "title": "Default Task Restrictions",
+        "description": "Defines what users can access Supervision tasks created by this block.",
+        "optional": true
+      },
+      {
+        "name": "transcription_model",
+        "type": "string",
+        "title": "Transcription Model",
+        "description": "The transcription model that will be used for this flow",
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_transcription_training",
+        "type": "TranscriptionAutomationTraining",
+        "title": "Transcription Automation Training",
+        "description": "Uses QA data for on-premise machine learning to improve transcription automation.",
+        "value": true,
+        "schema": {
+          "type": "boolean",
+          "training_type": "structured"
+        }
+      },
+      {
+        "name": "structured_transcription_training_period",
+        "type": "integer",
+        "title": "Period of records to use",
+        "value": 30,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "prefix": "Past",
+          "suffix": "days"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "structured_transcription_training": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Automation Training is disabled."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "structured_improved_transcr_threshold_accuracy",
+        "type": "boolean",
+        "title": "Improved threshold accuracy",
+        "value": true,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "structured_transcription_training": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Automation Training is disabled."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "structured_text_min_training_records",
+        "type": "integer",
+        "title": "Structured Text Min Training Records",
+        "value": 2000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_text_max_training_records",
+        "type": "integer",
+        "title": "Structured Text Max Training Records",
+        "value": 50000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_text_target_accuracy",
+        "type": "TranscriptionTargetAccuracy",
+        "title": "Structured Text Target Accuracy",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "entry",
+          "min_training_records_prop": "structured_text_min_training_records",
+          "training_period_prop": "structured_transcription_training_period"
+        }
+      },
+      {
+        "name": "structured_text_automation",
+        "type": "TranscriptionAutomation",
+        "title": "Structured Text Automation",
+        "description": "This number shows the amount of automation you will get based on the target accuracy.",
+        "value": 0,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "entry",
+          "target_accuracy_prop": "structured_text_target_accuracy",
+          "min_training_records_prop": "structured_text_min_training_records",
+          "training_period_prop": "structured_transcription_training_period"
+        },
+        "ui": {
+          "disabled": true
+        }
+      },
+      {
+        "name": "structured_text_threshold",
+        "type": "TranscriptionThreshold",
+        "title": "Structured Text Threshold",
+        "value": 0.52,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "entry",
+          "target_accuracy_prop": "structured_text_target_accuracy",
+          "training_period_prop": "structured_transcription_training_period"
+        }
+      },
+      {
+        "name": "structured_min_leg_threshold",
+        "type": "number",
+        "title": "Structured Text Minimum Legibility Threshold",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      {
+        "name": "structured_checkbox_min_training_records",
+        "type": "integer",
+        "title": "Structured Checkbox Min Training Records",
+        "value": 2000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_checkbox_max_training_records",
+        "type": "integer",
+        "title": "Structured Checkbox Max Training Records",
+        "value": 50000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_checkbox_target_accuracy",
+        "type": "TranscriptionTargetAccuracy",
+        "title": "Structured Checkbox Target Accuracy",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "checkbox",
+          "min_training_records_prop": "structured_checkbox_min_training_records",
+          "training_period_prop": "structured_transcription_training_period"
+        }
+      },
+      {
+        "name": "structured_checkbox_automation",
+        "type": "TranscriptionAutomation",
+        "title": "Structured Checkbox Automation",
+        "description": "This number shows the amount of automation you will get based on the target accuracy.",
+        "value": 0,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "checkbox",
+          "target_accuracy_prop": "structured_checkbox_target_accuracy",
+          "min_training_records_prop": "structured_checkbox_min_training_records",
+          "training_period_prop": "structured_transcription_training_period"
+        },
+        "ui": {
+          "disabled": true
+        }
+      },
+      {
+        "name": "structured_checkbox_threshold",
+        "type": "TranscriptionThreshold",
+        "title": "Structured Checkbox Threshold",
+        "value": 0.56,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "checkbox",
+          "target_accuracy_prop": "structured_checkbox_target_accuracy",
+          "training_period_prop": "structured_transcription_training_period"
+        }
+      },
+      {
+        "name": "checkbox_min_leg_threshold",
+        "type": "number",
+        "title": "Structured Checkbox Minimum Legibility Threshold",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      {
+        "name": "structured_signature_min_training_records",
+        "type": "integer",
+        "title": "Structured Signature Min Training Records",
+        "value": 2000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_signature_max_training_records",
+        "type": "integer",
+        "title": "Structured Signature Max Training Records",
+        "value": 50000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "structured_signature_target_accuracy",
+        "type": "TranscriptionTargetAccuracy",
+        "title": "Structured Signature Target Accuracy",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "signature",
+          "min_training_records_prop": "structured_signature_min_training_records",
+          "training_period_prop": "structured_transcription_training_period"
+        }
+      },
+      {
+        "name": "structured_signature_automation",
+        "type": "TranscriptionAutomation",
+        "title": "Structured Signature Automation",
+        "description": "This number shows the amount of automation you will get based on the target accuracy.",
+        "value": 0,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "signature",
+          "target_accuracy_prop": "structured_signature_target_accuracy",
+          "min_training_records_prop": "structured_signature_min_training_records",
+          "training_period_prop": "structured_transcription_training_period"
+        },
+        "ui": {
+          "disabled": true
+        }
+      },
+      {
+        "name": "structured_signature_threshold",
+        "type": "TranscriptionThreshold",
+        "title": "Structured Signature Threshold",
+        "value": 0.99,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "signature",
+          "target_accuracy_prop": "structured_signature_target_accuracy",
+          "training_period_prop": "structured_transcription_training_period"
+        }
+      },
+      {
+        "name": "signature_min_leg_threshold",
+        "type": "number",
+        "title": "Structured Signature Minimum Legibility Threshold",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      {
+        "name": "semi_structured_transcription_training",
+        "type": "TranscriptionAutomationTraining",
+        "title": "Transcription Automation Training",
+        "description": "Uses QA data for on-premise machine learning to improve transcription automation.",
+        "value": true,
+        "schema": {
+          "type": "boolean",
+          "training_type": "semi_structured"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_transcription_training_period",
+        "type": "integer",
+        "title": "Period of records to use",
+        "value": 30,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "prefix": "Past",
+          "suffix": "days"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "semi_structured_transcription_training": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Automation Training is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_improved_transcr_threshold_accuracy",
+        "type": "boolean",
+        "title": "Improved threshold accuracy",
+        "value": true,
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "semi_structured_transcription_training": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "na_reason": "Not applied when Transcription Automation Training is disabled."
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_text_min_training_records",
+        "type": "integer",
+        "title": "Semi-Structured Text Min Training Records",
+        "value": 2000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_text_max_training_records",
+        "type": "integer",
+        "title": "Semi-Structured Text Max Training Records",
+        "value": 50000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_text_target_accuracy",
+        "type": "TranscriptionTargetAccuracy",
+        "title": "Semi-Structured Text Target Accuracy",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_entry",
+          "min_training_records_prop": "semi_structured_text_min_training_records",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_text_automation",
+        "type": "TranscriptionAutomation",
+        "title": "Semi-Structured Text Automation",
+        "description": "This number shows the amount of automation you will get based on the target accuracy.",
+        "value": 0,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_entry",
+          "target_accuracy_prop": "semi_structured_text_target_accuracy",
+          "min_training_records_prop": "semi_structured_text_min_training_records",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "ui": {
+          "disabled": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_text_threshold",
+        "type": "TranscriptionThreshold",
+        "title": "Semi-Structured Text Threshold",
+        "value": 0.52,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_entry",
+          "target_accuracy_prop": "semi_structured_text_target_accuracy",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_min_leg_threshold",
+        "type": "number",
+        "title": "Semi-Structured Text Minimum Legibility Threshold",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_table_min_training_records",
+        "type": "integer",
+        "title": "Table Min Training Records",
+        "value": 2000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_table_max_training_records",
+        "type": "integer",
+        "title": "Table Max Training Records",
+        "value": 50000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_table_target_accuracy",
+        "type": "TranscriptionTargetAccuracy",
+        "title": "Table Target Accuracy",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_table_entry",
+          "min_training_records_prop": "semi_structured_table_min_training_records",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_table_automation",
+        "type": "TranscriptionAutomation",
+        "title": "Table Automation",
+        "description": "This number shows the amount of automation you will get based on the target accuracy.",
+        "value": 0,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_table_entry",
+          "target_accuracy_prop": "semi_structured_table_target_accuracy",
+          "min_training_records_prop": "semi_structured_table_min_training_records",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "ui": {
+          "disabled": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_table_threshold",
+        "type": "TranscriptionThreshold",
+        "title": "Table Threshold",
+        "value": 0.52,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_table_entry",
+          "target_accuracy_prop": "semi_structured_table_target_accuracy",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_table_min_leg_threshold",
+        "type": "number",
+        "title": "Table Minimum Legibility Threshold",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_checkbox_min_training_records",
+        "type": "integer",
+        "title": "Semi-Structured Checkbox Min Training Records",
+        "value": 2000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_checkbox_max_training_records",
+        "type": "integer",
+        "title": "Semi-Structured Checkbox Max Training Records",
+        "value": 50000,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_checkbox_target_accuracy",
+        "type": "TranscriptionTargetAccuracy",
+        "title": "Semi-Structured Checkbox Target Accuracy",
+        "value": 0.95,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_checkbox",
+          "min_training_records_prop": "semi_structured_checkbox_min_training_records",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_checkbox_automation",
+        "type": "TranscriptionAutomation",
+        "title": "Semi-Structured Checkbox Automation",
+        "description": "This number shows the amount of automation you will get based on the target accuracy.",
+        "value": 0,
+        "schema": {
+          "type": "number",
+          "multipleOf": 0.001,
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_checkbox",
+          "target_accuracy_prop": "semi_structured_checkbox_target_accuracy",
+          "min_training_records_prop": "semi_structured_checkbox_min_training_records",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "ui": {
+          "disabled": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_checkbox_threshold",
+        "type": "TranscriptionThreshold",
+        "title": "Semi-Structured Checkbox Threshold",
+        "value": 0.56,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "entity_type": "flex_checkbox",
+          "target_accuracy_prop": "semi_structured_checkbox_target_accuracy",
+          "training_period_prop": "semi_structured_transcription_training_period"
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "semi_structured_checkbox_min_leg_threshold",
+        "type": "number",
+        "title": "Semi-Structured Checkbox Minimum Legibility Threshold",
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1003
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "notification_workflow_flexible_extraction",
+        "type": "FlowIdentifier",
+        "type_spec": {
+          "filter_roles": [
+            "notifications"
+          ],
+          "label": "If task needed"
+        },
+        "title": "Flexible Extraction Notification Flow",
+        "value": null,
+        "optional": true
+      },
+      {
+        "name": "flexible_extraction_supervision_transcription_masking",
+        "type": "boolean",
+        "title": "Flexible Extraction Transcription Masking",
+        "description": "Prevents users from inputting invalid characters during the Flexible Extraction task.",
+        "value": true
+      },
+      {
+        "name": "flexible_extraction_task_restrictions",
+        "type": "TaskRestrictions",
+        "title": "Default Task Restrictions",
+        "description": "Defines what users can access Supervision tasks created by this block.",
+        "optional": true
+      },
+      {
+        "name": "document_rendering_enabled",
+        "type": "boolean",
+        "title": "Document Rendering Enabled",
+        "description": "Enable document rendering",
+        "value": false,
+        "ui": {
+          "warning": "Enabling document rendering will result in a higher compute utilization and require more storage for storing all documents."
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1021
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "value": false,
+              "ui": {
+                "hide_and_retain": true,
+                "warning": "Document rendering feature is not available in your current license."
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "document_rendering_mime_type",
+        "type": "string",
+        "title": "Rendered Document Format",
+        "description": "Format in which the document will be rendered. Currently only PDF is supported.",
+        "value": "application/pdf",
+        "schema": {
+          "type": "string",
+          "oneOf": [
+            {
+              "title": "PDF",
+              "const": "application/pdf"
+            }
+          ]
+        },
+        "ui": {
+          "hidden": true
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1021
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "document_rendering_unit",
+        "type": "number",
+        "title": "Document Measurement Unit",
+        "description": "Unit of measurement for the document rendering.",
+        "value": "in",
+        "schema": {
+          "type": "string",
+          "oneOf": [
+            {
+              "title": "Inches",
+              "const": "in"
+            },
+            {
+              "title": "Millimeters",
+              "const": "mm"
+            }
+          ]
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1021
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "document_rendering_width",
+        "type": "number",
+        "title": "Document Width",
+        "description": "Width of the rendered document.",
+        "value": 8.5,
+        "optional": true,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 600
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1021
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_unit": {
+                  "const": "in"
+                }
+              }
+            },
+            "override": {
+              "value": 8.5
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_unit": {
+                  "const": "mm"
+                }
+              }
+            },
+            "override": {
+              "value": 215.9
+            }
+          }
+        ]
+      },
+      {
+        "name": "document_rendering_height",
+        "type": "number",
+        "title": "Document Height",
+        "description": "Height of the rendered document.",
+        "value": 11,
+        "optional": true,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 600
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1021
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_unit": {
+                  "const": "in"
+                }
+              }
+            },
+            "override": {
+              "value": 11
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_unit": {
+                  "const": "mm"
+                }
+              }
+            },
+            "override": {
+              "value": 279.4
+            }
+          }
+        ]
+      },
+      {
+        "name": "document_rendering_quality",
+        "type": "integer",
+        "title": "Quality",
+        "description": "Quality of pages (images) appended to the resulting document as a percentage (recommended 50%). Higher quality results in a larger file size for the generated PDF.",
+        "value": 50,
+        "optional": true,
+        "schema": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 100
+        },
+        "dependencies": [
+          {
+            "condition": {
+              "properties": {
+                "document_rendering_enabled": {
+                  "const": false
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hidden": true
+              }
+            }
+          },
+          {
+            "condition": {
+              "properties": {
+                "$hs_validation_context": {
+                  "properties": {
+                    "license": {
+                      "properties": {
+                        "available_features": {
+                          "not": {
+                            "allOf": [
+                              {
+                                "contains": {
+                                  "const": 1021
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "override": {
+              "ui": {
+                "hide_and_retain": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "reprocessing_enabled",
+        "type": "boolean",
+        "title": "Reprocessing Enabled",
+        "value": true
+      },
+      {
+        "name": "submission",
+        "type": "object",
+        "title": "Submission",
+        "optional": true
+      }
+    ],
+    "ui": {
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAMbGlDQ1BJQ0MgUHJvZmlsZQAASImVVwdYU8kWnluSkJDQAhGQEnoTRHqREkKLVKmCjZAEEkqMCUHFhsqigmsXUbChqyCKrq6ALCpiL4ti74sFFWVd1EVRVN6EBHTdV753vm/u/Dlz5j8lM/fOAKDZx5VIclAtAHLFedK4sCDmhJRUJukZIAAq0AT2wJzLk0lYsbGRAMpQ/3d5dwMgiv6qo4Lrn+P/VXT4AhkPAGQSxOl8GS8X4hYA8EqeRJoHAFGht5iRJ1HgQoh1pTBAiNcqcKYSVytwuhI3D9okxLEhvgyAGpXLlWYCoHEP6pn5vEzIo/EJYmcxXyQGQHMUxP48IZcPsSL2Ubm50xS4HGJbaC+BGMYDvNK/4cz8G3/6MD+XmzmMlXkNilqwSCbJ4c76P0vzvyU3Rz7kwxo2qlAaHqfIH9bwVva0CAWmQtwtTo+OUdQa4j4RX1l3AFCKUB6eqLRHjXgyNqwfYEDszOcGR0BsBHGoOCc6UqVPzxCFciCGqwWdKcrjJECsD/ESgSwkXmWzVTotTuULrc+Qslkq/VmudNCvwtcDeXYiS8X/RijgqPgxjQJhQjLEFIgt80VJ0RBrQOwky46PUNmMLRCyo4dspPI4RfyWEMcJxGFBSn4sP0MaGqeyL8mVDeWLbRWKONEqfCBPmBCurA92kscdjB/mgl0WiFmJQzwC2YTIoVz4guAQZe7Yc4E4MV7F0yfJC4pTzsUpkpxYlT1uLsgJU+jNIXaT5cer5uJJeXBxKvnxDElebIIyTrwgizsuVhkPvhJEAjYIBkwghy0dTANZQNTW3dANfylHQgEXSEEmEABHlWZoRvLgiBg+40EB+AMiAZANzwsaHBWAfKj/PKxVPh1BxuBo/uCMbPAU4lwQAXLgb/ngLPGwtyTwBGpE//DOhY0H482BTTH+7/VD2q8aFtREqjTyIY9MzSFLYggxmBhODCXa4Ya4P+6LR8JnIGwuuBfuPZTHV3vCU0I74RHhOqGDcHuqaKH0uyijQAfkD1XVIv3bWuDWkNMdD8L9IDtkxhm4IXDE3aAfFh4APbtDLVsVt6IqzO+4/5bBN/+Gyo7sTEbJI8iBZNvvZ2rYa7gPsyhq/W19lLGmD9ebPTzyvX/2N9Xnwz7ie0tsCXYQO4Mdx85hzVgDYGLHsEbsInZEgYdX15PB1TXkLW4wnmzII/qHP67Kp6KSMuda5y7nT8qxPMHMPMXGY0+TzJKKMoV5TBb8OgiYHDHPaRTTxdnFFQDFt0b5+nrLGPyGIIzzX3WLzADwmzUwMND8VRcB37kHj8Dtf+erzqYTvibOA3B2PU8uzVfqcMWDAN8SmnCnGQATYAFsYT4uwAP4gkAQAsaBGJAAUsAUWGUhXOdSMAPMAQtAMSgFK8E6sBFsAdtBNdgLDoAG0AyOg9PgArgMroO7cPV0gpegB7wD/QiCkBAaQkcMEFPECnFAXBAvxB8JQSKROCQFSUMyETEiR+Ygi5BSZDWyEdmG1CA/I4eR48g5pB25jTxEupA3yEcUQ6moLmqMWqOjUS+UhUagCehkNBOdjhagRehytBytQveg9ehx9AJ6He1AX6K9GMDUMQZmhjliXhgbi8FSsQxMis3DSrAyrAqrw5rg/3wV68C6sQ84EafjTNwRruBwPBHn4dPxefgyfCNejdfjJ/Gr+EO8B/9CoBGMCA4EHwKHMIGQSZhBKCaUEXYSDhFOwb3USXhHJBIZRBuiJ9yLKcQs4mziMuIm4j5iC7Gd+JjYSyKRDEgOJD9SDIlLyiMVkzaQ9pCOka6QOkl9aupqpmouaqFqqWpitYVqZWq71Y6qXVF7ptZP1iJbkX3IMWQ+eRZ5BXkHuYl8idxJ7qdoU2wofpQEShZlAaWcUkc5RblHeauurm6u7q0+Xl2kXqherr5f/az6Q/UPVB2qPZVNnUSVU5dTd1FbqLepb2k0mjUtkJZKy6Mtp9XQTtAe0Po06BpOGhwNvsZ8jQqNeo0rGq80yZpWmizNKZoFmmWaBzUvaXZrkbWstdhaXK15WhVah7VuavVq07XHaMdo52ov096tfU77uQ5Jx1onRIevU6SzXeeEzmM6Rregs+k8+iL6DvopeqcuUddGl6ObpVuqu1e3TbdHT0fPTS9Jb6Zehd4RvQ4GxrBmcBg5jBWMA4wbjI8jjEewRghGLB1RN+LKiPf6I/UD9QX6Jfr79K/rfzRgGoQYZBusMmgwuG+IG9objjecYbjZ8JRh90jdkb4jeSNLRh4YeccINbI3ijOabbTd6KJRr7GJcZixxHiD8QnjbhOGSaBJlslak6MmXaZ0U39Tkela02OmL5h6TBYzh1nOPMnsMTMyCzeTm20zazPrN7cxTzRfaL7P/L4FxcLLIsNirUWrRY+lqWWU5RzLWss7VmQrLyuh1XqrM1bvrW2sk60XWzdYP7fRt+HYFNjU2tyzpdkG2E63rbK9Zke087LLtttkd9ketXe3F9pX2F9yQB08HEQOmxzaRxFGeY8Sj6oaddOR6shyzHesdXzoxHCKdFro1OD0arTl6NTRq0afGf3F2d05x3mH890xOmPGjVk4pmnMGxd7F55Lhcs1V5prqOt810bX124ObgK3zW633OnuUe6L3VvdP3t4ekg96jy6PC090zwrPW966XrFei3zOutN8A7ynu/d7P3Bx8Mnz+eAz5++jr7Zvrt9n4+1GSsYu2PsYz9zP67fNr8Of6Z/mv9W/44AswBuQFXAo0CLQH7gzsBnLDtWFmsP61WQc5A06FDQe7YPey67JRgLDgsuCW4L0QlJDNkY8iDUPDQztDa0J8w9bHZYSzghPCJ8VfhNjjGHx6nh9IzzHDd33MkIakR8xMaIR5H2kdLIpig0alzUmqh70VbR4uiGGBDDiVkTcz/WJnZ67K/jieNjx1eMfxo3Jm5O3Jl4evzU+N3x7xKCElYk3E20TZQntiZpJk1Kqkl6nxycvDq5Y8LoCXMnXEgxTBGlNKaSUpNSd6b2TgyZuG5i5yT3ScWTbky2mTxz8rkphlNyphyZqjmVO/VgGiEtOW132iduDLeK25vOSa9M7+Gxeet5L/mB/LX8LoGfYLXgWYZfxuqM55l+mWsyu4QBwjJht4gt2ih6nRWetSXrfXZM9q7sgZzknH25arlpuYfFOuJs8clpJtNmTmuXOEiKJR3Tfaavm94jjZDulCGyybLGPF14qL8ot5X/IH+Y759fkd83I2nGwZnaM8UzL86yn7V01rOC0IKfZuOzebNb55jNWTDn4VzW3G3zkHnp81rnW8wvmt9ZGFZYvYCyIHvBbwudF65e+Nei5EVNRcZFhUWPfwj7obZYo1hafHOx7+ItS/AloiVtS12Xblj6pYRfcr7UubSs9NMy3rLzP475sfzHgeUZy9tWeKzYvJK4UrzyxqqAVdWrtVcXrH68JmpN/Vrm2pK1f62buu5cmVvZlvWU9fL1HeWR5Y0bLDes3PBpo3Dj9Yqgin2VRpVLK99v4m+6sjlwc90W4y2lWz5uFW29tS1sW32VdVXZduL2/O1PdyTtOPOT1081Ow13lu78vEu8q6M6rvpkjWdNzW6j3Stq0Vp5bdeeSXsu7w3e21jnWLdtH2Nf6X6wX77/xc9pP984EHGg9aDXwbpfrH6pPEQ/VFKP1M+q72kQNnQ0pjS2Hx53uLXJt+nQr06/7mo2a644ondkxVHK0aKjA8cKjvW2SFq6j2cef9w6tfXuiQknrp0cf7LtVMSps6dDT584wzpz7Kzf2eZzPucOn/c633DB40L9RfeLh35z/+1Qm0db/SXPS42XvS83tY9tP3ol4Mrxq8FXT1/jXLtwPfp6+43EG7duTrrZcYt/6/ntnNuv7+Tf6b9beI9wr+S+1v2yB0YPqn63+31fh0fHkYfBDy8+in909zHv8csnsiefOoue0p6WPTN9VvPc5XlzV2jX5RcTX3S+lLzs7y7+Q/uPyle2r375M/DPiz0TejpfS18PvFn21uDtrr/c/mrtje198C73Xf/7kj6DvuoPXh/OfEz++Kx/xifSp/LPdp+bvkR8uTeQOzAg4Uq5g0cBDDY0IwOAN7sAoKUAQIdnCMpE5V1wUBDl/XUQgf+ElffFQfEAoA52imM8uwWA/bBZF0Ju2CuO8AmBAHV1HW4qkWW4uii5qPAmROgbGHhrDACpCYDP0oGB/k0DA593wGBvA9AyXXkHVQgR3hm2BivQ7TWTC8F3oryffpPj9z1QROAGvu//BRpQkXCiEKuZAAADSUlEQVRoBe1bvW4iMRA26Fqi66GgJDwAob0XQAc1KJcHgBYKWhA8ANT8tcADAEJXEkW6knSHRNKfoIf4s86RsQhnBvuWrHakZe3dsWc+z9hjzyYhxukrp5ubmx8oou4H2u/3q/V63fkCMBzcL36Lo+wXCoVCLBaLxUNxTrvd7rdfgGk4VmHtge+qAcDPbtLAgoEFr3wEfO+iItBfaoRUKsXu7u5YNBo17mq5XLLpdMpeX1+N21AYLwr0ANRqtVgymaTIZi8vL6xQKLgESQ/0ANfv98ngMCJ8KyX6OMfy544keQ4Wi0Wh4LkCdX4JMpFI6K+s1Ekuyjfn7Onp6V0BzKN8Pm/kao1Gg+Vyufe2srDZbEQfz8/P8pGNO81FI5HIgfDRaGQE7qCRVsGgDQYDZtuSZBfV9CNX1VXUBUjPAequLUFms1nyoKkNPQd4bP4CZLPZZDZAeg4Q81mCRPBXyQZIKzsZVSmUEdfu7++RChGvFosFG4/HoqzOOTwAX7fbFSAR9BFbb29vBS9+ABIk24vKGT9OALbb7QMlZViAklhxEUMllUolhusUASQs3ev1TrEdfefERaXlVIlIAoFgwXq9rr4yKj88PBjx6UxOLFgul1m1WhWjDoEANZlM3mV3Oh1Rhnu63KZBiBOAj4+PLJPJCBAf/QDkcDhk6XT6w+COVRRbuUvICUBThbbbrbCsal21LY5hlwJ0MgdVJb0uO7GgHiZMQKqhxITflMcJQD1MmCiDUILVFzHRJjlx0WNhwkRpFyuqEwvWajURvPVj1SmQCCW2rQd5TgAimYTrGsiJi14DMKmD7wE6cdEgTEj/Ue7qiUN5fHHRiYtSw4R6DrwY2d8OnLhoECZsmcegHycuaiD3v7F8GoDIfFOIBBDnOJVwMLW9j0Sf+CQnCV+iKERaZDCaON5IBXAonc/nFPnGbWazmTGvykiyIDqoVCoi16J25qqMfS2ycRQiA8TuX0+7UxT4VxvkbpDEohLp85kuDK5qI3+i9ossN6aBnu1WeQzKKysADQR5xUL7PuiVthS55DlIEeZFmwCgF6NuU2ZgQZuj6UVffrfgn/CKEx9ZXL4j/rfoP8VmOxwOf+OV7xyhr/6tgJ9AOm+LQDKbDr467wAAAABJRU5ErkJggg==",
+      "groups": [
+        {
+          "title": "File Filter",
+          "fields": [
+            "file_filter_filter_type",
+            "file_filter_minimum_image_width",
+            "file_filter_minimum_image_height",
+            "file_filter_minimum_file_size_kb",
+            "file_filter_file_extensions_action",
+            "file_filter_file_extensions",
+            "file_filter_file_extensions_other"
+          ]
+        },
+        {
+          "title": "Submission Bootstrap",
+          "fields": [
+            "notification_workflow_initialization",
+            "submission_bootstrap_s3_config",
+            "submission_bootstrap_s3_endpoint_url",
+            "submission_bootstrap_ocs_config",
+            "submission_bootstrap_http_config",
+            "submission_bootstrap_abs_auth_type",
+            "submission_bootstrap_abs_account_url",
+            "submission_bootstrap_abs_tenant_id",
+            "submission_bootstrap_abs_client_id",
+            "submission_bootstrap_abs_client_secret",
+            "submission_bootstrap_abs_authority_host",
+            "submission_bootstrap_abs_account_key",
+            "submission_bootstrap_abs_account_name"
+          ]
+        },
+        {
+          "title": "Collation",
+          "fields": [
+            "machine_collation_dedupe_files",
+            "machine_collation_retention_period",
+            "machine_collation_refresh_retention_period"
+          ]
+        },
+        {
+          "title": "Classification",
+          "fields": [
+            "structured_layout_match_threshold",
+            "semi_structured_classification",
+            "manual_nlc_enabled",
+            "semi_target_accuracy",
+            "semi_doc_grouping_logic",
+            "semi_qa_sample_rate",
+            "machine_classification_rotation_correction_enabled",
+            "machine_classification_mobile_processing_enabled",
+            "machine_classification_file_transcription_enabled",
+            "notification_workflow_classification",
+            "manual_classification_task_restrictions",
+            "layout_id_dealbreaker",
+            "layout_id_dealbreaker_bypass"
+          ]
+        },
+        {
+          "title": "Identification",
+          "fields": [
+            "identification_target_accuracies",
+            "field_id_target_accuracy",
+            "table_id_target_accuracy",
+            "manual_field_id_enabled",
+            "field_id_qa_enabled",
+            "field_id_qa_sample_rate",
+            "table_id_qa_enabled",
+            "table_id_qa_sample_rate",
+            "notification_workflow_identification",
+            "manual_identification_task_restrictions"
+          ]
+        },
+        {
+          "title": "General Transcription",
+          "fields": [
+            "field_transcription_target_accuracies",
+            "manual_transcription_enabled",
+            "qa",
+            "auto_qa_sampling_rate_enabled",
+            "structured_entry_qa_sample_rate",
+            "structured_checkbox_qa_sample_rate",
+            "structured_signature_qa_sample_rate",
+            "semi_structured_qa_sample_rate",
+            "table_cell_transcription_qa_enabled",
+            "table_cell_transcription_qa_sample_rate",
+            "transcription_overrides",
+            "finetuning_only_trained_layouts",
+            "exclude_auto_transcribe_fields_from_qa",
+            "notification_workflow_transcription",
+            "manual_transcription_task_restrictions",
+            "manual_transcription_supervision_transcription_masking",
+            "manual_transcription_table_output_manual_review",
+            "manual_transcription_always_supervise_blank_cells",
+            "force_normalization_errors_to_sv",
+            "force_required_entries_to_sv"
+          ]
+        },
+        {
+          "title": "Structured Document Transcription",
+          "fields": [
+            "structured_transcription_training",
+            "structured_transcription_training_period",
+            "structured_improved_transcr_threshold_accuracy",
+            "structured_text_min_training_records",
+            "structured_text_max_training_records",
+            "structured_text_target_accuracy",
+            "structured_text_automation",
+            "structured_text_threshold",
+            "structured_min_leg_threshold",
+            "structured_checkbox_min_training_records",
+            "structured_checkbox_max_training_records",
+            "structured_checkbox_target_accuracy",
+            "structured_checkbox_automation",
+            "structured_checkbox_threshold",
+            "checkbox_min_leg_threshold",
+            "structured_signature_min_training_records",
+            "structured_signature_max_training_records",
+            "structured_signature_target_accuracy",
+            "structured_signature_automation",
+            "structured_signature_threshold",
+            "signature_min_leg_threshold"
+          ]
+        },
+        {
+          "title": "Semi-Structured Document Transcription",
+          "fields": [
+            "semi_structured_transcription_training",
+            "semi_structured_transcription_training_period",
+            "semi_structured_improved_transcr_threshold_accuracy",
+            "semi_structured_text_min_training_records",
+            "semi_structured_text_max_training_records",
+            "semi_structured_text_target_accuracy",
+            "semi_structured_text_automation",
+            "semi_structured_text_threshold",
+            "semi_structured_min_leg_threshold",
+            "semi_structured_table_min_training_records",
+            "semi_structured_table_max_training_records",
+            "semi_structured_table_target_accuracy",
+            "semi_structured_table_automation",
+            "semi_structured_table_threshold",
+            "semi_structured_table_min_leg_threshold",
+            "semi_structured_checkbox_min_training_records",
+            "semi_structured_checkbox_max_training_records",
+            "semi_structured_checkbox_target_accuracy",
+            "semi_structured_checkbox_automation",
+            "semi_structured_checkbox_threshold",
+            "semi_structured_checkbox_min_leg_threshold"
+          ]
+        },
+        {
+          "title": "Flexible Extraction",
+          "fields": [
+            "notification_workflow_flexible_extraction",
+            "flexible_extraction_supervision_transcription_masking",
+            "flexible_extraction_task_restrictions"
+          ]
+        },
+        {
+          "title": "Document Rendering",
+          "fields": [
+            "document_rendering_enabled",
+            "document_rendering_mime_type",
+            "document_rendering_unit",
+            "document_rendering_width",
+            "document_rendering_height",
+            "document_rendering_quality"
+          ]
+        },
+        {
+          "title": "Reprocessing",
+          "fields": [
+            "reprocessing_enabled"
+          ]
+        }
+      ]
+    },
+    "identifier": "CANCELLATION_CUSTOM_CORE_V44",
+    "roles": [
+      "supporting",
+      "idp_core"
+    ],
+    "output": [
+      {
+        "name": "submission",
+        "type": "Submission",
+        "title": "Submission",
+        "description": "The processed submission"
+      }
+    ],
+    "enable_overrides": true
+  },
+  "blocks": [
+    {
+      "identifier": "SUBMISSION_BOOTSTRAP_2",
+      "reference_name": "submission_bootstrap",
+      "input": {
+        "$trigger": "${workflow.input.$trigger}",
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "s3_config": "${workflow.input.submission_bootstrap_s3_config}",
+        "s3_endpoint_url": "${workflow.input.submission_bootstrap_s3_endpoint_url}",
+        "ocs_config": "${workflow.input.submission_bootstrap_ocs_config}",
+        "http_config": "${workflow.input.submission_bootstrap_http_config}",
+        "abs_auth_type": "${workflow.input.submission_bootstrap_abs_auth_type}",
+        "abs_account_url": "${workflow.input.submission_bootstrap_abs_account_url}",
+        "abs_tenant_id": "${workflow.input.submission_bootstrap_abs_tenant_id}",
+        "abs_client_id": "${workflow.input.submission_bootstrap_abs_client_id}",
+        "abs_client_secret": "${workflow.input.submission_bootstrap_abs_client_secret}",
+        "abs_authority_host": "${workflow.input.submission_bootstrap_abs_authority_host}",
+        "abs_account_name": "${workflow.input.submission_bootstrap_abs_account_name}",
+        "abs_account_key": "${workflow.input.submission_bootstrap_abs_account_key}",
+        "notification_workflow": "${workflow.input.notification_workflow_initialization}",
+        "workflow_uuid": "${workflow.input.workflow_uuid}",
+        "workflow_name": "${workflow.input.workflow_name}",
+        "workflow_version": "${workflow.input.workflow_version}",
+        "submission": "${workflow.input.submission}"
+      },
+      "title": "Submission Initialization",
+      "description": "Initialize submission and, if necessary, fetch and prepare external images or other submission data"
+    },
+    {
+      "identifier": "MACHINE_CLASSIFICATION_7",
+      "reference_name": "machine_classification",
+      "input": {
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "submission": "${submission_bootstrap.output.result.submission}",
+        "api_params": "${submission_bootstrap.output.result.api_params}",
+        "vpc_registration_threshold": "${workflow.input.structured_layout_match_threshold}",
+        "nlc_enabled": "${workflow.input.semi_structured_classification}",
+        "nlc_target_accuracy": "${workflow.input.semi_target_accuracy}",
+        "nlc_doc_grouping_logic": "${workflow.input.semi_doc_grouping_logic}",
+        "rotation_correction_enabled": "${workflow.input.machine_classification_rotation_correction_enabled}",
+        "mobile_processing_enabled": "${workflow.input.machine_classification_mobile_processing_enabled}",
+        "file_transcription_enabled": "${workflow.input.machine_classification_file_transcription_enabled}",
+        "layout_id_dealbreaker": "${workflow.input.layout_id_dealbreaker}",
+        "layout_id_dealbreaker_bypass": "${workflow.input.layout_id_dealbreaker_bypass}",
+        "manual_nlc_enabled": "${workflow.input.manual_nlc_enabled}"
+      },
+      "title": "Machine Classification",
+      "description": "Automatically classify documents"
+    },
+    {
+      "identifier": "MANUAL_CLASSIFICATION_7",
+      "reference_name": "manual_classification",
+      "input": {
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "manual_nlc_enabled": "${workflow.input.manual_nlc_enabled}",
+        "task_restrictions": "${workflow.input.manual_classification_task_restrictions}",
+        "api_params": "${submission_bootstrap.output.result.api_params}",
+        "submission": "${machine_classification.output.submission}",
+        "notification_workflow": "${workflow.input.notification_workflow_classification}",
+        "vpc_registration_threshold": "${workflow.input.structured_layout_match_threshold}",
+        "nlc_metadata": null
+      },
+      "title": "Manual Classification",
+      "description": "Manually classify documents that could not be automatically classified"
+    },
+    {
+      "identifier": "MACHINE_IDENTIFICATION_8",
+      "reference_name": "machine_identification",
+      "input": {
+        "submission": "${manual_classification.output.submission}",
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "api_params": "${submission_bootstrap.output.result.api_params}",
+        "manual_field_id_enabled": false,
+        "force_required_missing_entries_to_sv": "${workflow.input.force_required_entries_to_sv}",
+        "field_id_target_accuracy": "${workflow.input.field_id_target_accuracy}",
+        "table_id_target_accuracy": "${workflow.input.table_id_target_accuracy}",
+        "id_target_accuracies": "${workflow.input.identification_target_accuracies}"
+      },
+      "title": "Machine Identification",
+      "description": "Automatically locate fields on semi-structured documents"
+    },
+    {
+      "identifier": "MANUAL_IDENTIFICATION_5",
+      "reference_name": "manual_identification",
+      "input": {
+        "submission": "${machine_identification.output.submission}",
+        "api_params": "${submission_bootstrap.output.result.api_params}",
+        "manual_field_id_enabled": false,
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "notification_workflow": "${workflow.input.notification_workflow_identification}",
+        "task_restrictions": "${workflow.input.manual_identification_task_restrictions}"
+      },
+      "title": "Manual Identification",
+      "description": "Manually locate fields on semi-structured documents that could not be automatically located"
+    },
+    {
+      "identifier": "MACHINE_TRANSCRIPTION_9",
+      "reference_name": "machine_transcription",
+      "input": {
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "submission": "${manual_identification.output.submission}",
+        "api_params": "${submission_bootstrap.output.result.api_params}",
+        "transcription_model": "${workflow.input.transcription_model}",
+        "finetuning_only_trained_layouts": "${workflow.input.finetuning_only_trained_layouts}",
+        "force_normalization_errors_to_sv": "${workflow.input.force_normalization_errors_to_sv}",
+        "force_required_blank_entries_to_sv": "${workflow.input.force_required_entries_to_sv}",
+        "transcription_overrides": "${workflow.input.transcription_overrides}",
+        "structured_text_target_accuracy": "${workflow.input.structured_text_target_accuracy}",
+        "structured_text_confidence_threshold": "${workflow.input.structured_text_threshold}",
+        "structured_text_acceptable_confidence": "${workflow.input.structured_min_leg_threshold}",
+        "semi_structured_text_target_accuracy": "${workflow.input.semi_structured_text_target_accuracy}",
+        "semi_structured_text_confidence_threshold": "${workflow.input.semi_structured_text_threshold}",
+        "semi_structured_text_acceptable_confidence": "${workflow.input.semi_structured_min_leg_threshold}",
+        "semi_structured_table_target_accuracy": "${workflow.input.semi_structured_table_target_accuracy}",
+        "semi_structured_table_confidence_threshold": "${workflow.input.semi_structured_table_threshold}",
+        "semi_structured_table_acceptable_confidence": "${workflow.input.semi_structured_table_min_leg_threshold}",
+        "structured_checkbox_target_accuracy": "${workflow.input.structured_checkbox_target_accuracy}",
+        "structured_checkbox_confidence_threshold": "${workflow.input.structured_checkbox_threshold}",
+        "structured_checkbox_acceptable_confidence": "${workflow.input.checkbox_min_leg_threshold}",
+        "structured_signature_target_accuracy": "${workflow.input.structured_signature_target_accuracy}",
+        "structured_signature_confidence_threshold": "${workflow.input.structured_signature_threshold}",
+        "structured_signature_acceptable_confidence": "${workflow.input.signature_min_leg_threshold}",
+        "semi_structured_checkbox_target_accuracy": "${workflow.input.semi_structured_checkbox_target_accuracy}",
+        "semi_structured_checkbox_confidence_threshold": "${workflow.input.semi_structured_checkbox_threshold}",
+        "semi_structured_checkbox_acceptable_confidence": "${workflow.input.semi_structured_checkbox_min_leg_threshold}",
+        "field_target_accuracies": "${workflow.input.field_transcription_target_accuracies}",
+        "column_target_accuracies": "${workflow.input.column_transcription_target_accuracies}",
+        "always_supervise_blank_cells": "${workflow.input.manual_transcription_always_supervise_blank_cells}",
+        "manual_transcription_enabled": "${workflow.input.manual_transcription_enabled}"
+      },
+      "title": "Machine Transcription",
+      "description": "Automatically transcribe fields"
+    },
+    {
+      "identifier": "MANUAL_TRANSCRIPTION_5",
+      "reference_name": "manual_transcription",
+      "input": {
+        "submission": "${machine_transcription.output.submission}",
+        "api_params": "${submission_bootstrap.output.result.api_params}",
+        "task_restrictions": "${workflow.input.manual_transcription_task_restrictions}",
+        "manual_transcription_enabled": "${workflow.input.manual_transcription_enabled}",
+        "supervision_transcription_masking": "${workflow.input.manual_transcription_supervision_transcription_masking}",
+        "table_output_manual_review": "${workflow.input.manual_transcription_table_output_manual_review}",
+        "always_supervise_blank_cells": "${workflow.input.manual_transcription_always_supervise_blank_cells}",
+        "notification_workflow": "${workflow.input.notification_workflow_transcription}"
+      },
+      "title": "Manual Transcription",
+      "description": "Manually transcribe fields that could not be automatically transcribed"
+    },
+    {
+      "identifier": "PYTHON_3_14_CODE",
+      "reference_name": "build_supervision_template",
+      "input": {
+        "data": {
+          "submission": "${manual_transcription.output.submission}",
+          "hs_base_url": "${workflow.input.hs_base_url}",
+          "transaction_type_oneof": [
+            {
+              "const": "None",
+              "title": "-- None --"
+            },
+            {
+              "const": "Cancellation",
+              "title": "Cancellation"
+            },
+            {
+              "const": "Endorsement",
+              "title": "Endorsement"
+            },
+            {
+              "const": "Exception",
+              "title": "Exception"
+            },
+            {
+              "const": "Combination",
+              "title": "Combination(Cancellation and Endorsement)"
+            }
+          ],
+          "flat_cancellation_oneof": [
+            {
+              "const": "None",
+              "title": "-- None --"
+            },
+            {
+              "const": "Yes",
+              "title": "Yes"
+            },
+            {
+              "const": "No",
+              "title": "No"
+            }
+          ]
+        },
+        "code": "from typing import Any, Dict, List, Tuple\nfrom blocks.base_python_block import WFEngineTaskResult\nfrom blocks.types import BlockInputs\nfrom blocks.base_python_block import Block, WFEngineTask\n\n\n# Used to deserialize json inputs by the CCB\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    flat_cancellation_oneof: Any\n    hs_base_url: Any\n    submission: Any\n    transaction_type_oneof: Any\n\ndef _build_dynamic_template(\n    submission,\n    \n    # intent_oneof,\n    # intent_slots,\n    # policy_field_names,\n    # date_field_names,\n    hs_base_url=None,\n    transaction_type_oneof=None,\n    flat_cancellation_oneof=None,\n):\n    \"\"\"Build a minimal custom-supervision template: only the per-slot Intent\n    decision dropdowns. A banner row at the top renders a link back to the\n    Hyperscience submission detail page so reviewers can open the source\n    submission (and all attached documents) in a new tab.\n\n    The submission and field-name inputs are accepted for backward-\n    compatibility with the PythonBlock input contract but are unused.\n    \"\"\"\n\n    # Resolve submission id and full link URL (defensive against missing keys).\n    sub_id = None\n    if isinstance(submission, dict):\n        sub_id = submission.get(\"id\") or submission.get(\"submission_id\")\n    base_url = (hs_base_url or \"\").rstrip(\"/\")\n    link_url = (\n        f\"{base_url}/submissions/{sub_id}\"\n        if base_url and sub_id is not None\n        else None\n    )\n\n    inputs = []\n    groups = []\n\n    # Top banner: a transcription component whose visible TITLE carries the\n    # full submission URL as selectable plain text. HS populates the input\n    # box from ``data_identifier`` (not from ``value``), so the box itself\n    # will render empty -- but the URL printed in the title is selectable\n    # for copy/paste. HS still requires a well-formed UUID in\n    # ``data_identifier`` even for display-only components, so we pass the\n    # nil UUID.\n    # Top banner: a decision component with a single \"Acknowledge\" option.\n    # The decision component's title renders as a full-width label that\n    # wraps, so we put the full submission URL in the title. The dropdown\n    # below is functionally a no-op (single option, pre-selected) but is\n    # the only HS component type whose label reliably wraps long text.\n    # for i in range(1, intent_slots + 1):\n    #     s = str(i)\n    #     inputs.append({\n    #         \"name\": f\"intent_{s}\",\n    #         \"type\": \"decision\",\n    #         \"title\": f\"Intent {s}\",\n    #         \"relation\": {\"type\": \"document\"},\n    #         \"schema\": {\"oneOf\": intent_oneof},\n    #     })\n    #     groups.append({\"title\": \"\", \"fields\": [f\"intent_{s}\"]})\n\n    # Transaction Type dropdown: required reviewer selection that drives the\n    # 'Transaction Type' field on the downstream Salesforce payload.\n    tx_oneof = transaction_type_oneof or [\n        {\"const\": \"Cancellation\", \"title\": \"Cancellation\"},\n        {\"const\": \"Endorsement\", \"title\": \"Endorsement\"},\n        {\"const\": \"Exception\", \"title\": \"Exception\"},\n        {\"const\": \"Combination\", \"title\": \"Combination\"},\n    ]\n    inputs.append({\n        \"name\": \"transaction_type\",\n        \"type\": \"decision\",\n        \"title\": \"Transaction Type\",\n        \"relation\": {\"type\": \"document\"},\n        \"required\": True,\n        \"schema\": {\"oneOf\": tx_oneof},\n    })\n\n    inputs.append({\n        \"name\": \"multiple_transaction_type\",\n        \"type\": \"decision\",\n        \"title\": \"Multiple Transaction Type\",\n        \"relation\": {\"type\": \"document\"},\n        \"schema\": {\n            \"oneOf\": [\n                {\"const\": \"True\", \"title\": \"True\"},\n                {\"const\": \"False\", \"title\": \"False\"},\n            ]\n        },\n    })\n \n    inputs.append({\n        \"name\": \"flat_cancellation\",\n        \"type\": \"decision\",\n        \"title\": \"Flat Cancellation\",\n        \"relation\": {\"type\": \"document\"},\n        \"schema\": {\"oneOf\": flat_cancellation_oneof},\n    })\n\n    groups.append({\"title\": \"\", \"fields\": [\"transaction_type\", \"multiple_transaction_type\",\"flat_cancellation\"]})\n    \n\n    action = {\n        \"name\": \"cancellation_transaction_type\", # TODO udpate endorsement_intents to cancellation_instents?\n        \"display\": \"Cancellation Transaction Type\", # TODO update Cancellation Transaction Type to Cancellation Transaction Type?\n        \"input\": inputs,\n        \"ui\": {\"groups\": groups},\n    }\n    if link_url:\n        # Some HS UI versions render the action description prominently near\n        # the task header; this is a belt-and-braces second placement for the\n        # link in case the banner component is collapsed.\n        action[\"description\"] = f\"Submission link: {link_url}\"\n\n    return [\n        {\n            \"name\": \"three_column_template\",\n            \"version\": \"1.0\",\n            \"thumbnail\": {\"group_by_document\": True, \"group_by_case\": True},\n            \"action\": [action],\n        }\n    ]\n\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _build_dynamic_template(**task.inputData.dict())\n\n"
+      }
+    },
+    {
+      "identifier": "IDP_CUSTOM_SUPERVISION_2",
+      "reference_name": "transaction_supervision",
+      "input": {
+        "supervision_template": "${build_supervision_template.output.result}",
+        "data": {},
+        "task_purpose": "capture_transcription",
+        "submission": "${manual_transcription.output.submission}",
+        "task_restrictions": [],
+        "supervision_transcription_masking": true,
+        "page_ids": [],
+        "notification_workflow": "IDP_SUBMISSION_NOTIFY",
+        "chat_flow_identifier": null
+      },
+      "title": "IDP Custom Supervision",
+      "description": "IDP Custom Supervision"
+    },
+    {
+      "identifier": "PYTHON_3_14_CODE",
+      "reference_name": "merge_outputs",
+      "input": {
+        "data": {
+          "submission": "${transaction_supervision.output.submission}",
+          "decisions": "${transaction_supervision.output.decisions}"
+        },
+        "code": "from typing import Any, Dict, List, Tuple\nfrom blocks.base_python_block import WFEngineTaskResult\nfrom blocks.types import BlockInputs\nfrom blocks.base_python_block import Block, WFEngineTask\n\n\n# Used to deserialize json inputs by the CCB\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    decisions: Any\n    submission: Any\n\ndef _merge_outputs(submission: dict, decisions: dict) -> dict:\n    # Extract selected decision choices into a clean dictionary (e.g., {\"transaction_type\": \"Cancellation\"})\n    extracted_decisions = {}\n    for item in decisions.get(\"selected_choices\", []):\n        dc = item.get(\"decision_choice\", {})\n        decision_name = dc.get(\"decision\", {}).get(\"name\")\n        choice_name = dc.get(\"choice\", {}).get(\"name\")\n        if decision_name:\n            extracted_decisions[decision_name] = choice_name\n\n    # Attach to submission external_metadata (or inject into a specific document's fields)\n    # metadata = submission.get(\"external_metadata\") or {}\n    # metadata[\"custom_decisions\"] = extracted_decisions\n    # metadata[\"raw_decisions\"] = decisions\n    # submission[\"external_metadata\"] = metadata\n\n    submission[\"custom_decisions\"] = decisions\n\n    return submission\n\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _merge_outputs(**task.inputData.dict())\n\n"
+      }
+    },
+    {
+      "identifier": "SUBMISSION_COMPLETE_4",
+      "reference_name": "complete",
+      "input": {
+        "submission": "${merge_outputs.output.result}",
+        "is_reprocessing": false,
+        "nlc_qa_sampling_ratio": "${workflow.input.semi_qa_sample_rate}",
+        "field_id_qa_enabled": "${workflow.input.field_id_qa_enabled}",
+        "field_id_qa_sampling_ratio": "${workflow.input.field_id_qa_sample_rate}",
+        "table_id_qa_enabled": "${workflow.input.table_id_qa_enabled}",
+        "table_id_qa_sampling_ratio": "${workflow.input.table_id_qa_sample_rate}",
+        "transcription_qa_enabled": "${workflow.input.qa}",
+        "transcription_structured_entry_qa_sample_rate": "${workflow.input.structured_entry_qa_sample_rate}",
+        "transcription_structured_checkbox_qa_sample_rate": "${workflow.input.structured_checkbox_qa_sample_rate}",
+        "transcription_structured_signature_qa_sample_rate": "${workflow.input.structured_signature_qa_sample_rate}",
+        "transcription_semi_structured_qa_sample_rate": "${workflow.input.semi_structured_qa_sample_rate}",
+        "table_cell_transcription_qa_enabled": "${workflow.input.table_cell_transcription_qa_enabled}",
+        "table_cell_transcription_qa_sample_rate": "${workflow.input.table_cell_transcription_qa_sample_rate}",
+        "auto_qa_sampling_rate_enabled": "${workflow.input.auto_qa_sampling_rate_enabled}",
+        "exclude_auto_transcribe_fields_from_qa": "${workflow.input.exclude_auto_transcribe_fields_from_qa}"
+      },
+      "title": "Complete",
+      "description": "Finalize submission processing and update reporting data"
+    }
+  ],
+  "input": {
+    "layout_release_uuid": "1defda42-a878-4563-a904-c84cab0f7cc2",
+    "workflow_uuid": null,
+    "workflow_name": null,
+    "workflow_version": null,
+    "submission_bootstrap_s3_config": "${system.secrets.s3_downloader}",
+    "submission_bootstrap_ocs_config": "${system.secrets.ocs_downloader}",
+    "submission_bootstrap_http_config": null,
+    "notification_workflow_initialization": null,
+    "structured_layout_match_threshold": 0.6,
+    "semi_structured_classification": true,
+    "semi_target_accuracy": 0.99,
+    "manual_nlc_enabled": false,
+    "semi_doc_grouping_logic": "group_pages",
+    "semi_qa_sample_rate": 0.05,
+    "machine_classification_rotation_correction_enabled": true,
+    "machine_classification_mobile_processing_enabled": false,
+    "machine_classification_file_transcription_enabled": false,
+    "notification_workflow_classification": null,
+    "field_id_target_accuracy": 0.95,
+    "table_id_target_accuracy": 0.96,
+    "manual_field_id_enabled": true,
+    "notification_workflow_identification": null,
+    "field_id_qa_enabled": true,
+    "field_id_qa_sample_rate": 0.05,
+    "table_id_qa_enabled": true,
+    "table_id_qa_sample_rate": 0.05,
+    "structured_transcription_training": false,
+    "structured_improved_transcr_threshold_accuracy": true,
+    "structured_transcription_training_period": 30,
+    "semi_structured_transcription_training": false,
+    "semi_structured_transcription_training_period": 30,
+    "semi_structured_improved_transcr_threshold_accuracy": true,
+    "transcription_model": "IDP",
+    "structured_text_min_training_records": 5000,
+    "structured_text_max_training_records": 50000,
+    "structured_text_target_accuracy": 0.95,
+    "structured_text_threshold": 0.52,
+    "structured_min_leg_threshold": 0.1,
+    "semi_structured_text_min_training_records": 2000,
+    "semi_structured_text_max_training_records": 50000,
+    "semi_structured_text_target_accuracy": 0.95,
+    "semi_structured_text_threshold": 0.52,
+    "semi_structured_min_leg_threshold": 0.1,
+    "semi_structured_table_min_training_records": 2000,
+    "semi_structured_table_max_training_records": 50000,
+    "semi_structured_table_target_accuracy": 0.95,
+    "semi_structured_table_threshold": 0.52,
+    "semi_structured_table_min_leg_threshold": 0.1,
+    "structured_checkbox_min_training_records": 2000,
+    "structured_checkbox_max_training_records": 50000,
+    "structured_checkbox_target_accuracy": 0.95,
+    "structured_checkbox_threshold": 0.56,
+    "checkbox_min_leg_threshold": 0.5,
+    "structured_signature_min_training_records": 2000,
+    "structured_signature_max_training_records": 50000,
+    "structured_signature_target_accuracy": 0.95,
+    "structured_signature_threshold": 0.99,
+    "signature_min_leg_threshold": 0.5,
+    "semi_structured_checkbox_min_training_records": 2000,
+    "semi_structured_checkbox_max_training_records": 50000,
+    "semi_structured_checkbox_target_accuracy": 0.95,
+    "semi_structured_checkbox_threshold": 0.56,
+    "semi_structured_checkbox_min_leg_threshold": 0.5,
+    "manual_transcription_enabled": true,
+    "notification_workflow_transcription": null,
+    "manual_transcription_supervision_transcription_masking": true,
+    "manual_transcription_task_restrictions": [],
+    "manual_transcription_table_output_manual_review": false,
+    "manual_transcription_always_supervise_blank_cells": true,
+    "qa": true,
+    "structured_entry_qa_sample_rate": 0.05,
+    "structured_checkbox_qa_sample_rate": 0.05,
+    "structured_signature_qa_sample_rate": 0.05,
+    "semi_structured_qa_sample_rate": 0.05,
+    "exclude_auto_transcribe_fields_from_qa": false,
+    "table_cell_transcription_qa_enabled": true,
+    "table_cell_transcription_qa_sample_rate": 0.05,
+    "finetuning_only_trained_layouts": true,
+    "force_normalization_errors_to_sv": false,
+    "force_required_entries_to_sv": false,
+    "auto_qa_sampling_rate_enabled": false,
+    "notification_workflow_flexible_extraction": null,
+    "flexible_extraction_supervision_transcription_masking": true,
+    "flexible_extraction_task_restrictions": [],
+    "document_rendering_enabled": false,
+    "document_rendering_height": 11,
+    "document_rendering_width": 8.5,
+    "document_rendering_quality": 50,
+    "document_rendering_mime_type": "application/pdf",
+    "document_rendering_unit": "in",
+    "field_transcription_target_accuracies": [],
+    "identification_target_accuracies": [],
+    "layout_id_dealbreaker": false,
+    "layout_id_dealbreaker_bypass": false,
+    "reprocessing_enabled": true,
+    "file_filter_filter_type": "ALL_FILES",
+    "file_filter_minimum_image_width": null,
+    "file_filter_minimum_image_height": null,
+    "file_filter_minimum_file_size_kb": null,
+    "file_filter_file_extensions_action": "NONE",
+    "file_filter_file_extensions": null,
+    "file_filter_file_extensions_other": null
+  },
+  "description": "IDP Core subflow: standard pipeline (classification -> identification -> transcription) + custom supervision that captures cancellation transaction type per document."
+}
