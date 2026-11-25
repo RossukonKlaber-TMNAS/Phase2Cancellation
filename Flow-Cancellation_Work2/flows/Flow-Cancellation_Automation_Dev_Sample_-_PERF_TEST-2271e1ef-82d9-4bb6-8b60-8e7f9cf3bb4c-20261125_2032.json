@@ -1,0 +1,298 @@
+{
+  "metadata": {
+    "schema_version": 2,
+    "exported_from_hostname": "hs-uat.corp.tmnas.com",
+    "hs_tag": "41.0.35",
+    "hs_revision": "0abbb6e0345ea06bd2b34bf37f96375307f407c4",
+    "exported_version": 5,
+    "file_type": "flow_json"
+  },
+  "uuid": "2271e1ef-82d9-4bb6-8b60-8e7f9cf3bb4c",
+  "owner_email": "flows-sdk@hyperscience.com",
+  "title": "Cancellation Automation Dev Sample - PERF TEST",
+  "manifest": {
+    "input": [
+      {
+        "name": "layout_release_uuid",
+        "type": "ReleaseUUID",
+        "title": "Layout Release"
+      },
+      {
+        "name": "hs_base_url",
+        "type": "string",
+        "title": "Hyperscience UI base URL",
+        "description": "Used to render the 'Open submission in HS' link inside the Custom Supervision task. Override per environment.",
+        "value": "https://hs-dev.corp.tmnas.com",
+        "optional": true
+      },
+      {
+        "name": "perf_test_mode",
+        "type": "boolean",
+        "title": "Perf Test Mode (auto-fill supervision)",
+        "description": "TEMPORARY: When true, the custom supervision step is auto-filled with intent_1='Add_Named_Insured' + transaction_type='MidTermChange', and Policy Number / Effective Date / Instructions are populated with hardcoded values. Also set manual_field_id_enabled=false and manual_transcription_enabled=false for a fully hands-off run. Leave FALSE for regular UAT / prod runs.",
+        "value": false,
+        "optional": true
+      }
+    ],
+    "identifier": "DROPDOWN_TRANSACTION_TYPE_WRAPPER",
+    "roles": [
+      "idp"
+    ]
+  },
+  "blocks": [
+    {
+      "identifier": "CANCELLATION_CUSTOM_CORE_V44",
+      "reference_name": "__idp_core__",
+      "input": {
+        "layout_release_uuid": "${workflow.input.layout_release_uuid}",
+        "workflow_uuid": "${workflow.input.workflow_uuid}",
+        "workflow_name": "${workflow.input.workflow_name}",
+        "workflow_version": "${workflow.input.workflow_version}",
+        "submission_bootstrap_s3_config": null,
+        "submission_bootstrap_ocs_config": null,
+        "submission_bootstrap_http_config": null,
+        "notification_workflow_initialization": "IDP_SUBMISSION_NOTIFY",
+        "structured_layout_match_threshold": 0.66,
+        "semi_structured_classification": true,
+        "semi_target_accuracy": 0.95,
+        "manual_nlc_enabled": false,
+        "semi_doc_grouping_logic": "group_pages",
+        "semi_qa_sample_rate": 0.02,
+        "machine_classification_rotation_correction_enabled": true,
+        "machine_classification_mobile_processing_enabled": false,
+        "machine_classification_file_transcription_enabled": false,
+        "notification_workflow_classification": "IDP_SUBMISSION_NOTIFY",
+        "field_id_target_accuracy": 0.95,
+        "table_id_target_accuracy": 0.95,
+        "manual_field_id_enabled": true,
+        "notification_workflow_identification": "IDP_SUBMISSION_NOTIFY",
+        "field_id_qa_enabled": true,
+        "field_id_qa_sample_rate": 0.02,
+        "table_id_qa_enabled": true,
+        "structured_transcription_training": true,
+        "structured_improved_transcr_threshold_accuracy": true,
+        "structured_transcription_training_period": 30,
+        "semi_structured_transcription_training": true,
+        "semi_structured_transcription_training_period": 30,
+        "semi_structured_improved_transcr_threshold_accuracy": true,
+        "transcription_model": "IDP",
+        "structured_text_min_training_records": 5000,
+        "structured_text_max_training_records": 50000,
+        "structured_text_target_accuracy": 0.95,
+        "structured_text_threshold": 0.85,
+        "structured_min_leg_threshold": 0.1,
+        "semi_structured_text_min_training_records": 2000,
+        "semi_structured_text_max_training_records": 50000,
+        "semi_structured_text_target_accuracy": 0.85,
+        "semi_structured_text_threshold": 0.85,
+        "semi_structured_min_leg_threshold": 0.1,
+        "semi_structured_table_min_training_records": 2000,
+        "semi_structured_table_max_training_records": 50000,
+        "semi_structured_table_target_accuracy": 0.95,
+        "semi_structured_table_threshold": 0.85,
+        "semi_structured_table_min_leg_threshold": 0.1,
+        "structured_checkbox_min_training_records": 2000,
+        "structured_checkbox_max_training_records": 50000,
+        "structured_checkbox_target_accuracy": 0.95,
+        "structured_checkbox_threshold": 0.85,
+        "checkbox_min_leg_threshold": 0.5,
+        "structured_signature_min_training_records": 2000,
+        "structured_signature_max_training_records": 50000,
+        "structured_signature_target_accuracy": 0.95,
+        "structured_signature_threshold": 0.85,
+        "signature_min_leg_threshold": 0.5,
+        "semi_structured_checkbox_min_training_records": 2000,
+        "semi_structured_checkbox_max_training_records": 50000,
+        "semi_structured_checkbox_target_accuracy": 0.95,
+        "semi_structured_checkbox_threshold": 0.85,
+        "semi_structured_checkbox_min_leg_threshold": 0.5,
+        "manual_transcription_enabled": true,
+        "notification_workflow_transcription": "IDP_SUBMISSION_NOTIFY",
+        "manual_transcription_supervision_transcription_masking": true,
+        "manual_transcription_task_restrictions": [],
+        "manual_transcription_table_output_manual_review": false,
+        "manual_transcription_always_supervise_blank_cells": true,
+        "qa": true,
+        "structured_entry_qa_sample_rate": 0.01,
+        "structured_checkbox_qa_sample_rate": 0.01,
+        "structured_signature_qa_sample_rate": 0.01,
+        "semi_structured_qa_sample_rate": 0.02,
+        "exclude_auto_transcribe_fields_from_qa": false,
+        "table_cell_transcription_qa_enabled": true,
+        "table_cell_transcription_qa_sample_rate": 0,
+        "finetuning_only_trained_layouts": true,
+        "force_normalization_errors_to_sv": false,
+        "force_required_entries_to_sv": false,
+        "auto_qa_sampling_rate_enabled": false,
+        "notification_workflow_flexible_extraction": "IDP_SUBMISSION_NOTIFY",
+        "flexible_extraction_supervision_transcription_masking": true,
+        "flexible_extraction_task_restrictions": [],
+        "document_rendering_enabled": false,
+        "document_rendering_mime_type": "application/pdf",
+        "field_transcription_target_accuracies": [],
+        "identification_target_accuracies": [],
+        "layout_id_dealbreaker": false,
+        "layout_id_dealbreaker_bypass": false,
+        "file_filter_filter_type": "ALL_FILES",
+        "file_filter_minimum_image_width": null,
+        "file_filter_minimum_image_height": null,
+        "file_filter_minimum_file_size_kb": null,
+        "file_filter_file_extensions_action": "NONE",
+        "file_filter_file_extensions": null,
+        "file_filter_file_extensions_other": null,
+        "$trigger": "${workflow.input.$trigger}",
+        "hs_base_url": "${workflow.input.hs_base_url}",
+        "perf_test_mode": "${workflow.input.perf_test_mode}"
+      },
+      "title": "Start Document Processing Subflow",
+      "description": "Calls the Document Processing Subflow with the specified settings.",
+      "compatibility_spec": {
+        "filter_roles": [
+          "idp_core"
+        ]
+      }
+    },
+    {
+      "identifier": "PYTHON_3_12_CODE",
+      "reference_name": "log_pre_export",
+      "input": {
+        "data": {
+          "submission": "${__idp_core__.output.merge_outputs}"
+        },
+        "code": "\nfrom typing import Any\nimport hashlib\nimport json\nfrom blocks.base_python_block import WFEngineTaskResult\nfrom blocks.types import BlockInputs\nfrom blocks.base_python_block import Block, WFEngineTask\n\n\nclass CustomCodeBlockProxyInputs(BlockInputs):\n    submission: Any = None\n\n\ndef _log_pre_export(submission: Any) -> dict:\n    sub_id = None\n    external_id = None\n    doc_count = None\n    top_level_keys = None\n\n    if isinstance(submission, dict):\n        sub_id = submission.get('id')\n        external_id = submission.get('external_id')\n        docs = submission.get('documents')\n        if isinstance(docs, list):\n            doc_count = len(docs)\n        top_level_keys = list(submission.keys())\n\n    print(\n        f'[pre_export] submission_id={sub_id} '\n        f'external_id={external_id} '\n        f'documents_count={doc_count} '\n        f'top_level_keys={top_level_keys}'\n    )\n\n    # Log first doc id if present\n    if isinstance(submission, dict):\n        docs = submission.get('documents') or []\n        for i, doc in enumerate(docs[:3]):\n            doc_id = doc.get('id') if isinstance(doc, dict) else None\n            layout_name = doc.get('layout_name') if isinstance(doc, dict) else None\n            field_count = len(doc.get('document_fields') or []) if isinstance(doc, dict) else None\n            print(f'[pre_export] doc[{i}] id={doc_id} layout={layout_name} field_count={field_count}')\n\n    # Deterministic snapshot of the exact object routed to export.\n    payload_json = json.dumps(submission, separators=(',', ':'), sort_keys=True, ensure_ascii=False)\n    payload_bytes = len(payload_json.encode('utf-8'))\n    payload_sha256 = hashlib.sha256(payload_json.encode('utf-8')).hexdigest()\n    print(f'[pre_export_exact] bytes={payload_bytes} sha256={payload_sha256}')\n    print(f'[pre_export_exact_json]{payload_json}')\n\n    return submission\n\n\ndef process_task(\n    proxy: Block, task: WFEngineTask[CustomCodeBlockProxyInputs]\n) -> WFEngineTaskResult:\n    return _log_pre_export(task.inputData.submission)\n"
+      },
+      "title": "Log Pre Export",
+      "description": "Log submission shape before output block fires to confirm id and documents are present."
+    },
+    {
+      "identifier": "OUTPUTS",
+      "reference_name": "outputs",
+      "title": "Outputs",
+      "description": "Send submission data to external systems",
+      "role_filter": [
+        "idp_output"
+      ],
+      "input_template": {
+        "submission": "${log_pre_export.output.result}",
+        "enabled": true
+      },
+      "blocks": [
+        {
+          "identifier": "COB_HTTP_EXPORT",
+          "reference_name": "cob_http_export_b23b79af-8e79-47c8-8449-0525281f7edc",
+          "title": "HTTP Notifier Output Block 11/25/2026",
+          "description": "Added manually on 11/25/2026",
+          "enabled": true,
+          "input": {
+            "submission": "${log_pre_export.output.result}",
+            "enabled": true,
+            "api_version": "transformed",
+            "export_type": "SUBMISSION",
+            "authorization_type": "oauth_2_client_credentials",
+            "auth_url": "https://login.microsoftonline.com/8be8e238-f32a-4b1b-b02e-44d1b7db4632/oauth2/v2.0/token",
+            "client_id": "0588ea77-cb13-4d8d-ac57-8fe4656d92e3",
+            "client_secret": "${system.secrets.2271e1ef82d94bb68b608e7f9cf3bb4c__a203b2108fd84ce1ac7d1cefa2f5bcf1__client_secret}",
+            "endpoint": "https://npapim.nonprod.corp.tmnas.io/api-01-qa4-faphyperscience-001/SyncHSPolicyTxnToSF?subscription-key={secret_token}",
+            "endpoint_secrets": "${system.secrets.2271e1ef82d94bb68b608e7f9cf3bb4c__2d8b5a54c2734ea2a771e3f4b065929a__endpoint_secrets}",
+            "scope": "api://3eb38c44-fa7c-4d41-ba37-8d98b9d35969/.default"
+          }
+        }
+      ]
+    }
+  ],
+  "input": {
+    "layout_release_uuid": "4df85a6f-1d95-4029-83e3-3076cfde2ca7",
+    "hs_base_url": "https://hs-dev.corp.tmnas.com",
+    "perf_test_mode": false
+  },
+  "description": "Use this flow to manage your input and output connector configuration and document processing workflow settings.",
+  "triggers": {
+    "title": "Inputs",
+    "description": "Ingest submission data from an external source, and trigger submission processing",
+    "reference_name": "triggers",
+    "api_params_manifest": {
+      "input": [
+        {
+          "name": "restrictions",
+          "type": "TaskRestrictions",
+          "title": "Task Restrictions",
+          "description": "Supervision tasks for submissions created via this input connection will only be accessible to users associated with the specified Task Restrictions.",
+          "value": [],
+          "optional": true
+        },
+        {
+          "name": "goal_time_rule",
+          "type": "GoalTimeRule",
+          "title": "Submission Processing Deadline",
+          "description": "Dynamic processing deadline for submissions coming via this connection.This will impact how manual tasks get prioritized in the Work Queue.",
+          "value": null,
+          "optional": true
+        },
+        {
+          "name": "layout_uuid",
+          "type": "LayoutUUID",
+          "title": "Layout UUID",
+          "description": "The UUID of a Semi-Structured layout that's part of an active release can be specified. When specified, all submitted pages in the request will be matched to it and machine page classification will be skipped.",
+          "value": null,
+          "optional": true
+        },
+        {
+          "name": "fallback_layout_uuid",
+          "type": "LayoutUUID",
+          "title": "Fallback Layout UUID",
+          "description": "The UUID of a Semi-Structured layout that's part of an active release can be specified. When specified only pages that are not matched to a live Structured layout in the request will be matched to the specified Semi-structured layout.",
+          "value": null,
+          "optional": true
+        },
+        {
+          "name": "source_routing_tag_comma_separated",
+          "type": "string",
+          "title": "Source Tags",
+          "description": "Comma-separated values. Source tags can be used to filter what status change notifications are sent to each output connection.",
+          "value": null,
+          "optional": true
+        },
+        {
+          "name": "machine_only",
+          "type": "boolean",
+          "title": "Machine Only",
+          "description": "Process the submission using an automated flow only.",
+          "value": false
+        },
+        {
+          "name": "single_document_per_page",
+          "type": "boolean",
+          "title": "Single Document Per Page",
+          "description": "This parameter only applies to semi-structured documents. Force the creation of separate documents for each uploaded page in each file. For example, a single PNG image will produce a single document while a 3-page PDF file will always produce 3 separate documents under this scheme. It takes precedence over the flow's settings. By default, PNG and JPG files that match the same layout are combined into one document while only consecutive pages in a single PDF, TFF, or XPS matching the same layout will be grouped into the same document.",
+          "value": false
+        }
+      ],
+      "ui": {
+        "groups": [
+          {
+            "title": "Submission Processing Settings",
+            "fields": [
+              "restrictions",
+              "goal_time_rule",
+              "layout_uuid",
+              "fallback_layout_uuid",
+              "source_routing_tag_comma_separated",
+              "machine_only",
+              "single_document_per_page"
+            ]
+          }
+        ]
+      }
+    },
+    "blocks": []
+  },
+  "output": {
+    "submission": "${__idp_core__.output.submission}"
+  },
+  "error_handling": {
+    "block_error_retry_policy": null,
+    "on_error_flow": {
+      "identifier": "SUBMISSION_AWARE_ON_ERROR_FLOW_EXAMPLE"
+    }
+  }
+}

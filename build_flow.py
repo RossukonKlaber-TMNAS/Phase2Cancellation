@@ -579,8 +579,6 @@ def build_core_flow() -> Flow:
             python_version=SAAS_PYTHON_BLOCK_VERSION,
             code_input={
                 "submission": manual_transcription.output("submission"),
-                # "intent_oneof": INTENT_SCHEMA_ONEOF,
-                # "intent_slots": INTENT_SLOTS,
 
                 # Identify policy / effective-date fields by their layout field
                 # *name* (case-insensitive, zero-width-space tolerant). Names are
